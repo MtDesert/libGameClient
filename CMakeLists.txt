@@ -13,12 +13,6 @@ set(INCLUDE_LIST
 	Scenes #场景,提供公共的常见场景(如选择文件场景)
 )
 
-macro(dbg)
-	foreach(name ${LIBS_LIST})
-		message(${name})
-	endforeach()
-endmacro()
-
 set(INCLUDE_DIR_ONLY ON)
 if(COMPILE_GAME_CLIENT)
 	message(编译客户端游戏库${GAME_NAME})
@@ -28,8 +22,7 @@ if(COMPILE_GAME_CLIENT)
 	include(../lib${GAME_NAME}/CMakeLists.txt)#寻找对应游戏的工程目录
 	#库输出
 	add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
-	target_link_libraries(${PROJECT_NAME} ${LIBS_LIST} GamesClient ${GAME_NAME})
-	dbg()
+	target_link_libraries(${PROJECT_NAME} ${LIBS_LIST} GamesClient ${GAME_NAME} GamesEngines)
 else()
 	if(COMPILE_GAME_EXE)
 		message(编译执行程序)
