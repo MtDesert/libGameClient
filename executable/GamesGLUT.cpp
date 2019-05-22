@@ -237,7 +237,6 @@ int main(int argc,char* argv[]){
 	printGlutDeviceGet();
 	//OpenGL初始化
 	glScalef(2.0/width,2.0/height,1);//以原点为缩放源进行缩放,使得整个屏幕的坐标范围变成(-width/2,-height/2 ~ width/2,height/2)
-	glTranslatef(-width/2,-height/2,0);//原本屏幕的坐标范围为(-1,-1 ~ 1,1),此操作将原点移动到左下角,变成(0,0 ~ width,height)
 	//glEnable(GL_DEPTH_TEST);
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
