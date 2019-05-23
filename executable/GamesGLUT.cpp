@@ -81,7 +81,9 @@ void glutSpecialFunction(int key,int x,int y){specialFunction(key,true);}
 void glutSpecialUpFunction(int key,int x,int y){specialFunction(key,false);}
 
 //input-mouse
+#define GAME_MOUSE_MOVE game->mouseMove(x-game->resolution.x()/2,game->resolution.y()/2-y);
 void glutMouseFunction(int button,int state,int x,int y){
+	GAME_MOUSE_MOVE
 	switch(button){
 		case GLUT_LEFT_BUTTON:game->mouseKey(Game::Mouse_LeftButton,state==GLUT_DOWN);break;
 		case GLUT_MIDDLE_BUTTON:game->mouseKey(Game::Mouse_MiddleButton,state==GLUT_DOWN);break;
@@ -92,10 +94,10 @@ void glutMouseFunction(int button,int state,int x,int y){
 	}
 }
 void glutMotionFunction(int x,int y){
-	game->mouseMove(x,game->resolution.y()-y);
+	GAME_MOUSE_MOVE
 }
 void glutPassiveMotionFunction(int x,int y){
-	game->mouseMove(x,game->resolution.y()-y);
+	GAME_MOUSE_MOVE
 }
 //input-joystick
 void glutJoystickFunction(unsigned int buttonMask,int x, int y, int z){

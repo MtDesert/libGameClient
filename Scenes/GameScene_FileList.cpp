@@ -5,8 +5,7 @@
 GameScene_FileList::GameScene_FileList(){
 	auto &res=Game::resolution;
 	//标题,顶部居中
-	textTitle.position=res;
-	textTitle.position.x()/=2;
+	textTitle.position.y()=res.y()/2;
 	textTitle.anchorPoint.y()=1;
 	subObjects.push_back(&textTitle);
 	//路径
@@ -29,8 +28,8 @@ GameScene_FileList::GameScene_FileList(){
 	for(auto i=0;i<4;++i){
 		auto btn=buttons[i];
 		btn->setString(game->translate(names[i]));
-		btn->position.x() = btnWidth*i + btnWidth/2;
-		btn->position.y() = btn->buttonSize.y()/2;
+		btn->position.x() = btnWidth*i - btnWidth*3/2;
+		btn->position.y() = -res.y()/2 + btn->buttonSize.y()/2;
 		subObjects.push_back(btn);
 	}
 }

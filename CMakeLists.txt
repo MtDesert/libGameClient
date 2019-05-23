@@ -13,42 +13,44 @@ set(INCLUDE_LIST
 	Scenes #场景,提供公共的常见场景(如选择文件场景)
 )
 
-set(INCLUDE_DIR_ONLY ON)
-if(COMPILE_GAME_CLIENT)
+if(INCLUDE_DIR_ONLY)
+	includeDirAll(../libGamesClient/)
+	include(../libGamesEngines/CMakeLists.txt)
+elseif(COMPILE_GAME_CLIENT)
 	message(编译客户端游戏库${GAME_NAME})
 	project(${GAME_NAME}Client)
 	#包含目录
 	includeDirAll(../libGamesClient/)
+	set(INCLUDE_DIR_ONLY ON)
 	include(../lib${GAME_NAME}/CMakeLists.txt)#寻找对应游戏的工程目录
 	#库输出
 	add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
 	target_link_libraries(${PROJECT_NAME} ${LIBS_LIST} GamesClient ${GAME_NAME} GamesEngines)
-else()
-	if(COMPILE_GAME_EXE)
-		message(编译执行程序)
-		project(${GAME_NAME})
-		#包含依赖库的目录
-		includeDirAll(../libGamesClient/)
-		include(../libGamesEngines/CMakeLists.txt)
-		#设置共用库,给不同平台的可执行文件用
-		set(LIBS_LIST ${GAME_NAME} ${GAME_NAME}Client GamesClient GamesEngines ${LIBS_LIST})#把编译好的引擎添加到库中
-		set(GLUT_NAME glut)
-		if(${TARGET_SYSTEM_NAME} STREQUAL Windows)
-			set(GLUT_NAME freeglut)
-		endif()
-		set(LIBS_LIST ${LIBS_LIST} ${GLUT_NAME})
-		#以下为各种可执行文件的编译过程,根据情况选择编译自己需要的可执行文件即可
-		add_executable(GamesGLUT ./executable/GamesGLUT.cpp)
-		target_link_libraries(GamesGLUT ${LIBS_LIST})
-	else()
-		message(编译客户端库)
-		project(GamesClient)
-		#添加所有paths下的源码和头文件
-		srcIncludeAll()
-		#包含依赖库的目录
-		include(../libGamesEngines/CMakeLists.txt)
-		#库输出
-		add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
-		target_link_libraries(${PROJECT_NAME} ${LIBS_LIST} GamesEngines)
+elseif(COMPILE_GAME_EXE)
+	message(编译执行程序)
+	project(GamesExe)
+	#包含依赖库的目录
+	set(INCLUDE_DIR_ONLY ON)
+	include(../libGamesClient/CMakeLists.txt)
+	#设置共用库,给不同平台的可执行文件用
+	set(LIBS_LIST ${GAME_NAME} ${GAME_NAME}Client GamesClient GamesEngines ${LIBS_LIST})#把编译好的引擎添加到库中
+	set(GLUT_NAME glut)
+	if(${TARGET_SYSTEM_NAME} STREQUAL Windows)
+		set(GLUT_NAME freeglut)
 	endif()
+	set(LIBS_LIST ${LIBS_LIST} ${GLUT_NAME})
+	#以下为各种可执行文件的编译过程,根据情况选择编译自己需要的可执行文件即可
+	add_executable(GamesGLUT ./executable/GamesGLUT.cpp)
+	target_link_libraries(GamesGLUT ${LIBS_LIST})
+else()
+	message(编译客户端库)
+	project(GamesClient)
+	#添加所有paths下的源码和头文件
+	srcIncludeAll()
+	#包含依赖库的目录
+	set(INCLUDE_DIR_ONLY ON)
+	include(../libGamesEngines/CMakeLists.txt)
+	#库输出
+	add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
+	target_link_libraries(${PROJECT_NAME} ${LIBS_LIST} GamesEngines)
 endif()
