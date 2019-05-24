@@ -71,8 +71,8 @@ const char* Game::translate(const string &english)const{
 GameScene_FileList *Game::showScene_FileList(){
 	if(!sceneFileList){
 		sceneFileList=new GameScene_FileList();
+		subObjects.push_front(sceneFileList);
 	}
-	subObjects.push_front(sceneFileList);
 	return sceneFileList;
 }
 void Game::deleteScene_FileList(){
@@ -83,6 +83,18 @@ void Game::deleteScene_FileList(){
 	sceneFileList=nullptr;
 }
 
+void Game::joystickKey(JoystickKey key,bool pressed){
+	auto scene=findFirstGameScene();
+	if(scene)scene->joystickKey(key,pressed);
+}
+void Game::keyboardKey(Keyboard::KeyboardKey key,bool pressed){
+	auto scene=findFirstGameScene();
+	if(scene)scene->keyboardKey(key,pressed);
+}
+void Game::mouseKey(MouseKey key,bool pressed){
+	auto scene=findFirstGameScene();
+	if(scene)scene->mouseKey(key,pressed);
+}
 void Game::mouseMove(int x,int y){
 	mousePos.x()=x;
 	mousePos.y()=y;

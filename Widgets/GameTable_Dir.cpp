@@ -2,17 +2,34 @@
 #include"extern.h"
 
 enum ColumnType{
-	Filename,FileSize,AmountOfColumnType
+	FileName,FileSize,AmountOfColumnType
 };
 
 GameTable_Dir::GameTable_Dir(){
 	//设定数据源
 	renderItemAmount=10;
 	itemHeight=32;
-	entryBuffer=new DirectoryEntry[renderItemAmount];//创建缓冲
+	fileInfoBuffer=new FileInfo[renderItemAmount];
+	//关联控件
+	rect=rectF();
+	for(uint i=0;i<renderItemAmount;++i){
+		auto &fileName=fileInfoBuffer[i].fileName;
+		auto &fileSize=fileInfoBuffer[i].fileSize;
+		//文件名位置
+		fileName.anchorPoint.x()=0;
+		fileName.position.x()=rect.left();
+		fileName.position.y()=rect.top() - fileName.sizeF().y() * (i+0.5);
+		subObjects.push_back(&fileName);
+		//文件大小位置
+		fileSize.anchorPoint.x()=1;
+		fileSize.position.x()=rect.right();
+		fileSize.position.y()=fileName.position.y();
+		subObjects.push_back(&fileSize);
+	}
 }
 GameTable_Dir::~GameTable_Dir(){
-	delete []entryBuffer;//删除缓冲
+	subObjects.clear();
+	delete []fileInfoBuffer;//删除缓冲
 }
 
 bool GameTable_Dir::changeDir(const string &dirName){
@@ -22,42 +39,79 @@ bool GameTable_Dir::changeDir(const string &dirName){
 		directory.direntList.sortBy(DirentList::ByName);
 		renderItemStart=selectingItemIndex=0;
 		updateBuffer();
+		updateSelecting();
 	}
 	return b;
+}
+string GameTable_Dir::selectingFilename()const{
+	auto itr=getDirentItr(selectingItemIndex);
+	return itr==directory.direntList.end()?"":directory.toString() + "/" + itr->d_name;
+}
+const DirectoryEntry *GameTable_Dir::selectingDirectoryEntry()const{
+	auto itr=getDirentItr(selectingItemIndex);
+	return itr==directory.direntList.end() ? nullptr : &(*itr);
 }
 
 void GameTable_Dir::renderItem(uint x,uint y,const Rectangle2D<float> &rectArea)const{
 	switch(x){
+		case FileName:break;
 		case FileSize:break;
 	}
 }
 
+uint GameTable_Dir::rowAmount()const{return directory.direntList.size();}
 uint GameTable_Dir::columnAmount()const{return 3;}
 uint GameTable_Dir::columnWidth(uint col)const{
 	switch(col){
-		case Filename:return 400;
+		case FileName:return 400;
 		case FileSize:return 120;
 		default:return 0;
 	}
 }
 void GameTable_Dir::keyboardKey(Keyboard::KeyboardKey key,bool pressed){
-	auto old=renderItemStart;
+	auto start=renderItemStart,sel=selectingItemIndex;
 	GameTable::keyboardKey(key,pressed);
 	//改变状态,这会影响到渲染过程
-	if(old!=renderItemStart){
+	if(start!=renderItemStart){
 		updateBuffer();
+	}
+	if(sel!=selectingItemIndex){
+		updateSelecting();
 	}
 }
 
 void GameTable_Dir::updateBuffer(){
 	//更新迭代器
-	auto itrStart=directory.direntList.begin();
-	for(decltype(renderItemStart) i=0;i<renderItemStart;++i){
-		++itrStart;
-	}
+	auto itr=getDirentItr(renderItemStart);
 	//更新缓冲
 	for(decltype(renderItemAmount) i=0;i<renderItemAmount;++i){
-		entryBuffer[i] = *itrStart;
-		++itrStart;
+		//更新显示
+		auto &info=fileInfoBuffer[i];
+		bool hasInfo=i<directory.direntList.size();
+		info.fileName.setString(hasInfo ? itr->d_name : "");
+		info.fileSize.setString(hasInfo ? itr->strSize() : "");
+		//下一个
+		++itr;
 	}
+}
+void GameTable_Dir::updateSelecting(){
+	auto index=selectingItemIndex-renderItemStart;
+	auto black=ColorRGBA(0,0,0),white=ColorRGBA(0xFF,0xFF,0xFF);
+	for(decltype(renderItemAmount) i=0;i<renderItemAmount;++i){
+		if(i>=directory.direntList.size())break;//防止读取不存在的数据
+		//更新显示
+		auto &info=fileInfoBuffer[i];
+		//更新当前选择项状态
+		bool isSelected=(i==index);
+		info.fileName.color=isSelected?black:white;
+		info.fileSize.color=info.fileName.color;
+	}
+}
+DirentList::const_iterator GameTable_Dir::getDirentItr(uint pos)const{
+	auto itr=directory.direntList.begin();
+	for(uint i=0;i<pos;++i){
+		if(itr!=directory.direntList.end())++itr;
+		else break;
+	}
+	return itr;
 }

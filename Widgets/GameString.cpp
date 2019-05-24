@@ -10,7 +10,7 @@ static uint16 u16;//存放双字节的字符
 static size_t w;//渲染时候计算字符长度用的变量
 static Point2D<float> p;//渲染纹理用的点
 //静态缓冲区,用于字符转换
-static const size_t bufferSize=256;
+static const size_t bufferSize=512;
 static char stringBuffer[bufferSize];
 static char *destStr=nullptr;
 static size_t destLen=0;

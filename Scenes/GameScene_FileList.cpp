@@ -15,9 +15,6 @@ GameScene_FileList::GameScene_FileList(){
 	textPath.setString(".");
 	subObjects.push_back(&textPath);
 	//文件列表
-	gameTableDir.position = textPath.position;
-	gameTableDir.position.y() -= textPath.charSize.y();
-	gameTableDir.anchorPoint.y()=1;
 	subObjects.push_back(&gameTableDir);
 
 	//按钮
@@ -35,10 +32,21 @@ GameScene_FileList::GameScene_FileList(){
 }
 
 bool GameScene_FileList::changeDirectory(const string &dirName){
-	if(directory.changeDir(dirName,true)){
-		for(auto &dirEntry:directory.direntList){
-			printf("%s\n",dirEntry.name().data());
-		}
+	if(gameTableDir.changeDir(dirName)){
+		textPath.setString(gameTableDir.directory.toString());
 	}
 	return false;
+}
+void GameScene_FileList::keyboardKey(Keyboard::KeyboardKey key,bool pressed){
+	GameScene::keyboardKey(key,pressed);
+	if(key==Keyboard::Key_Enter && !pressed){
+		auto entry=gameTableDir.selectingDirectoryEntry();
+		if(entry){
+			if(entry->isDirectory()){//是目录,进行切换
+				changeDirectory(entry->d_name);
+			}else if(entry->isRegularFile()){//常规文件
+				printf("%s\n",entry->d_name);
+			}
+		}
+	}
 }

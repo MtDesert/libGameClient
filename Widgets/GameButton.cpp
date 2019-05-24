@@ -21,10 +21,6 @@ void GameButton::mouseKey(MouseKey key,bool pressed){
 	//检查点击的位置
 	rect=rectF();
 	auto &pos(Game::currentGame()->mousePos);
-	//debug
-	/*if(pressed){
-		printf("%d,%d,%d,%d\n",(int)rect.p0.x(),(int)rect.p0.y(),(int)rect.p1.x(),(int)rect.p1.y());
-	}*/
 	//判断前需要进行平移
 	rect.translate(position.x(),position.y());
 	if(rect.containPoint(pos.x(),pos.y())){

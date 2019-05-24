@@ -13,8 +13,10 @@ class GameScene_FileList:public GameScene{
 public:
 	GameScene_FileList();
 
-	Directory directory;
+	//更换目录
 	bool changeDirectory(const string &dirName);
+	//重写
+	virtual void keyboardKey(Keyboard::KeyboardKey key,bool pressed);
 
 	GameString textTitle;//标题,告知玩家需要选择什么文件
 	GameString textPath;//路径,用于显示文件位置
@@ -25,4 +27,4 @@ public:
 	GameButton_String buttonDir;//目录按钮,使用目录的常用功能
 	GameButton_String buttonCancel;//取消按钮,关闭本页面
 };
-#endif // GAMESCENE_FILELIST_H
+#endif
