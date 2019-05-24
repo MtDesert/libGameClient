@@ -15,7 +15,7 @@ public:
 
 	//更换目录
 	bool changeDirectory(const string &dirName);
-	//重写
+	//重写,以便支持按键操作
 	virtual void keyboardKey(Keyboard::KeyboardKey key,bool pressed);
 
 	GameString textTitle;//标题,告知玩家需要选择什么文件
@@ -26,5 +26,7 @@ public:
 	GameButton_String buttonFile;//文件按钮,对选中文件进行操作
 	GameButton_String buttonDir;//目录按钮,使用目录的常用功能
 	GameButton_String buttonCancel;//取消按钮,关闭本页面
+
+	void (*whenConfirmFile)(const string &filename);//当确定选择的文件后,调用此回调函数,传递选择的文件相对路径到filename
 };
 #endif

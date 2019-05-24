@@ -45,7 +45,9 @@ void GameScene_FileList::keyboardKey(Keyboard::KeyboardKey key,bool pressed){
 			if(entry->isDirectory()){//是目录,进行切换
 				changeDirectory(entry->d_name);
 			}else if(entry->isRegularFile()){//常规文件
-				printf("%s\n",entry->d_name);
+				if(whenConfirmFile){
+					whenConfirmFile(gameTableDir.directory.toString()+"/"+entry->d_name);
+				}
 			}
 		}
 	}

@@ -83,30 +83,29 @@ void Game::deleteScene_FileList(){
 	sceneFileList=nullptr;
 }
 
+#define GAME_FIRST_SCENE(code) \
+auto scene=findFirstGameScene();\
+if(scene)scene->code;
+
 void Game::joystickKey(JoystickKey key,bool pressed){
-	auto scene=findFirstGameScene();
-	if(scene)scene->joystickKey(key,pressed);
+	GAME_FIRST_SCENE(joystickKey(key,pressed))
 }
 void Game::keyboardKey(Keyboard::KeyboardKey key,bool pressed){
-	auto scene=findFirstGameScene();
-	if(scene)scene->keyboardKey(key,pressed);
+	GAME_FIRST_SCENE(keyboardKey(key,pressed))
 }
 void Game::mouseKey(MouseKey key,bool pressed){
-	auto scene=findFirstGameScene();
-	if(scene)scene->mouseKey(key,pressed);
+	GAME_FIRST_SCENE(mouseKey(key,pressed))
 }
 void Game::mouseMove(int x,int y){
 	mousePos.x()=x;
 	mousePos.y()=y;
-	GameObject::mouseMove(x,y);
+	GAME_FIRST_SCENE(mouseMove(x,y))
 }
 void Game::addTimeSlice(uint usec){
-	auto scene=findFirstGameScene();
-	if(scene)scene->addTimeSlice(usec);
+	GAME_FIRST_SCENE(addTimeSlice(usec))
 }
 void Game::render()const{
-	auto scene=findFirstGameScene();
-	if(scene)scene->render();
+	GAME_FIRST_SCENE(render())
 }
 
 GameScene* Game::findFirstGameScene()const{
