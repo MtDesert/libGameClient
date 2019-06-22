@@ -72,7 +72,7 @@ DATABLOCK_CUSTOM_TYPE_CPP(FileBMP_InfoHeader,ProfileData,uint32,112,true)
 DATABLOCK_CUSTOM_TYPE_CPP(FileBMP_InfoHeader,ProfileSize,uint32,116,true)
 DATABLOCK_CUSTOM_TYPE_CPP(FileBMP_InfoHeader,Reserved,uint32,120,true)
 
-#define FILEBMP_POSITIVE_HEIGHT height<0?height=-height:0;
+#define FILEBMP_POSITIVE_HEIGHT(value) height=(value<0?-value:value);
 
 uint FileBMP_InfoHeader::lineSize()const{
 	uint16 bitCount;uint32 width;
@@ -121,7 +121,7 @@ bool FileBMP_InfoHeader::isValid_Compression(uint32 compression){
 bool FileBMP_InfoHeader::isValid_ImageSize()const{
 	int32 height;uint32 imageSize,compression;
 	if(getHeight(height)&&getImageSize(imageSize)&&getCompression(compression)){
-		FILEBMP_POSITIVE_HEIGHT
+		FILEBMP_POSITIVE_HEIGHT(height)
 		return lineSize()*height==imageSize||(compression==NoCompression&&imageSize==0);
 	}return false;
 }
@@ -159,7 +159,7 @@ void FileBMP_Scanline::setInfoHeader(const FileBMP_InfoHeader &infoHeader){
 	//获取属性
 	infoHeader.getWidth(width);
 	infoHeader.getHeight(h);
-	FILEBMP_POSITIVE_HEIGHT
+	FILEBMP_POSITIVE_HEIGHT(h)
 	height=h;
 	uint16 bitCount;
 	infoHeader.getBitCount(bitCount);
@@ -247,7 +247,7 @@ DataBlock::SizeType FileBMP::parseData(){
 	if(pos<dataLength){
 		int32 height;
 		if(infoHeader.getHeight(height)){
-			FILEBMP_POSITIVE_HEIGHT
+			FILEBMP_POSITIVE_HEIGHT(height)
 			auto imgSize=infoHeader.lineSize()*height;//计算数据大小
 			if(pos+imgSize>dataLength)imgSize=dataLength-pos;//可能数据不足
 			subDataBlock(pos,imgSize,bitmapData);//确定图像数据
