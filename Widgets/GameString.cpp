@@ -51,16 +51,16 @@ void GameString::setString(const string &str){
 	arrayCharAttr.setSize(charAmount);//去掉用不着的空间
 	strWidth=block.dataLength;
 }
-uint GameString::stringWidth()const{return charSize.x()*strWidth;}
+uint GameString::stringWidth()const{return charSize.x*strWidth;}
 
 Point2D<GLfloat> GameString::sizeF()const{
-	return Point2D<GLfloat>(stringWidth(),charSize.y());
+	return Point2D<GLfloat>(stringWidth(),charSize.y);
 }
 
 void GameString::renderX()const{
 	shapeRenderer.setColor(color);
 	point2D=rectF().p0;
-	size2D.y()=charSize.y();
+	size2D.y=charSize.y;
 	//开始计算
 	renderX(0,arrayCharAttr.size());
 }
@@ -72,12 +72,12 @@ void GameString::renderX(uint from,uint amount)const{
 		if(!attr)break;
 		//根据是否ASCII来进行渲染
 		if(attr->isAscii){
-			w=size2D.x()=charSize.x();//确定宽度
+			w=size2D.x=charSize.x;//确定宽度
 			attr->tex.draw(point2D,size2D,Texture::TexCoord_LeftHalf);//渲染
 		}else{
-			w=size2D.x()=charSize.x()*2;//确定宽度
+			w=size2D.x=charSize.x*2;//确定宽度
 			attr->tex.draw(point2D,size2D);
 		}
-		point2D.x()+=w;//确定下一个字的绘制位置
+		point2D.x+=w;//确定下一个字的绘制位置
 	}
 }

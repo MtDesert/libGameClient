@@ -24,23 +24,23 @@ public:
 		//向量
 		Point2D<int> vec=p2-p1;
 		//长度
-		Point2D<int> len(abs(vec.x()),abs(vec.y()));
+		Point2D<int> len(abs(vec.x),abs(vec.y));
 		//微积分
-		Point2D<int> delta((len.x()?vec.x()/len.x():0),(len.y()?vec.y()/len.y():0));
+		Point2D<int> delta((len.x?vec.x/len.x:0),(len.y?vec.y/len.y:0));
 		//特殊情况(提高执行效率,根据情况可注释掉)
-		if(vec.x()==0){//竖线
-			int y=p1.y();
-			for(;y!=p2.y();y+=delta.y())pixmap.setColor(p1.x(),y,color);
-			pixmap.setColor(p1.x(),y,color);
+		if(vec.x==0){//竖线
+			int y=p1.y;
+			for(;y!=p2.y;y+=delta.y)pixmap.setColor(p1.x,y,color);
+			pixmap.setColor(p1.x,y,color);
 			return;
-		}else if(vec.y()==0){//横线
-			int x=p1.x();
-			for(;x!=p2.x();x+=delta.x())pixmap.setColor(x,p1.y(),color);
-			pixmap.setColor(x,p1.y(),color);
+		}else if(vec.y==0){//横线
+			int x=p1.x;
+			for(;x!=p2.x;x+=delta.x)pixmap.setColor(x,p1.y,color);
+			pixmap.setColor(x,p1.y,color);
 			return;
-		}else if(len.x()==len.y()){//平分xy轴的斜线
+		}else if(len.x==len.y){//平分xy轴的斜线
 			auto p=p1;
-			for(int i=0;i<=len.x();++i){
+			for(int i=0;i<=len.x;++i){
 				pixmap.setColor(p,color);
 				p+=delta;
 			}
@@ -51,15 +51,15 @@ public:
 		const int *lngP1,*shtP1,*lngLen,*shtLen,*lngDelta,*shtDelta;
 		int *lngP,*shtP;
 		//确定长短
-		bool b=(len.x()>=len.y());
-		lngP=&(b?p.x():p.y());
-		shtP=&(b?p.y():p.x());
-		lngP1=&(b?p1.x():p1.y());
-		shtP1=&(b?p1.y():p1.x());
-		lngLen=&(b?len.x():len.y());
-		shtLen=&(b?len.y():len.x());
-		lngDelta=&(b?delta.x():delta.y());
-		shtDelta=&(b?delta.y():delta.x());
+		bool b=(len.x>=len.y);
+		lngP=&(b?p.x:p.y);
+		shtP=&(b?p.y:p.x);
+		lngP1=&(b?p1.x:p1.y);
+		shtP1=&(b?p1.y:p1.x);
+		lngLen=&(b?len.x:len.y);
+		shtLen=&(b?len.y:len.x);
+		lngDelta=&(b?delta.x:delta.y);
+		shtDelta=&(b?delta.y:delta.x);
 		//开始画线
 		int product,quotient,remainder;
 		for(int i=0;i<=(*lngLen);++i){
@@ -74,7 +74,7 @@ public:
 			pixmap.setColor(p,color);
 		}
 	}
-	void drawLine(const Line<int,2> &line)const{
+	void drawLine(const Line2D<int> &line)const{
 		drawLine(line.p0,line.p1);
 	}
 	//折线
@@ -126,13 +126,13 @@ public:
 	void drawCircle(const Point2D<int> &center,int r){
 		Point2D<int> p(0,r);
 		int upLimit=r*r+r;//因为(r+1)^2 - r^2 == r*2+1,取此值的一半即r+0.5,则可得出r和r+1为4舍5入的判定依据
-		while(p.x()<=p.y()){//画1/8的圆弧
-			drawCircleXY(center.x(),center.y(),p.x(),p.y());
-			drawCircleXY(center.x(),center.y(),p.y(),p.x());
+		while(p.x<=p.y){//画1/8的圆弧
+			drawCircleXY(center.x,center.y,p.x,p.y);
+			drawCircleXY(center.x,center.y,p.y,p.x);
 			//寻找下一个坐标
-			++p.x();
+			++p.x;
 			if(p.distance2()>upLimit){
-				--p.y();
+				--p.y;
 			}
 		}
 	}
@@ -140,58 +140,58 @@ public:
 	void drawEllipse(const Rectangle2D<int> &rect){
 		//向量
 		decltype(rect.p0) vec(rect.p1-rect.p0);
-		if(vec.x()==0||vec.y()==0){
+		if(vec.x==0||vec.y==0){
 			drawLine(rect.p0,rect.p1);
 			return;
 		}
-		decltype(vec) diameter(abs(vec.x()),abs(vec.y()));//直径
-		decltype(vec) radius(diameter.x()/2,diameter.y()/2);//半径
+		decltype(vec) diameter(abs(vec.x),abs(vec.y));//直径
+		decltype(vec) radius(diameter.x/2,diameter.y/2);//半径
 		decltype(vec) c1=rect.center(),c2=c1,c3=c1,c4=c1;//圆心,有可能在4个象限上
 		//确定X坐标
-		if(diameter.x()%2){
-			if(vec.x()>0){++c1.x();++c4.x();}
-			if(vec.x()<0){--c2.x();--c3.x();}
+		if(diameter.x%2){
+			if(vec.x>0){++c1.x;++c4.x;}
+			if(vec.x<0){--c2.x;--c3.x;}
 		}
 		//确定Y坐标
-		if(diameter.y()%2){
-			if(vec.y()>0){++c1.y();++c2.y();}
-			if(vec.y()<0){--c3.y();--c4.y();}
+		if(diameter.y%2){
+			if(vec.y>0){++c1.y;++c2.y;}
+			if(vec.y<0){--c3.y;--c4.y;}
 		}
 		//开始积分
-		auto aa=radius.x()*radius.x();
-		auto bb=radius.y()*radius.y();
-		auto ab=radius.x()*radius.y();
-		decltype(rect.p0) p(0,radius.y());
+		auto aa=radius.x*radius.x;
+		auto bb=radius.y*radius.y;
+		auto ab=radius.x*radius.y;
+		decltype(rect.p0) p(0,radius.y);
 		auto upLimit = ab*ab + ab;
 		//X方向积分
-		while(p.x()*bb<=p.y()*aa){
-			pixmap.setColor(c1.x()+p.x(),c1.y()+p.y(),color);
-			pixmap.setColor(c2.x()-p.x(),c2.y()+p.y(),color);
-			pixmap.setColor(c3.x()-p.x(),c3.y()-p.y(),color);
-			pixmap.setColor(c4.x()+p.x(),c4.y()-p.y(),color);
-			++p.x();
-			if(p.x()*p.x()*bb + p.y()*p.y()*aa > upLimit){
-				--p.y();
+		while(p.x*bb<=p.y*aa){
+			pixmap.setColor(c1.x+p.x,c1.y+p.y,color);
+			pixmap.setColor(c2.x-p.x,c2.y+p.y,color);
+			pixmap.setColor(c3.x-p.x,c3.y-p.y,color);
+			pixmap.setColor(c4.x+p.x,c4.y-p.y,color);
+			++p.x;
+			if(p.x*p.x*bb + p.y*p.y*aa > upLimit){
+				--p.y;
 			}
 		}
 		//Y方向积分
-		p.x()=radius.x();p.y()=0;
-		while(p.y()*aa<=p.x()*bb){
-			pixmap.setColor(c1.x()+p.x(),c1.y()+p.y(),color);
-			pixmap.setColor(c2.x()-p.x(),c2.y()+p.y(),color);
-			pixmap.setColor(c3.x()-p.x(),c3.y()-p.y(),color);
-			pixmap.setColor(c4.x()+p.x(),c4.y()-p.y(),color);
-			++p.y();
-			if(p.x()*p.x()*bb + p.y()*p.y()*aa > upLimit){
-				--p.x();
+		p.x=radius.x;p.y=0;
+		while(p.y*aa<=p.x*bb){
+			pixmap.setColor(c1.x+p.x,c1.y+p.y,color);
+			pixmap.setColor(c2.x-p.x,c2.y+p.y,color);
+			pixmap.setColor(c3.x-p.x,c3.y-p.y,color);
+			pixmap.setColor(c4.x+p.x,c4.y-p.y,color);
+			++p.y;
+			if(p.x*p.x*bb + p.y*p.y*aa > upLimit){
+				--p.x;
 			}
 		}
 	}
 	//画椭圆(圆心,x半径,y半径)
 	void drawEllipse(const Point2D<int> &center,int rx,int ry){
 		drawEllipse(Rectangle2D<int>(
-			Point2D<int>(center.x()-rx,center.y()-ry),
-			Point2D<int>(center.x()+rx,center.y()+ry)
+			Point2D<int>(center.x-rx,center.y-ry),
+			Point2D<int>(center.x+rx,center.y+ry)
 		));
 	}
 	//画圆(圆心,半径)椭圆版

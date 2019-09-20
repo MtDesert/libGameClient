@@ -32,15 +32,15 @@ void GameText::updateRenderParameter(){
 }
 
 Point2D<GLfloat> GameText::sizeF()const{
-	return Point2D<GLfloat>(charSize.x()*lineCharAmount,charSize.y()*lineAmount());
+	return Point2D<GLfloat>(charSize.x*lineCharAmount,charSize.y*lineAmount());
 }
 void GameText::renderX()const{
 	ShapeRenderer::setColor(color);
 	shapeRenderer.setColor(color);
 	rect=rectF();
 	point2D=rect.p0;
-	point2D.y()=rect.p1.y()-charSize.y();
-	size2D.y()=charSize.y();
+	point2D.y=rect.p1.y-charSize.y;
+	size2D.y=charSize.y;
 	//开始计算
 	uint from=0,to=0;
 	for(auto itr=lineStart.begin();itr!=lineStart.end();++itr){
@@ -50,7 +50,7 @@ void GameText::renderX()const{
 		to=(itrNext!=lineStart.end()?*itrNext:arrayCharAttr.size());
 		GameString::renderX(from,to-from);
 		//下一个点
-		point2D.x()=rect.p0.x();
-		point2D.y()-=charSize.y();
+		point2D.x=rect.p0.x;
+		point2D.y-=charSize.y;
 	}
 }

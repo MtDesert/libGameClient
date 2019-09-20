@@ -16,14 +16,14 @@ GameTable_Dir::GameTable_Dir(){
 		auto &fileName=fileInfoBuffer[i].fileName;
 		auto &fileSize=fileInfoBuffer[i].fileSize;
 		//文件名位置
-		fileName.anchorPoint.x()=0;
-		fileName.position.x()=rect.left();
-		fileName.position.y()=rect.top() - fileName.sizeF().y() * (i+0.5);
+		fileName.anchorPoint.x=0;
+		fileName.position.x=rect.left();
+		fileName.position.y=rect.top() - fileName.sizeF().y * (i+0.5);
 		subObjects.push_back(&fileName);
 		//文件大小位置
-		fileSize.anchorPoint.x()=1;
-		fileSize.position.x()=rect.right();
-		fileSize.position.y()=fileName.position.y();
+		fileSize.anchorPoint.x=1;
+		fileSize.position.x=rect.right();
+		fileSize.position.y=fileName.position.y;
 		subObjects.push_back(&fileSize);
 	}
 }

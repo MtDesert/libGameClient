@@ -5,13 +5,13 @@
 GameScene_FileList::GameScene_FileList(){
 	auto &res=Game::resolution;
 	//标题,顶部居中
-	textTitle.position.y()=res.y()/2;
-	textTitle.anchorPoint.y()=1;
+	textTitle.position.y=res.y/2;
+	textTitle.anchorPoint.y=1;
 	subObjects.push_back(&textTitle);
 	//路径
 	textPath.position = textTitle.position;
-	textPath.position.y() -= textTitle.charSize.y();
-	textPath.anchorPoint.y()=1;
+	textPath.position.y -= textTitle.charSize.y;
+	textPath.anchorPoint.y=1;
 	textPath.setString(".");
 	subObjects.push_back(&textPath);
 	//文件列表
@@ -21,12 +21,12 @@ GameScene_FileList::GameScene_FileList(){
 	auto game=Game::currentGame();
 	const char* names[]={"Confirm","File","Directory","Cancel"};
 	GameButton_String *buttons[]={&buttonConfirm,&buttonFile,&buttonDir,&buttonCancel};
-	auto btnWidth=res.x()/4;
+	auto btnWidth=res.x/4;
 	for(auto i=0;i<4;++i){
 		auto btn=buttons[i];
 		btn->setString(game->translate(names[i]));
-		btn->position.x() = btnWidth*i - btnWidth*3/2;
-		btn->position.y() = -res.y()/2 + btn->buttonSize.y()/2;
+		btn->position.x = btnWidth*i - btnWidth*3/2;
+		btn->position.y = -res.y/2 + btn->buttonSize.y/2;
 		subObjects.push_back(btn);
 	}
 }

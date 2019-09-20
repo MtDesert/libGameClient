@@ -97,8 +97,8 @@ void Game::mouseKey(MouseKey key,bool pressed){
 	GAME_FIRST_SCENE(mouseKey(key,pressed))
 }
 void Game::mouseMove(int x,int y){
-	mousePos.x()=x;
-	mousePos.y()=y;
+	mousePos.x=x;
+	mousePos.y=y;
 	GAME_FIRST_SCENE(mouseMove(x,y))
 }
 void Game::addTimeSlice(uint usec){

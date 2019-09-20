@@ -23,11 +23,11 @@ struct Pixmap:public Array2D_LV1_Pointer<T>{
 	//读取像素值的接口
 	inline bool getColor(uint x,uint y,T &color)const{return this->getValue(x,y,color);}
 	inline bool getColor(const Point2D<uint> &p,T &color)const{return this->getValue(p,color);}
-	inline bool getColor(const Point2D<int> &p,T &color)const{return this->getValue(p.x(),p.y(),color);}
+	inline bool getColor(const Point2D<int> &p,T &color)const{return this->getValue(p.x,p.y,color);}
 	//写入像素值的接口
 	inline bool setColor(uint x,uint y,const T &color){return this->setValue(x,y,color);}
 	inline bool setColor(const Point2D<uint> &p,const T &color){return this->setValue(p,color);}
-	inline bool setColor(const Point2D<int> &p,const T &color){return this->setValue(p.x(),p.y(),color);}
+	inline bool setColor(const Point2D<int> &p,const T &color){return this->setValue(p.x,p.y,color);}
 
 	//转换表,转换成Bitmap的时候用
 	Map<T,uint32> colorMap;

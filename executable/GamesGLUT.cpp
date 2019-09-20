@@ -81,7 +81,7 @@ void glutSpecialFunction(int key,int x,int y){specialFunction(key,true);}
 void glutSpecialUpFunction(int key,int x,int y){specialFunction(key,false);}
 
 //input-mouse
-#define GAME_MOUSE_MOVE game->mouseMove(x-game->resolution.x()/2,game->resolution.y()/2-y);
+#define GAME_MOUSE_MOVE game->mouseMove(x-game->resolution.x/2,game->resolution.y/2-y);
 void glutMouseFunction(int button,int state,int x,int y){
 	GAME_MOUSE_MOVE
 	switch(button){
@@ -199,7 +199,7 @@ int main(int argc,char* argv[]){
 	//glut初始化
 	glutInit(&argc,argv);
 	glutInitDisplayMode(GLUT_SINGLE|GLUT_RGBA|GLUT_DEPTH);
-	glutInitWindowSize(Game::resolution.x(),Game::resolution.y());
+	glutInitWindowSize(Game::resolution.x,Game::resolution.y);
 	glutInitWindowPosition(100,100);
 	int window=glutCreateWindow("GamesGLUT");
 	//计时器回调函数

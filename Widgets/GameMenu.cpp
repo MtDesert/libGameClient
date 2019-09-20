@@ -46,7 +46,7 @@ void GameMenu::keyboardKey(Keyboard::KeyboardKey key,bool pressed){
 }
 
 Point2D<float> GameMenu::sizeF()const{//菜单尺寸,根据项尺寸和显示项数决定(子类可能会多出边缘或者间距等部分)
-	size2D.x()=itemWidth;
-	size2D.y()=itemHeight*renderItemAmount;
+	size2D.x=itemWidth;
+	size2D.y=itemHeight*renderItemAmount;
 	return size2D;
 }

@@ -22,8 +22,8 @@ void GameMenu_String::renderX()const{
 				shapeRenderer.fillColor=0xFFFFFFFF;
 				//计算矩形选择区域
 				rect=gString.rectF();
-				rect.p0.y()+=gString.position.y();
-				rect.p1.y()+=gString.position.y();
+				rect.p0.y+=gString.position.y;
+				rect.p1.y+=gString.position.y;
 				shapeRenderer.drawRectangle(rect);
 			}
 			//开始绘制文字
@@ -43,7 +43,7 @@ void GameMenu_String::updateRenderParameters(){
 	decltype(renderItemStart) i=0,j=0;
 	for(auto &gString:gameStringList){
 		if(i>=renderItemStart){
-			gString.position.y() = point2D.y() - itemHeight*j - itemHeight/2;
+			gString.position.y = point2D.y - itemHeight*j - itemHeight/2;
 			//根据选择状态调整颜色
 			gString.color=(selectingItemIndex==i ? 0xFF000000 : 0xFFFFFFFF);
 			++j;

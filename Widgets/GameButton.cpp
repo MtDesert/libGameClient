@@ -12,7 +12,7 @@ GameButton_String::~GameButton_String(){}
 void GameButton::mouseMove(int x,int y){
 	rect=rectF();
 	auto &pos(Game::currentGame()->mousePos);
-	if(rect.containPoint(pos.x(),pos.y())){
+	if(rect.containPoint(pos.x,pos.y)){
 	}else{
 		setIsPressed(false);
 	}
@@ -22,8 +22,8 @@ void GameButton::mouseKey(MouseKey key,bool pressed){
 	rect=rectF();
 	auto &pos(Game::currentGame()->mousePos);
 	//判断前需要进行平移
-	rect.translate(position.x(),position.y());
-	if(rect.containPoint(pos.x(),pos.y())){
+	rect.translate(position.x,position.y);
+	if(rect.containPoint(pos.x,pos.y)){
 		bool changed=(isPressed!=pressed);
 		setIsPressed(pressed);
 		if(changed && !isPressed){
@@ -43,9 +43,9 @@ void GameButton::renderX()const{
 }
 Point2D<float> GameButton::sizeF()const{
 	size2D=texture.sizeF();
-	if(size2D.x()==0 || size2D.y()==0){//无精灵的时候可以使用自定义大小
-		size2D.x()=buttonSize.x();
-		size2D.y()=buttonSize.y();
+	if(size2D.x==0 || size2D.y==0){//无精灵的时候可以使用自定义大小
+		size2D.x=buttonSize.x;
+		size2D.y=buttonSize.y;
 	}
 	return size2D;
 }

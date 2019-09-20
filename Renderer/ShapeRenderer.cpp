@@ -16,14 +16,14 @@ void ShapeRenderer::drawPoint(numType x,numType y)const{
 	drawPoints(vertex,1);
 }
 void ShapeRenderer::drawPoint(const Point2D<numType> &p)const{
-	drawPoints(p.data,1);
+	drawPoints(&p.x,1);
 }
 void ShapeRenderer::drawPoints(const list<Point2D<numType> > &points)const{
 	numType vertex[points.size()*2];
 	size_t i=0;
 	for(auto &p:points){
-		vertex[i]=p.x();
-		vertex[i+1]=p.y();
+		vertex[i]=p.x;
+		vertex[i+1]=p.y;
 		i+=2;
 	}
 	drawPoints(vertex,points.size());
@@ -48,10 +48,10 @@ void ShapeRenderer::drawLine(numType x0,numType y0,numType x1,numType y1)const{
 	SHAPERENDERER_DRAWLINE(x0,y0,x1,y1)
 }
 void ShapeRenderer::drawLine(const Point2D<numType> p0,const Point2D<numType> p1)const{
-	SHAPERENDERER_DRAWLINE(p0.x(),p0.y(),p1.x(),p1.y())
+	SHAPERENDERER_DRAWLINE(p0.x,p0.y,p1.x,p1.y)
 }
 void ShapeRenderer::drawLine(const Line2D<numType> &line)const{
-	SHAPERENDERER_DRAWLINE(line.p0.data[0],line.p0.data[1],line.p1.data[0],line.p1.data[1])
+	SHAPERENDERER_DRAWLINE(line.p0.x,line.p0.y,line.p1.x,line.p1.y)
 }
 
 void ShapeRenderer::drawLines(const numType vertex[],int n)const{
@@ -66,8 +66,8 @@ void ShapeRenderer::drawBrokenLine(const list<Point2D<numType> > &points)const{
 	numType vertex[points.size()*2];
 	size_t i=0;
 	for(auto &p:points){
-		vertex[i]=p.x();
-		vertex[i+1]=p.y();
+		vertex[i]=p.x;
+		vertex[i+1]=p.y;
 		i+=2;
 	}
 	glBindTexture(GL_TEXTURE_2D,0);
@@ -91,13 +91,13 @@ void ShapeRenderer::drawTriangle(numType x0,numType y0,numType x1,numType y1,num
 	SHAPERENDERER_DRAW_TRIANGLE(x0,y0,x1,y1,x2,y2)
 }
 void ShapeRenderer::drawTriangle(const Point2D<numType> p0,const Point2D<numType> p1,const Point2D<numType> p2)const{
-	SHAPERENDERER_DRAW_TRIANGLE(p0.x(),p0.y(),p1.x(),p1.y(),p2.x(),p2.y())
+	SHAPERENDERER_DRAW_TRIANGLE(p0.x,p0.y,p1.x,p1.y,p2.x,p2.y)
 }
 void ShapeRenderer::drawTriangle(const Triangle2D<numType> &triangle)const{
 	SHAPERENDERER_DRAW_TRIANGLE(
-		triangle.p0.data[0],triangle.p0.data[1],
-		triangle.p1.data[0],triangle.p1.data[1],
-		triangle.p2.data[0],triangle.p2.data[1])
+		triangle.p0.x,triangle.p0.y,
+		triangle.p1.x,triangle.p1.y,
+		triangle.p2.x,triangle.p2.y)
 }
 void ShapeRenderer::drawTriangle(const numType vertex[])const{
 	drawPolygen(vertex,3);
@@ -116,10 +116,10 @@ void ShapeRenderer::drawRectangle(numType x0,numType y0,numType x1,numType y1)co
 	SHAPERENDERER_DRAW_RECTANGLE(x0,y0,x1,y1)
 }
 void ShapeRenderer::drawRectangle(const Point2D<numType> &p0,const Point2D<numType> &p1)const{
-	SHAPERENDERER_DRAW_RECTANGLE(p0.x(),p0.y(),p1.x(),p1.y())
+	SHAPERENDERER_DRAW_RECTANGLE(p0.x,p0.y,p1.x,p1.y)
 }
 void ShapeRenderer::drawRectangle(const Rectangle2D<numType> &rect)const{
-	SHAPERENDERER_DRAW_RECTANGLE(rect.p0.x(),rect.p0.y(),rect.p1.x(),rect.p1.y())
+	SHAPERENDERER_DRAW_RECTANGLE(rect.p0.x,rect.p0.y,rect.p1.x,rect.p1.y)
 }
 void ShapeRenderer::drawRectangle(const numType vertex[])const{
 	drawPolygen(vertex,4);

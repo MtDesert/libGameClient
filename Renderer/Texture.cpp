@@ -122,10 +122,10 @@ Point2D<GLsizei> Texture::size()const{return Point2D<GLsizei>(width,height);}
 Point2D<GLfloat> Texture::sizeF()const{return Point2D<GLfloat>(width,height);}
 
 void Texture::rect2vertex(const Rectangle2D<GLfloat> &rect,GLfloat vertex[]){
-	vertex[0]=vertex[6]=rect.p0.x();
-	vertex[1]=vertex[3]=rect.p0.y();
-	vertex[2]=vertex[4]=rect.p1.x();
-	vertex[5]=vertex[7]=rect.p1.y();
+	vertex[0]=vertex[6]=rect.p0.x;
+	vertex[1]=vertex[3]=rect.p0.y;
+	vertex[2]=vertex[4]=rect.p1.x;
+	vertex[5]=vertex[7]=rect.p1.y;
 }
 
 void TextureCache::clearCache(){
