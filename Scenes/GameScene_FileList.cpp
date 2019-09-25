@@ -7,15 +7,15 @@ GameScene_FileList::GameScene_FileList(){
 	//标题,顶部居中
 	textTitle.position.y=res.y/2;
 	textTitle.anchorPoint.y=1;
-	subObjects.push_back(&textTitle);
+	addSubObject(&textTitle);
 	//路径
 	textPath.position = textTitle.position;
 	textPath.position.y -= textTitle.charSize.y;
 	textPath.anchorPoint.y=1;
 	textPath.setString(".");
-	subObjects.push_back(&textPath);
+	addSubObject(&textPath);
 	//文件列表
-	subObjects.push_back(&gameTableDir);
+	addSubObject(&gameTableDir);
 
 	//按钮
 	auto game=Game::currentGame();
@@ -26,8 +26,8 @@ GameScene_FileList::GameScene_FileList(){
 		auto btn=buttons[i];
 		btn->setString(game->translate(names[i]));
 		btn->position.x = btnWidth*i - btnWidth*3/2;
-		btn->position.y = -res.y/2 + btn->buttonSize.y/2;
-		subObjects.push_back(btn);
+		btn->position.y = -res.y/2 + btn->size.y/2;
+		addSubObject(btn);
 	}
 }
 

@@ -39,5 +39,4 @@ protected:
 	//渲染部分文字,从arrayCharAttr的from下标开始,渲染amount个字符
 	void renderX(uint from,uint amount)const;
 };
-
 #endif

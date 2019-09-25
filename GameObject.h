@@ -55,8 +55,11 @@ public:
 	};
 
 	//保存子类的容器,主要用于事件传递
-	//警告,subObject相当于树叉,如果把让它形成环状(比如subObjects.push_back(this);)会出现严重的后果,除非你知道你自己在干什么
-	List<GameObject*> subObjects;
+	//警告,subObject相当于树叉,如果把让它形成环状(比如addSubObject(this);)会出现严重的后果,除非你知道你自己在干什么
+	GameObject *parentObject;//父物体
+	List<GameObject*> subObjects;//子物体
+	void addSubObject(GameObject *subObj);
+	void removeSubObject(GameObject *subObj);
 	void clearSubObjects();
 
 	//如需要响应事件,请在子类重写virtual函数

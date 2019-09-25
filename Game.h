@@ -24,9 +24,11 @@ public:
 	//翻译
 	bool loadTranslationFile(const string &filename);
 	const char* translate(const string &english)const;//翻译(英文原文),返回译文,翻译失败则返回原文
+
 	//文件选择
 	GameScene_FileList* showScene_FileList();//显示选择文件列表
 	void deleteScene_FileList();//删除文件列表所占的内存
+
 	//重写方法
 	void joystickKey(JoystickKey key,bool pressed);
 	void keyboardKey(Keyboard::KeyboardKey key,bool pressed);

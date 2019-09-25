@@ -1,6 +1,5 @@
 #include"Game.h"
 #include"GameScene.h"
-#include"GameString.h"
 
 #include"errno.h"
 
@@ -77,7 +76,7 @@ GameScene_FileList *Game::showScene_FileList(){
 }
 void Game::deleteScene_FileList(){
 	if(sceneFileList){
-		subObjects.remove(sceneFileList);
+		removeSubObject(sceneFileList);
 		delete sceneFileList;
 	}
 	sceneFileList=nullptr;

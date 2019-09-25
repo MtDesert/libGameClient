@@ -19,12 +19,12 @@ GameTable_Dir::GameTable_Dir(){
 		fileName.anchorPoint.x=0;
 		fileName.position.x=rect.left();
 		fileName.position.y=rect.top() - fileName.sizeF().y * (i+0.5);
-		subObjects.push_back(&fileName);
+		addSubObject(&fileName);
 		//文件大小位置
 		fileSize.anchorPoint.x=1;
 		fileSize.position.x=rect.right();
 		fileSize.position.y=fileName.position.y;
-		subObjects.push_back(&fileSize);
+		addSubObject(&fileSize);
 	}
 }
 GameTable_Dir::~GameTable_Dir(){

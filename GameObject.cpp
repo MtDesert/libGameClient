@@ -1,7 +1,7 @@
 #include"GameObject.h"
 #include<stdio.h>
 
-GameObject::GameObject():timeSlice(0),minTimeSlice(16000),maxTimeSlice(100000){}
+GameObject::GameObject():parentObject(nullptr),timeSlice(0),minTimeSlice(16000),maxTimeSlice(100000){}
 GameObject::~GameObject(){clearSubObjects();}
 
 #define FOR_SUB_OBJECTS(code)\
@@ -9,8 +9,18 @@ for(auto obj:subObjects){\
 	if(obj){code;}\
 }
 
+void GameObject::addSubObject(GameObject *subObj){
+	if(!subObj)return;
+	subObjects.push_back(subObj);
+	subObj->parentObject=this;
+}
+void GameObject::removeSubObject(GameObject *subObj){
+	if(!subObj)return;
+	subObjects.remove(subObj);
+	subObj->parentObject=nullptr;
+}
 void GameObject::clearSubObjects(){
-	//FOR_SUB_OBJECTS(delete obj;)
+	FOR_SUB_OBJECTS(obj->parentObject=nullptr)
 	subObjects.clear();
 }
 

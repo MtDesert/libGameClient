@@ -1,6 +1,8 @@
 #include"GameMenu_String.h"
 #include"extern.h"
 
+static ColorRGBA borderColor(0xFFFFFFFF);//边框颜色
+
 GameMenu_String::GameMenu_String(){}
 GameMenu_String::~GameMenu_String(){}
 
@@ -34,7 +36,7 @@ void GameMenu_String::renderX()const{
 		++i;//下一个
 	}
 	//绘制菜单边框
-	renderRectBorder();
+	renderRect(&borderColor);
 }
 void GameMenu_String::updateRenderParameters(){
 	GameMenu::updateRenderParameters();

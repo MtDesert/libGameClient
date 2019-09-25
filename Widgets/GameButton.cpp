@@ -2,32 +2,29 @@
 #include"Game.h"
 #include"extern.h"
 
-GameButton::GameButton():buttonSize(160,32),isPressed(false),bgColor(0xFF000000),onClicked(nullptr){}
+static ColorRGBA borderColor(0xFFFFFFFF);
+
+GameButton::GameButton():isPressed(false),bgColor(0xFF000000),onClicked(nullptr){
+	size.x=160;
+	size.y=32;
+}
 GameButton::~GameButton(){}
 GameButton_String::GameButton_String(){
-	subObjects.push_back(&mGameString);
+	addSubObject(&mGameString);
 }
 GameButton_String::~GameButton_String(){}
 
 void GameButton::mouseMove(int x,int y){
-	rect=rectF();
-	auto &pos(Game::currentGame()->mousePos);
-	if(rect.containPoint(pos.x,pos.y)){
-	}else{
+	if(!isMouseOnButton()){
 		setIsPressed(false);
 	}
 }
 void GameButton::mouseKey(MouseKey key,bool pressed){
-	//检查点击的位置
-	rect=rectF();
-	auto &pos(Game::currentGame()->mousePos);
-	//判断前需要进行平移
-	rect.translate(position.x,position.y);
-	if(rect.containPoint(pos.x,pos.y)){
+	if(isMouseOnButton()){
 		bool changed=(isPressed!=pressed);
 		setIsPressed(pressed);
 		if(changed && !isPressed){
-			if(onClicked)onClicked();
+			if(onClicked)onClicked(this);
 		}
 	}
 }
@@ -38,16 +35,25 @@ void GameButton::renderX()const{
 	shapeRenderer.fillColor=(isPressed ? color : bgColor);
 	shapeRenderer.drawRectangle(rect);
 	//绘制按钮边框
-	shapeRenderer.hasFill=false;
-	shapeRenderer.drawRectangle(rect);
+	renderRect(&borderColor);
 }
-Point2D<float> GameButton::sizeF()const{
-	size2D=texture.sizeF();
-	if(size2D.x==0 || size2D.y==0){//无精灵的时候可以使用自定义大小
-		size2D.x=buttonSize.x;
-		size2D.y=buttonSize.y;
+
+bool GameButton::isMouseOnButton()const{
+	rect=rectF();
+	auto &pos(Game::currentGame()->mousePos);
+	//判断前需要进行平移
+	rect.translate(position.x,position.y);
+	auto parent=this->parentObject;
+	while(parent){
+		auto sprite=dynamic_cast<GameSprite*>(parent);
+		if(sprite){
+			rect.translate(sprite->position.x,sprite->position.y);
+			parent=sprite->parentObject;
+		}else{
+			parent=nullptr;
+		}
 	}
-	return size2D;
+	return rect.containPoint(pos.x,pos.y);
 }
 void GameButton::setIsPressed(bool pressed){isPressed=pressed;}
 

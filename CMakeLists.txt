@@ -33,7 +33,7 @@ if(GAME_NAME)
 		set(LIBS_LIST ${LIBS_LIST} ${GLUT_NAME})
 		#以下为各种可执行文件的编译过程,根据情况选择编译自己需要的可执行文件即可
 		add_executable(GamesGLUT ./executable/GamesGLUT.cpp)
-		target_link_libraries(GamesGLUT ${LIBS_LIST})
+		target_link_libraries(GamesGLUT ${LIBS_LIST} gtk-3 gobject-2.0)
 	else()
 		message(编译客户端游戏库${GAME_NAME})
 		project(${GAME_NAME}Client)
@@ -50,6 +50,16 @@ else()
 	#包含依赖库的目录
 	set(INCLUDE_DIR_ONLY ON)
 	include(../libGamesEngines/CMakeLists.txt)
+	if(${TARGET_SYSTEM_NAME} STREQUAL Linux)
+		include_directories(
+			/usr/include/gtk-3.0
+			/usr/include/atk-1.0
+			/usr/include/glib-2.0
+			/usr/include/pango-1.0
+			/usr/include/cairo
+			/usr/include/gdk-pixbuf-2.0/
+			/usr/lib/x86_64-linux-gnu/glib-2.0/include)
+	endif()
 	#库输出
 	add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
 	target_link_libraries(${PROJECT_NAME} GamesEngines ${LIBS_LIST})

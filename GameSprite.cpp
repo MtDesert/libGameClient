@@ -24,10 +24,11 @@ void GameSprite::render()const{
 }
 void GameSprite::renderX()const{}
 
-void GameSprite::renderRectBorder()const{
-	shapeRenderer.hasEdge=true;
-	shapeRenderer.hasFill=false;
-	shapeRenderer.edgeColor=color;
+void GameSprite::renderRect(ColorRGBA *edgeColor,ColorRGBA *fillColor)const{
+	shapeRenderer.hasEdge=edgeColor;
+	shapeRenderer.hasFill=fillColor;
+	if(edgeColor)shapeRenderer.edgeColor=*edgeColor;
+	if(fillColor)shapeRenderer.fillColor=*fillColor;
 	shapeRenderer.drawRectangle(rectF());
 }
 
@@ -36,7 +37,14 @@ Point2D<float> GameSprite::posF()const{
 	point2D.y=position.y;
 	return point2D;
 }
-Point2D<float> GameSprite::sizeF()const{return texture.sizeF();}
+Point2D<float> GameSprite::sizeF()const{
+	size2D=texture.sizeF();
+	if(size2D.x==0 || size2D.y==0){
+		size2D.x=size.x;
+		size2D.y=size.y;
+	}
+	return size2D;
+}
 Rectangle2D<float> GameSprite::rectF()const{
 	size2D=sizeF();
 	rect.p0.x=-anchorPoint.x*size2D.x;

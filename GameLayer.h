@@ -3,8 +3,7 @@
 
 #include"GameObject.h"
 
-class GameLayer:public GameObject
-{
+class GameLayer:public GameObject{
 public:
 	GameLayer();
 };
