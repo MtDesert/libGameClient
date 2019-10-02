@@ -1,6 +1,4 @@
 #include"Game.h"
-#include"GameScene.h"
-
 #include"errno.h"
 
 //全局变量
@@ -82,9 +80,24 @@ void Game::deleteScene_FileList(){
 	sceneFileList=nullptr;
 }
 
+static Client *client=nullptr;
+Client* Game::currentClient(){
+	if(!client){
+		client=new Client();
+	}
+	return client;
+}
+
 #define GAME_FIRST_SCENE(code) \
 auto scene=findFirstGameScene();\
 if(scene)scene->code;
+
+void Game::showDialogMessage(const string &content){
+	GAME_FIRST_SCENE(showDialogMessage(content))
+}
+void Game::hideDialogMessage(){
+	GAME_FIRST_SCENE(hideDialogMessage())
+}
 
 void Game::joystickKey(JoystickKey key,bool pressed){
 	GAME_FIRST_SCENE(joystickKey(key,pressed))

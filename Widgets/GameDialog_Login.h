@@ -15,5 +15,7 @@ public:
 	GameStringInputBox inputBoxPassword;
 	GameButton_String buttonConfirm;
 	GameButton_String buttonCancel;
+
+	void setIsRegister(bool b);
 };
 #endif

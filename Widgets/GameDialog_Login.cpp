@@ -1,15 +1,14 @@
 #include"GameDialog_Login.h"
 #include"Game.h"
 
-#define ENG(name) Game::currentGame()->translate(#name)
+#define ENG(name) #name
 
 GameDialog_Login::GameDialog_Login(){
 	size.x=400;size.y=160;
 	//内容
-	strUsername.setString(ENG(Username));
-	strPassword.setString(ENG(Password));
-	buttonConfirm.setString(ENG(Login));
-	buttonCancel.setString(ENG(Cancel));
+	strUsername.setString("Username");
+	strPassword.setString("Password");
+	buttonCancel.setString("Cancel");
 	inputBoxPassword.passwordChar='*';
 	//位置锚点
 	strUsername.position.x=strPassword.position.x=-100;
@@ -30,4 +29,8 @@ GameDialog_Login::GameDialog_Login(){
 	addSubObject(&inputBoxPassword);
 	addSubObject(&buttonConfirm);
 	addSubObject(&buttonCancel);
+}
+
+void GameDialog_Login::setIsRegister(bool b){
+	buttonConfirm.setString(b?"Register":"Login");
 }

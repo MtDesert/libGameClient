@@ -73,6 +73,6 @@ static void* inputBoxThreadFunc(void *box){
 	return nullptr;
 }
 void GameStringInputBox::startInput(){
-	inputBoxThread.create(inputBoxThreadFunc,this);
+	inputBoxThread.start(inputBoxThreadFunc,this);
 }
 #endif

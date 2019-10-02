@@ -1,9 +1,12 @@
 #include"GameString.h"
 #include"Charset.h"
+#include"Game.h"
 #include"extern.h"
 
+//静态变量
 Charset GameString::charset;
 FontTextureCache GameString::fontTextureCache;
+bool GameString::translateMode(false);
 //渲染用的变量
 static uint8 u8;//存放单字节的字符
 static uint16 u16;//存放双字节的字符
@@ -27,7 +30,7 @@ void GameString::setString(const string &str){
 	destStr=stringBuffer;
 	destLen=bufferSize;
 	//获取字符及其特征
-	charset.newString(str.data(),&destStr,destLen);
+	charset.newString(translateMode ? Game::currentGame()->translate(str) : str.data(),&destStr,destLen);
 	//计算特征,生成纹理
 	DataBlock block;
 	block.dataPointer=(uchar*)destStr;

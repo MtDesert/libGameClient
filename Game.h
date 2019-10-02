@@ -3,7 +3,7 @@
 
 #include"GameObject.h"
 #include"GameScene_FileList.h"
-#include"FontTextureCache.h"
+#include"Client.h"
 
 /** Game是整个游戏运行的环境，游戏的主要数据都在本类中
 该类主要是内存操作，与现有的游戏（或非游戏）图形环境等只做对接，比如glfw,glut,Qt,SDL,SFML等各种数不清的图形环境
@@ -29,6 +29,13 @@ public:
 	GameScene_FileList* showScene_FileList();//显示选择文件列表
 	void deleteScene_FileList();//删除文件列表所占的内存
 
+	//客户端
+	static Client* currentClient();
+
+	//提示框
+	void showDialogMessage(const string &content);
+	void hideDialogMessage();
+
 	//重写方法
 	void joystickKey(JoystickKey key,bool pressed);
 	void keyboardKey(Keyboard::KeyboardKey key,bool pressed);
@@ -42,8 +49,7 @@ protected:
 	Map<string,string> translationMap;
 	//文件管理
 	GameScene_FileList *sceneFileList;
-
+	//场景管理
 	GameScene* findFirstGameScene()const;
 };
-
 #endif

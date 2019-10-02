@@ -29,6 +29,7 @@ public:
 	//静态变量
 	static Charset charset;//GameString共用的字符集转化方案,暂时还没提供换字符集的方案
 	static FontTextureCache fontTextureCache;//GameString共用的文字缓存,暂时还没提供换字体的方案
+	static bool translateMode;//翻译模式,为true时,setString会对文本进行翻译处理
 protected:
 	struct CharAttr{//控制文字渲染的结构
 		bool isAscii;
