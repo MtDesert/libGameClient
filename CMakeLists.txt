@@ -9,6 +9,7 @@ set(GAMECLIENT_DIR
 	Font #字体处理模块,文字可以当作一种特殊的图像
 	Renderer #渲染模块,主要用于控制显存和绘制
 	Charset #字符集,处理字符转换过程
+	Network #网络模块
 	Widgets #控件集,类似于各种平台特有的控件
 	Scenes #场景,提供公共的常见场景(如选择文件场景)
 )

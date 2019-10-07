@@ -17,8 +17,7 @@ static void doRegister(GameButton*){
 //登陆
 static void doLogin(GameButton*){
 	GET_USERNAME_PASSWORD
-	Game::currentClient()->login(name,pass);
-	printf("用户名%s 密码%s\n",name.data(),pass.data());
+	Game::currentClient()->reqLogin(name,pass);
 }
 //取消登陆
 static void cancelLogin(GameButton*){

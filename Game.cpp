@@ -33,6 +33,7 @@ STATIC(Game::resolution);
 STATIC(Game::mousePos);
 
 Game* Game::currentGame(){return Game::game;}
+string Game::gameName()const{return"";}
 
 bool Game::loadTranslationFile(const string &filename){
 	translationMap.clear();
