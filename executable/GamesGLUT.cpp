@@ -23,7 +23,7 @@ void glutTimerFunction(int timerID){
 void glutIdleFunction(){
 	int error=glGetError();
 	if(error){
-		printf("GL get error %d\n",error);
+		printf("GL get error %d\n",error);fflush(stdout);
 	}
 	glutPostRedisplay();//空闲时候,立刻通知刷新
 }
@@ -235,8 +235,8 @@ int main(int argc,char* argv[]){
 	GAMESGLUT_GLUTFUNC(Entry);
 
 	//输出调试信息
-	printGlutGet();
-	printGlutDeviceGet();
+	//printGlutGet();
+	//printGlutDeviceGet();
 	//OpenGL初始化
 	glScalef(2.0/width,2.0/height,1);//以原点为缩放源进行缩放,使得整个屏幕的坐标范围变成(-width/2,-height/2 ~ width/2,height/2)
 	//glEnable(GL_DEPTH_TEST);

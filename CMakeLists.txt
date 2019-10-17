@@ -24,7 +24,7 @@ if(GAME_NAME)
 		message(编译执行程序)
 		project(GamesExe)
 		#设置共用库,给不同平台的可执行文件用
-		set(LIBS_LIST z GL ${LIBS_LIST})
+		set(LIBS_LIST ${LIBS_LIST} z)
 		set(LIBS_LIST ${GAME_NAME}Client GamesClient ${GAME_NAME} GamesEngines ${LIBS_LIST})#把编译好的引擎添加到库中
 		#GLUT
 		set(GLUT_NAME glut)
@@ -33,8 +33,11 @@ if(GAME_NAME)
 		endif()
 		set(LIBS_LIST ${LIBS_LIST} ${GLUT_NAME})
 		#以下为各种可执行文件的编译过程,根据情况选择编译自己需要的可执行文件即可
+		if(${TARGET_SYSTEM_NAME} STREQUAL Linux)
+			set(LIBS_LIST ${LIBS_LIST} GL gtk-3 gobject-2.0)
+		endif()
 		add_executable(GamesGLUT ./executable/GamesGLUT.cpp)
-		target_link_libraries(GamesGLUT ${LIBS_LIST} gtk-3 gobject-2.0)
+		target_link_libraries(GamesGLUT ${LIBS_LIST})
 	else()
 		message(编译客户端游戏库${GAME_NAME})
 		project(${GAME_NAME}Client)

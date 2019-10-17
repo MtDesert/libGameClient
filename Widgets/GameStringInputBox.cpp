@@ -76,3 +76,82 @@ void GameStringInputBox::startInput(){
 	inputBoxThread.start(inputBoxThreadFunc,this);
 }
 #endif
+
+#ifdef __MINGW32__
+
+#include<stdio.h>
+#include<windows.h>
+
+HWND window,editBox;
+static const char *inputStr=nullptr;
+char strInput[BUFSIZ];
+
+LRESULT __stdcall WindowProcedure(HWND window, unsigned int msg, WPARAM wp, LPARAM lp){
+	switch(msg){
+		case WM_CREATE:
+			editBox=CreateWindow("edit","text",WS_BORDER|WS_CHILD|WS_VISIBLE,0,0,400,20,window,0,0,0);
+		break;
+		case WM_DESTROY:
+			PostQuitMessage(0);
+		default:return DefWindowProc(window,msg,wp,lp);
+	}
+	return 0;
+}
+
+void inputOK(const char *str){
+	printf("input %s\n",str);
+	fflush(stdout);
+}
+
+static Thread inputBoxThread;
+static void* inputBoxThreadFunc(void *box){
+	auto inputBox=reinterpret_cast<GameStringInputBox*>(box);
+	window=editBox=0;
+	//注册WindowClass
+	WNDCLASS wc;
+	wc.style = CS_DBLCLKS;
+	wc.lpfnWndProc = WindowProcedure;
+	wc.cbClsExtra = 0;
+	wc.cbWndExtra = 0;
+	wc.hInstance = GetModuleHandle(0);
+	wc.hIcon = LoadIcon(0, IDI_APPLICATION);
+	wc.hCursor = LoadCursor(0, IDC_ARROW);
+	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW);
+	wc.lpszMenuName = 0;
+	wc.lpszClassName = "myclass";
+	RegisterClass(&wc);
+	//window
+	window = CreateWindow("myclass","title",WS_POPUPWINDOW|WS_OVERLAPPEDWINDOW,CW_USEDEFAULT,CW_USEDEFAULT,420,60,0,0,GetModuleHandle(0),0);
+	if(window){
+		ShowWindow(window,SW_SHOWDEFAULT) ;
+		MSG msg;
+		//事件循环
+		while(GetMessage(&msg,0,0,0)){
+			if(msg.message==WM_CHAR){
+				if(msg.wParam==VK_RETURN){
+					GetWindowText(editBox,strInput,BUFSIZ);
+					PostQuitMessage(0);
+				}
+				if(msg.wParam==VK_ESCAPE){
+					PostQuitMessage(0);
+				}
+			}
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+	}else{
+		printf("window error %lu\n",GetLastError());
+	}
+	UnregisterClass("myclass",wc.hInstance);
+	//输入结束
+	if(inputStr){
+		if(inputBox)inputBox->setString(inputStr);
+	}
+	return nullptr;
+}
+
+void GameStringInputBox::startInput(){
+	inputBoxThread.start(inputBoxThreadFunc,this);
+}
+
+#endif
