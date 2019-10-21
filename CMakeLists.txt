@@ -24,17 +24,22 @@ if(GAME_NAME)
 		message(编译执行程序)
 		project(GamesExe)
 		#设置共用库,给不同平台的可执行文件用
-		set(LIBS_LIST z GL ${LIBS_LIST})
-		set(LIBS_LIST ${GAME_NAME}Client GamesClient ${GAME_NAME} GamesEngines ${LIBS_LIST})#把编译好的引擎添加到库中
-		#GLUT
-		set(GLUT_NAME glut)
-		if(${TARGET_SYSTEM_NAME} STREQUAL Windows)
-			set(GLUT_NAME freeglut)
+		set(LIBS_LIST ${GAME_NAME}Client GamesClient ${GAME_NAME} GamesEngines ${LIBS_LIST} z)#把编译好的引擎添加到库中
+		if(${TARGET_SYSTEM_NAME} STREQUAL Android)
+			include_directories(${NDK_ROOT}/sources/android/native_app_glue)
+			add_library(main SHARED ./executable/GamesNativeActivity.cpp)
+			target_link_libraries(main android log EGL GLESv1_CM)
+		else()
+			#GLUT库
+			set(GLUT_NAME glut)
+			if(${TARGET_SYSTEM_NAME} STREQUAL Windows)
+				set(GLUT_NAME freeglut)
+			endif()
+			set(LIBS_LIST ${LIBS_LIST} ${GLUT_NAME})
+			#以下为各种可执行文件的编译过程,根据情况选择编译自己需要的可执行文件即可
+			add_executable(GamesGLUT ./executable/GamesGLUT.cpp)
+			target_link_libraries(GamesGLUT ${LIBS_LIST} gtk-3 gobject-2.0)
 		endif()
-		set(LIBS_LIST ${LIBS_LIST} ${GLUT_NAME})
-		#以下为各种可执行文件的编译过程,根据情况选择编译自己需要的可执行文件即可
-		add_executable(GamesGLUT ./executable/GamesGLUT.cpp)
-		target_link_libraries(GamesGLUT ${LIBS_LIST} gtk-3 gobject-2.0)
 	else()
 		message(编译客户端游戏库${GAME_NAME})
 		project(${GAME_NAME}Client)

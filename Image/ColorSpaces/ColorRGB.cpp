@@ -39,7 +39,7 @@ bool ColorRGB::operator==(const ColorRGB &color)const{
 		&& blue==color.blue;
 }
 bool ColorRGBA::operator==(const ColorRGBA &color)const{
-	return this->operator==(color)
+	return ColorRGB::operator==(color)
 		&& alpha==color.alpha;
 }
 ColorRGBA& ColorRGBA::operator=(const ColorRGB &color){

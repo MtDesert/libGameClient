@@ -13,9 +13,11 @@
 #include <android/rect.h>
 #include <android/sensor.h>
 #include <android/storage_manager.h>
-#include <android/tts.h>
+//#include <android/tts.h>
 #include <android/window.h>
 #include "android_native_app_glue.h"
+
+#include<string.h>
 
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "games.engines", __VA_ARGS__))
 #define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "games.engines", __VA_ARGS__))
@@ -104,14 +106,14 @@ static void engine_term_display(EngineEGL* engine) {
  */
 static int32_t engine_handle_input(struct android_app* app,AInputEvent* event){
 	int32_t type=AInputEvent_getType(event);
-	int32_t deviceID=AInputEvent_getDeviceId(event);
-	int32_t source=AInputEvent_getSource(event);
+	/*int32_t deviceID=AInputEvent_getDeviceId(event);
+	int32_t source=AInputEvent_getSource(event);*/
 	switch(type){
 		case AINPUT_EVENT_TYPE_KEY:{
-			int32_t action=AKeyEvent_getAction(event);
+			/*int32_t action=AKeyEvent_getAction(event);
 			int32_t flags=AKeyEvent_getFlags(event);
 			int32_t keyCode=AKeyEvent_getKeyCode(event);
-			int32_t scanCode=AKeyEvent_getScanCode(event);
+			int32_t scanCode=AKeyEvent_getScanCode(event);*/
 		}break;
 		case AINPUT_EVENT_TYPE_MOTION:{
 			int32_t action=AMotionEvent_getAction(event);
@@ -199,14 +201,13 @@ static void engine_handle_cmd(struct android_app *app, int32_t cmd) {
 void android_main(struct android_app* app) {
 	LOGI("主函数开始启动");
 	EngineEGL engine;
-	app_dummy();//删除此函数可能导致启动失败
 	memset(&engine, 0, sizeof(engine));
 	app->userData = &engine;
 	app->onAppCmd = engine_handle_cmd;
 	app->onInputEvent = engine_handle_input;
 	
 	//显示所有传感器信息
-	sensorManager = ASensorManager_getInstance();
+	sensorManager = ASensorManager_getInstanceForPackage(nullptr);
 	int i=0;
 	for(;i<SENSOR_AMOUNT;++i){
 		allSensors[i]=ASensorManager_getDefaultSensor(sensorManager,i);

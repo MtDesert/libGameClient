@@ -1,5 +1,5 @@
 #include"ShapeRenderer.h"
-#include"GL/gl.h"
+#include"gl.h"
 
 ShapeRenderer::ShapeRenderer():hasEdge(true),hasFill(true),edgeColor(0xFFFFFFFF),fillColor(0xFFFFFFFF),texture(0){}
 ShapeRenderer::~ShapeRenderer(){}

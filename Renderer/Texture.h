@@ -1,7 +1,7 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
-#include"GL/gl.h"
+#include"gl.h"
 #include"FileBMP.h"
 #include"FilePNG.h"
 #include"Pixmap.h"

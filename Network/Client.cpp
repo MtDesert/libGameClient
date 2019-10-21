@@ -16,12 +16,8 @@ static void whenSocketConnected(Socket *socket){
 	client->reqSelectGame(Game::currentGame()->gameName());
 	if(client->whenConnected)client->whenConnected();
 }
-static void whenSocketSent(Socket *socket){
-	printf("发送数据量%lu\n",socket->sentData.dataLength);
-}
-static void whenSocketReceived(Socket *socket){
-	printf("接收数据量%lu\n",socket->recvData.dataLength);
-}
+static void whenSocketSent(Socket *socket){}
+static void whenSocketReceived(Socket *socket){}
 
 //Client类
 Client::Client():serverIPaddress(nullptr),serverPort(nullptr),whenError(nullptr),whenConnected(nullptr){

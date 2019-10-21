@@ -1,5 +1,4 @@
 #include"GameCamera.h"
-#include<GL/glu.h>
 
 GameCamera::GameCamera(){}
 

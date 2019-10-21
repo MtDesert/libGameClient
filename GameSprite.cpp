@@ -11,9 +11,15 @@ void GameSprite::render()const{
 	//绘制纹理
 	glPushMatrix();//保存矩阵
 	//变换
+#ifdef __ANDROID__
+	glTranslatex(position.x,position.y,position.z);
+	glRotatex(rotateAngle,rotation.x,rotation.y,position.z);
+	glScalex(scale.x,scale.y,scale.z);
+#else
 	glTranslated(position.x,position.y,position.z);
 	glRotated(rotateAngle,rotation.x,rotation.y,position.z);
 	glScaled(scale.x,scale.y,scale.z);
+#endif
 	//绘制纹理
 	ShapeRenderer::setColor(color);
 	texture.draw(rectF());

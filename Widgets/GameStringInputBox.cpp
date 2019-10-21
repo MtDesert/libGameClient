@@ -28,6 +28,9 @@ void GameStringInputBox::setString(const string &str){
 
 //线程实现输入
 #ifdef __linux__
+#ifdef __ANDROID__
+void GameStringInputBox::startInput(){}
+#else
 
 #include<gtk-3.0/gtk/gtk.h>
 static GtkWidget *window=nullptr,*entry=nullptr;
@@ -75,4 +78,5 @@ static void* inputBoxThreadFunc(void *box){
 void GameStringInputBox::startInput(){
 	inputBoxThread.start(inputBoxThreadFunc,this);
 }
-#endif
+#endif //__ANDROID__
+#endif //__linux__
