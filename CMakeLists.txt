@@ -14,6 +14,10 @@ set(GAMECLIENT_DIR
 	Scenes #场景,提供公共的常见场景(如选择文件场景)
 )
 
+if(${TARGET_SYSTEM_NAME} STREQUAL Windows)
+	include_directories(c:/MinGW/include/GL)
+endif()
+
 if(GAME_NAME)
 	include(../lib${GAME_NAME}/CMakeLists.txt)#读取游戏的CMakeLists.txt
 	includeAll(./ ${GAMECLIENT_DIR})
