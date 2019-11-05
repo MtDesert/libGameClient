@@ -2,9 +2,6 @@
 #include"Number.h"
 
 #include"zlib.h"
-
-#include<iostream>
-#include<cmath>
 #include<string.h>
 
 //常量宏

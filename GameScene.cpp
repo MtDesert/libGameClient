@@ -35,6 +35,7 @@ GameScene::~GameScene(){
 	delete gameDialog_login;
 }
 
+//消息框
 void GameScene::showDialogMessage(const string &content){
 	if(!gameDialog_message){
 		gameDialog_message=new GameDialog_Message();

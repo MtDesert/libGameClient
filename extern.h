@@ -11,13 +11,10 @@
 MACRO(Point2D<float>,point2D)\
 MACRO(Point2D<float>,size2D)\
 MACRO(Rectangle2D<float>,rect)\
-MACRO(Texture,texture)\
 MACRO(ShapeRenderer,shapeRenderer)
 
 #define EXTERN_DECLARATION(type,name) extern type name;
-
 ALL_EXTERN_VARIABLE(EXTERN_DECLARATION)
-
 #undef EXTERN_DECLARATION
 
 #endif

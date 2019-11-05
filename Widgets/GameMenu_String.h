@@ -13,7 +13,7 @@ public:
 	GameMenu_String();
 	~GameMenu_String();
 
-	void addString(const string &str);//添加字符串
+	void addString(const string &str,bool translate=false);//添加字符串
 
 	//重写
 	uint rowAmount()const;

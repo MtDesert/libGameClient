@@ -6,10 +6,10 @@ static ColorRGBA borderColor(0xFFFFFFFF);//边框颜色
 GameMenu_String::GameMenu_String(){}
 GameMenu_String::~GameMenu_String(){}
 
-void GameMenu_String::addString(const string &str){
+void GameMenu_String::addString(const string &str, bool translate){
 	gameStringList.push_back(GameString());
 	auto gString=gameStringList.data(gameStringList.size()-1);
-	gString->setString(str);
+	gString->setString(str,translate);
 }
 
 uint GameMenu_String::rowAmount()const{return gameStringList.size();}

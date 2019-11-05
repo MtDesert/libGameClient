@@ -6,20 +6,19 @@
 static const char* strCharset[]={//静态字符表
 	CHARSET_ALL(STR_NAME)
 };
+//缓冲区
+static DataBlock targetBlock;
 
 Charset::Charset():srcCharset(UTF8),destCharset(GBK){
 	strCharset[UTF8]="UTF-8";//Windows的iconv -l命令查出"UTF-8"而非"UTF8",这会影响iconv_open的返回值
 }
-Charset::~Charset(){}
-
-bool Charset::newString(const char *srcStr,DataBlock &dataBlock)const{
-	auto p=(char*)dataBlock.dataPointer;
-	bool b=newString(srcStr,&p,dataBlock.dataLength);
-	dataBlock.dataPointer=(uchar*)p;
-	return b;
+Charset::~Charset(){
+	targetBlock.memoryFree();
 }
-bool Charset::newString(const char *srcStr,char **destStr,size_t &destLen)const{
-	return newString(srcStr,srcCharset,destCharset,destStr,destLen);
+
+DataBlock Charset::newString(const char *srcStr)const{
+	newString(srcStr,srcCharset,destCharset);
+	return targetBlock;
 }
 
 size_t Charset::charAmount(const char *str,EnumCharset charset){
@@ -57,9 +56,9 @@ static iconv_t convert;
 static char *fromStr,*toStr;
 static size_t fromLen,toLen;
 
-bool Charset::newString(const char *srcStr,EnumCharset fromCharset,EnumCharset toCharset,char **destStr, size_t &destLen){
-	if(!srcStr || fromCharset>=AmountOf_EnumCharset || toCharset>=AmountOf_EnumCharset || !destStr)return false;//防非法输入
-	prefixLen=0,bytesPerChar=1;//前缀字符个数和每个字符可能的个数
+bool Charset::newString(const char *srcStr,EnumCharset fromCharset,EnumCharset toCharset){
+	if(!srcStr || fromCharset>=AmountOf_EnumCharset || toCharset>=AmountOf_EnumCharset)return false;//防非法输入
+	prefixLen=0,bytesPerChar=1;//前缀字符个数,每个字符可能的个数
 	switch(toCharset){//根据目标字符集确定每个字可能的最长长度
 		case UNICODE:prefixLen=2;bytesPerChar=2;break;//iconv转换后自带2字节的头
 		case GB2312:case GBK:bytesPerChar=2;break;
@@ -67,20 +66,25 @@ bool Charset::newString(const char *srcStr,EnumCharset fromCharset,EnumCharset t
 		case GB18030:bytesPerChar=4;break;
 		default:;
 	}
-
-	toStr = *destStr;
-	toLen = prefixLen + charAmount(srcStr,fromCharset) * bytesPerChar;//测字符数,确定需要的转换空间
+	//获得目标可能的大小,调整缓冲区空间
+	toLen = prefixLen + charAmount(srcStr,fromCharset) * bytesPerChar + 1;//测字符数,确定需要的转换空间
+	if(toLen > targetBlock.dataLength){
+		targetBlock.memoryReallocate(toLen);
+	}else{
+		toLen=targetBlock.dataLength;
+	}
 	//申请成功就开始转换
-	if(toStr){
-		*destStr = toStr;
-		destLen = toLen;
+	if(targetBlock.dataPointer){
 		//准备转换,变量赋值
 		fromStr = (char*)srcStr;
 		fromLen = strlen(srcStr);//测字节数
+		toStr = (char*)targetBlock.dataPointer;
 		//iconv转换的完整过程
 		convert=iconv_open(strCharset[toCharset],strCharset[fromCharset]);
 		iconv(convert,&fromStr,&fromLen,&toStr,&toLen);
 		iconv_close(convert);
+		//结束符号
+		targetBlock.dataPointer[targetBlock.dataLength-toLen]='\0';
 	}
 	return true;
 }

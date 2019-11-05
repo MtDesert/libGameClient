@@ -26,13 +26,12 @@ public:
 	//源字符集和目标字符集
 	EnumCharset srcCharset,destCharset;
 	//创建字符
-	bool newString(const char *srcStr,DataBlock &dataBlock)const;
-	bool newString(const char *srcStr,char **destStr,size_t &destLen)const;
+	DataBlock newString(const char *srcStr)const;
 
 	//统计字符串str的字符数(charset为str的字符集)
 	static size_t charAmount(const char *str,EnumCharset charset);
 	//转换(静态方法)
-	static bool newString(const char *str,EnumCharset fromCharset,EnumCharset toCharset,char **destStr,size_t &destLen);
+	static bool newString(const char *str,EnumCharset fromCharset,EnumCharset toCharset);
 };
 
 #endif

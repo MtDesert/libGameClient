@@ -6,17 +6,11 @@
 //静态变量
 Charset GameString::charset;
 FontTextureCache GameString::fontTextureCache;
-bool GameString::translateMode(false);
 //渲染用的变量
 static uint8 u8;//存放单字节的字符
 static uint16 u16;//存放双字节的字符
 static size_t w;//渲染时候计算字符长度用的变量
 static Point2D<float> p;//渲染纹理用的点
-//静态缓冲区,用于字符转换
-static const size_t bufferSize=512;
-static char stringBuffer[bufferSize];
-static char *destStr=nullptr;
-static size_t destLen=0;
 
 GameString::GameString():charSize(16,32),strWidth(0){}
 GameString::GameString(const string &str):GameString(){
@@ -24,23 +18,20 @@ GameString::GameString(const string &str):GameString(){
 }
 GameString::~GameString(){}
 
-void GameString::setString(const string &str){
-	//准备缓冲
-	memset(stringBuffer,0,bufferSize);
-	destStr=stringBuffer;
-	destLen=bufferSize;
+void GameString::setString(const string &str, bool translate){
 	//获取字符及其特征
-	charset.newString(translateMode ? Game::currentGame()->translate(str) : str.data(),&destStr,destLen);
+	auto block=charset.newString(translate ? Game::currentGame()->translate(str) : str.data());
 	//计算特征,生成纹理
-	DataBlock block;
-	block.dataPointer=(uchar*)destStr;
-	block.dataLength=::strlen(destStr);
 	arrayCharAttr.setSize(block.dataLength);//申请缓冲
 	auto charAmount=0;//统计字符数
 	for(uint i=0;i<block.dataLength;++i){
 		auto attr=arrayCharAttr.data(charAmount);
 		//开始判断
 		block.get_uint8(i,u8);
+		if(u8=='\0'){
+			strWidth=i;
+			break;
+		}
 		attr->isAscii=(u8<0x80);
 		if(attr->isAscii){
 			u16=u8;
@@ -52,7 +43,6 @@ void GameString::setString(const string &str){
 		++charAmount;
 	}
 	arrayCharAttr.setSize(charAmount);//去掉用不着的空间
-	strWidth=block.dataLength;
 }
 uint GameString::stringWidth()const{return charSize.x*strWidth;}
 
