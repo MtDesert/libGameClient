@@ -6,9 +6,10 @@ set(GAMECLIENT_DIR
 	. #当前目录
 	Zipper Zipper/FileStructs #压缩模块,负责解压
 	Image Image/FileStructs Image/ColorSpaces #图像模块,主要用于图像解码和处理
-	Font #字体处理模块,文字可以当作一种特殊的图像
 	Renderer #渲染模块,主要用于控制显存和绘制
+	Font #字体处理模块,文字可以当作一种特殊的图像
 	Charset #字符集,处理字符转换过程
+	Timer #计时器,主要用于控制物体动作
 	Network #网络模块
 	Widgets #控件集,类似于各种平台特有的控件
 	Scenes #场景,提供公共的常见场景(如选择文件场景)

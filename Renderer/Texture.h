@@ -6,9 +6,6 @@
 #include"FilePNG.h"
 #include"Pixmap.h"
 
-#include<map>
-using namespace std;
-
 /*纹理主要是指在显存中的东西,而如果在内存或者外存中我们应该叫做图像,
 纹理由显卡直接调度,可以进行快速渲染
 这是OpenGL所使用的纹理,在OpenGL的标准中,操作纹理的依据是GLuint类型的一个值,通过不同的值来区分不同的纹理*/

@@ -1,8 +1,5 @@
 #include"Game.h"
-#include"errno.h"
-
-//全局变量
-string errorString;//错误描述,如果游戏运行过程中出现各种错误,都可以存到此变量中
+#include"GameDialog_Message.h"
 
 Game::Game():sceneFileList(nullptr){
 	//加载字体
@@ -17,10 +14,10 @@ Game::~Game(){
 	deleteScene_FileList();
 	//删除字体
 	FontTextureCache &cache(GameString::fontTextureCache);
-	cache.bitmapFontAscii.charBlock.deleteDataPointer();
-	cache.bitmapFontGb2312.symbolBlock.deleteDataPointer();
-	cache.bitmapFontGb2312.lv1Chinese.deleteDataPointer();
-	cache.bitmapFontGb2312.lv2Chinese.deleteDataPointer();
+	cache.bitmapFontAscii.charBlock.memoryFree();
+	cache.bitmapFontGb2312.symbolBlock.memoryFree();
+	cache.bitmapFontGb2312.lv1Chinese.memoryFree();
+	cache.bitmapFontGb2312.lv2Chinese.memoryFree();
 }
 
 //Game* Game::newGame(){return new Game();}
@@ -69,7 +66,7 @@ const char* Game::translate(const string &english)const{
 GameScene_FileList *Game::showScene_FileList(){
 	if(!sceneFileList){
 		sceneFileList=new GameScene_FileList();
-		subObjects.push_front(sceneFileList);
+		gotoScene(sceneFileList);
 	}
 	return sceneFileList;
 }
@@ -89,43 +86,35 @@ Client* Game::currentClient(){
 	return client;
 }
 
-#define GAME_FIRST_SCENE(code) \
-auto scene=findFirstGameScene();\
-if(scene)scene->code;
-
+//消息框
+static GameDialog_Message *messageDialog=nullptr;
 void Game::showDialogMessage(const string &content){
-	GAME_FIRST_SCENE(showDialogMessage(content))
+	if(!messageDialog){
+		messageDialog=new GameDialog_Message();
+		currentGame()->addSubObject(messageDialog);
+	}
+	messageDialog->setText(content);
 }
 void Game::hideDialogMessage(){
-	GAME_FIRST_SCENE(hideDialogMessage())
+	currentGame()->removeSubObject(messageDialog);
+	delete messageDialog;
+	messageDialog=nullptr;
 }
 
-void Game::joystickKey(JoystickKey key,bool pressed){
-	GAME_FIRST_SCENE(joystickKey(key,pressed))
-}
-void Game::keyboardKey(Keyboard::KeyboardKey key,bool pressed){
-	GAME_FIRST_SCENE(keyboardKey(key,pressed))
-}
-void Game::mouseKey(MouseKey key,bool pressed){
-	GAME_FIRST_SCENE(mouseKey(key,pressed))
-}
+//重写函数
 void Game::mouseMove(int x,int y){
 	mousePos.x=x;
 	mousePos.y=y;
-	GAME_FIRST_SCENE(mouseMove(x,y))
+	GameObject::mouseMove(x,y);
 }
 void Game::addTimeSlice(uint usec){
-	GAME_FIRST_SCENE(addTimeSlice(usec))
-}
-void Game::render()const{
-	GAME_FIRST_SCENE(render())
+	GameObject::addTimeSlice(usec);
+	timeSliceList.addTimeSlice(usec);
 }
 
-GameScene* Game::findFirstGameScene()const{
-	GameScene *scene=nullptr;
-	for(auto obj:subObjects){
-		scene=dynamic_cast<GameScene*>(obj);
-		if(scene)break;
-	}
-	return scene;
+static bool isScene(GameObject* const &obj){return obj && dynamic_cast<GameScene*>(obj);}
+void Game::clearAllScenes(){subObjects.remove_if(isScene);}
+void Game::gotoScene(GameScene *scene){
+	clearAllScenes();
+	addSubObject(scene,true);
 }

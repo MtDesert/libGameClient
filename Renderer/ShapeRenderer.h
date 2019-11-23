@@ -18,10 +18,8 @@ public:
 	//typedef int numType;
 	typedef float numType;
 	//成员变量
-	bool hasEdge;//是否绘制几何图形的边缘
-	bool hasFill;//是否填充图形
-	ColorRGBA edgeColor;//这是线的颜色
-	ColorRGBA fillColor;//这是闭合图形的填充色
+	const ColorRGBA *edgeColor;//这是线的颜色
+	const ColorRGBA *fillColor;//这是闭合图形的填充色
 	int texture;//OpenGL的当前纹理,可混合填充色
 	
 	static void setColor(const ColorRGBA &color);//设置当前绘制的颜色(OpenGL的话则是传给状态机)
@@ -50,6 +48,8 @@ public:
 	void drawRectangle(const Point2D<numType> &p0,const Point2D<numType> &p1)const;
 	void drawRectangle(const Rectangle2D<numType> &rect)const;
 	void drawRectangle(const numType vertex[])const;
+
+	void drawRectangle(const Rectangle2D<numType> &rect,const ColorRGBA *border,const ColorRGBA *background);
 	//画多边形(顶点数组,顶点数量)
 	void drawPolygen(const numType vertex[],int n)const;//注意:n是顶点数,不是数组大小
 };

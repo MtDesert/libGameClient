@@ -1,9 +1,7 @@
 #include"GameMenu_String.h"
 #include"extern.h"
 
-static ColorRGBA borderColor(0xFFFFFFFF);//边框颜色
-
-GameMenu_String::GameMenu_String(){}
+GameMenu_String::GameMenu_String(){borderColor=&ColorRGBA::White;}
 GameMenu_String::~GameMenu_String(){}
 
 void GameMenu_String::addString(const string &str, bool translate){
@@ -20,8 +18,7 @@ void GameMenu_String::renderX()const{
 		if(i>=renderItemStart){
 			//根据选择状态调整颜色
 			if(selectingItemIndex==i){
-				shapeRenderer.hasFill=true;
-				shapeRenderer.fillColor=0xFFFFFFFF;
+				shapeRenderer.fillColor=&ColorRGBA::White;
 				//计算矩形选择区域
 				rect=gString.rectF();
 				rect.p0.y+=gString.position.y;
@@ -35,8 +32,6 @@ void GameMenu_String::renderX()const{
 		if(j>=renderItemAmount)break;
 		++i;//下一个
 	}
-	//绘制菜单边框
-	renderRect(&borderColor);
 }
 void GameMenu_String::updateRenderParameters(){
 	GameMenu::updateRenderParameters();
@@ -47,7 +42,7 @@ void GameMenu_String::updateRenderParameters(){
 		if(i>=renderItemStart){
 			gString.position.y = point2D.y - itemHeight*j - itemHeight/2;
 			//根据选择状态调整颜色
-			gString.color=(selectingItemIndex==i ? 0xFF000000 : 0xFFFFFFFF);
+			gString.color=(selectingItemIndex==i ? ColorRGBA::Black : ColorRGBA::White);
 			++j;
 		}
 		if(j>=renderItemAmount)break;

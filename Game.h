@@ -3,6 +3,7 @@
 
 #include"GameObject.h"
 #include"GameScene_FileList.h"
+#include"GameTimer.h"
 #include"Client.h"
 
 /** Game是整个游戏运行的环境，游戏的主要数据都在本类中
@@ -16,11 +17,12 @@ public:
 	~Game();
 
 	static Game* newGame();//创建游戏,请在子类实现
-	static Game* currentGame();//当前游戏,请在子类实现
+	static Game* currentGame();//当前游戏,子类实现时候注意返回值
 	virtual string gameName()const;//游戏的名字
 	//输入输出变量
 	static Point3D<int> resolution;//分辨率
 	static Point2D<int> mousePos;//鼠标位置
+	TimeSliceList timeSliceList;//时间片列表,用于控制物体运动
 
 	//翻译
 	bool loadTranslationFile(const string &filename);
@@ -34,23 +36,18 @@ public:
 	static Client* currentClient();
 
 	//提示框
-	void showDialogMessage(const string &content);
-	void hideDialogMessage();
+	static void showDialogMessage(const string &content);
+	static void hideDialogMessage();
 
 	//重写方法
-	void joystickKey(JoystickKey key,bool pressed);
-	void keyboardKey(Keyboard::KeyboardKey key,bool pressed);
-	void mouseKey(MouseKey key,bool pressed);
 	void mouseMove(int x,int y);
 	void addTimeSlice(uint usec);
-	void render()const;
 protected:
 	static Game *game;//运行中的游戏
-	//翻译
-	Map<string,string> translationMap;
-	//文件管理
-	GameScene_FileList *sceneFileList;
+	Map<string,string> translationMap;//翻译表
+	GameScene_FileList *sceneFileList;//文件场景
 	//场景管理
-	GameScene* findFirstGameScene()const;
+	void clearAllScenes();//清除所有场景
+	void gotoScene(GameScene *scene);//转向特定场景
 };
 #endif

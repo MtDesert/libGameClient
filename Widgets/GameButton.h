@@ -12,14 +12,12 @@ public:
 
 	//成员变量
 	bool isPressed;//是否处于按下状态
-	ColorRGBA bgColor;//背景色,按下状态时颜色互换
 	//回调函数(button用于指示哪个按钮被按下)
 	void (*onClicked)(GameButton *button);
 
 	//以下函数有可能子类差异化
 	virtual void mouseMove(int x,int y);//鼠标移动出区域的时候恢复为不按下状态
 	virtual void mouseKey(MouseKey key,bool pressed);//让按钮可以响应鼠标点击
-	virtual void renderX()const;//按钮可能有纹理和文字需要绘制
 
 	bool isMouseOnButton()const;//判断鼠标是否在按钮上
 	virtual void setIsPressed(bool pressed);
@@ -33,7 +31,7 @@ public:
 	GameButton_String();
 	~GameButton_String();
 
-	void setString(const string &str);
+	void setString(const string &str,bool translate=false);
 	virtual void setIsPressed(bool pressed);
 };
 

@@ -15,7 +15,7 @@ int timerInterval[Timer_Amount]={16};//microsecond
 void glutTimerFunction(int timerID){
 	switch(timerID){
 		case TimerCPU:
-			game->addTimeSlice(1000*timerInterval[timerID]);
+			game->addTimeSlice(timerInterval[timerID]);
 		break;
 	}
 	glutTimerFunc(timerInterval[timerID],glutTimerFunction,timerID);

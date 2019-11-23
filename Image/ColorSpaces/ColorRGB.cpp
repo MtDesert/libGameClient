@@ -100,3 +100,10 @@ COLOR_CPP_FROMTO32(AGRB,alpha,green,red,blue)
 COLOR_CPP_FROMTO32(AGBR,alpha,green,blue,red)
 COLOR_CPP_FROMTO32(ABRG,alpha,blue,red,green)
 COLOR_CPP_FROMTO32(ABGR,alpha,blue,green,red)
+
+const ColorRGBA
+ColorRGBA::Black(0xFF000000),
+ColorRGBA::Red(0xFF0000FF),
+ColorRGBA::Green(0xFF00FF00),
+ColorRGBA::Blue(0xFFFF0000),
+ColorRGBA::White(0xFFFFFFFF);

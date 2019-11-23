@@ -1,7 +1,7 @@
 #include"ShapeRenderer.h"
 #include"gl.h"
 
-ShapeRenderer::ShapeRenderer():hasEdge(true),hasFill(true),edgeColor(0xFFFFFFFF),fillColor(0xFFFFFFFF),texture(0){}
+ShapeRenderer::ShapeRenderer():edgeColor(nullptr),fillColor(nullptr),texture(0){}
 ShapeRenderer::~ShapeRenderer(){}
 
 void ShapeRenderer::setColor(const ColorRGBA &color){
@@ -29,10 +29,12 @@ void ShapeRenderer::drawPoints(const list<Point2D<numType> > &points)const{
 	drawPoints(vertex,points.size());
 }
 void ShapeRenderer::drawPoints(const numType vertex[],int n)const{
-	glBindTexture(GL_TEXTURE_2D,0);
-	setColor(edgeColor);
-	glVertexPointer(2,GL_FLOAT,0,vertex);
-	glDrawArrays(GL_POINTS,0,n);
+	if(edgeColor){
+		glBindTexture(GL_TEXTURE_2D,0);
+		setColor(*edgeColor);
+		glVertexPointer(2,GL_FLOAT,0,vertex);
+		glDrawArrays(GL_POINTS,0,n);
+	}
 }
 
 //画线
@@ -55,25 +57,29 @@ void ShapeRenderer::drawLine(const Line2D<numType> &line)const{
 }
 
 void ShapeRenderer::drawLines(const numType vertex[],int n)const{
-	glBindTexture(GL_TEXTURE_2D,0);
-	setColor(edgeColor);
-	glVertexPointer(2,GL_FLOAT,0,vertex);
-	glDrawArrays(GL_LINES,0,n*2);
+	if(edgeColor){
+		glBindTexture(GL_TEXTURE_2D,0);
+		setColor(*edgeColor);
+		glVertexPointer(2,GL_FLOAT,0,vertex);
+		glDrawArrays(GL_LINES,0,n*2);
+	}
 }
 
 //折线
 void ShapeRenderer::drawBrokenLine(const list<Point2D<numType> > &points)const{
-	numType vertex[points.size()*2];
-	size_t i=0;
-	for(auto &p:points){
-		vertex[i]=p.x;
-		vertex[i+1]=p.y;
-		i+=2;
+	if(edgeColor){
+		numType vertex[points.size()*2];
+		size_t i=0;
+		for(auto &p:points){
+			vertex[i]=p.x;
+			vertex[i+1]=p.y;
+			i+=2;
+		}
+		glBindTexture(GL_TEXTURE_2D,0);
+		setColor(*edgeColor);
+		glVertexPointer(2,GL_FLOAT,0,vertex);
+		glDrawArrays(GL_LINE_STRIP,0,points.size()*2);
 	}
-	glBindTexture(GL_TEXTURE_2D,0);
-	setColor(edgeColor);
-	glVertexPointer(2,GL_FLOAT,0,vertex);
-	glDrawArrays(GL_LINE_STRIP,0,points.size()*2);
 }
 
 //三角形
@@ -124,16 +130,22 @@ void ShapeRenderer::drawRectangle(const Rectangle2D<numType> &rect)const{
 void ShapeRenderer::drawRectangle(const numType vertex[])const{
 	drawPolygen(vertex,4);
 }
+
+void ShapeRenderer::drawRectangle(const Rectangle2D<numType> &rect,const ColorRGBA *border,const ColorRGBA *background){
+	edgeColor=border;
+	fillColor=background;
+	drawRectangle(rect);
+}
 //多边形
 void ShapeRenderer::drawPolygen(const numType vertex[],int n)const{
 	glBindTexture(GL_TEXTURE_2D,texture);
 	glVertexPointer(2,GL_FLOAT,0,vertex);
-	if(hasFill){//绘制底色或纹理
-		setColor(fillColor);
+	if(fillColor){//绘制底色或纹理
+		setColor(*fillColor);
 		glDrawArrays(GL_TRIANGLE_FAN,0,n);
 	}
-	if(hasEdge){//绘制边框线
-		setColor(edgeColor);
+	if(edgeColor){//绘制边框线
+		setColor(*edgeColor);
 		glDrawArrays(GL_LINE_LOOP,0,n);
 	}
 }

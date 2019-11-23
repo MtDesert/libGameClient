@@ -10,7 +10,5 @@ class GameDialog:public GameSprite{
 public:
 	GameDialog();
 	~GameDialog();
-
-	virtual void renderX()const;
 };
 #endif

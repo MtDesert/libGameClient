@@ -50,7 +50,7 @@ size_t Charset::charAmount(const char *str,EnumCharset charset){
 	return ret;
 }
 
-size_t prefixLen,bytesPerChar;
+static size_t prefixLen,bytesPerChar;
 //转换过程变量
 static iconv_t convert;
 static char *fromStr,*toStr;

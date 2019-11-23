@@ -3,11 +3,16 @@
 
 const int border=16;
 uint GameDialog_Message::maxLineCharAmount = 36;
+static void whenConfirmClicked(GameButton *button){
+	Game::hideDialogMessage();
+}
 
 GameDialog_Message::GameDialog_Message(){
 	addSubObject(&mGameText);
 	addSubObject(&mGameButton);
-	mGameButton.setString(Game::currentGame()->translate("Confirm"));
+	mGameText.setLineCharAmount(maxLineCharAmount,maxLineCharAmount);
+	mGameButton.setString("Confirm",true);
+	mGameButton.onClicked=whenConfirmClicked;
 }
 GameDialog_Message::~GameDialog_Message(){}
 
@@ -20,14 +25,6 @@ Point2D<float> GameDialog_Message::sizeF()const{
 }
 void GameDialog_Message::setText(const string &text){
 	mGameText.setString(text);
-	//调整mGameText的行字数
-	auto strWidth = mGameText.stringWidth();
-	if(strWidth > maxLineCharAmount * mGameText.charSize.x){
-		mGameText.lineCharAmount = maxLineCharAmount;
-	}else{
-		mGameText.lineCharAmount = strWidth / mGameText.charSize.x;
-	}
-	mGameText.updateRenderParameter();
 	//设置mGameText的几何位置
 	auto rct=rectF();
 	mGameText.position.y=rct.p1.y - border - mGameText.sizeF().y/2;

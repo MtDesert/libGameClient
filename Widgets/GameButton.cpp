@@ -2,11 +2,10 @@
 #include"Game.h"
 #include"extern.h"
 
-static ColorRGBA borderColor(0xFFFFFFFF);
-
-GameButton::GameButton():isPressed(false),bgColor(0xFF000000),onClicked(nullptr){
-	size.x=160;
-	size.y=32;
+GameButton::GameButton():isPressed(false),onClicked(nullptr){
+	size.setXY(160,32);
+	bgColor=&ColorRGBA::Black;
+	borderColor=&ColorRGBA::White;
 }
 GameButton::~GameButton(){}
 GameButton_String::GameButton_String(){
@@ -28,15 +27,6 @@ void GameButton::mouseKey(MouseKey key,bool pressed){
 		}
 	}
 }
-void GameButton::renderX()const{
-	rect=rectF();
-	//绘制按钮纹理
-	shapeRenderer.hasFill=true;
-	shapeRenderer.fillColor=(isPressed ? color : bgColor);
-	shapeRenderer.drawRectangle(rect);
-	//绘制按钮边框
-	renderRect(&borderColor);
-}
 
 bool GameButton::isMouseOnButton()const{
 	rect=rectF();
@@ -57,11 +47,12 @@ bool GameButton::isMouseOnButton()const{
 }
 void GameButton::setIsPressed(bool pressed){isPressed=pressed;}
 
-void GameButton_String::setString(const string &str){
-	mGameString.setString(str);
+void GameButton_String::setString(const string &str,bool translate){
+	mGameString.setString(str,translate);
 }
 
 void GameButton_String::setIsPressed(bool pressed){
 	GameButton::setIsPressed(pressed);
-	mGameString.color=(isPressed ? bgColor : color);
+	bgColor=&(isPressed ? ColorRGBA::White:ColorRGBA::Black);
+	mGameString.color=(isPressed ? ColorRGBA::Black:ColorRGBA::White);
 }

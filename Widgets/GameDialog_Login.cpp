@@ -4,7 +4,7 @@
 #define ENG(name) #name
 
 GameDialog_Login::GameDialog_Login(){
-	size.x=400;size.y=160;
+	size.setXY(400,160);
 	//内容
 	strUsername.setString("Username");
 	strPassword.setString("Password");

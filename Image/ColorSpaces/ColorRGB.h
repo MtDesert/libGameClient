@@ -76,5 +76,7 @@ struct ColorRGBA:public ColorRGB{//RGBA(Red-Green-Blue-Alpha)
 
 	//member variable
 	uint8 alpha;
+
+	static const ColorRGBA Black,Red,Green,Blue,White;
 };
 #endif

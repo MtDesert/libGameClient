@@ -8,11 +8,11 @@ bool Bitmap_32bit::newBitmap(uint w,uint h){
 	if(w==0||h==0)return false;
 	width=w;
 	height=h;
-	return newDataPointer(w*h*4);
+	return memoryReallocate(w*h*4);
 }
-bool Bitmap_32bit::deleteBitmap(){
+void Bitmap_32bit::deleteBitmap(){
 	width=0;height=0;
-	return deleteDataPointer();
+	memoryFree();
 }
 uint Bitmap_32bit::getWidth()const{return width;}
 uint Bitmap_32bit::getHeight()const{return height;}

@@ -1,7 +1,7 @@
 #include"GameObject.h"
 #include<stdio.h>
 
-GameObject::GameObject():parentObject(nullptr),timeSlice(0),minTimeSlice(16000),maxTimeSlice(100000){}
+GameObject::GameObject():parentObject(nullptr){}
 GameObject::~GameObject(){clearSubObjects();}
 
 #define FOR_SUB_OBJECTS(code)\
@@ -9,9 +9,9 @@ for(auto obj:subObjects){\
 	if(obj){code;}\
 }
 
-void GameObject::addSubObject(GameObject *subObj){
+void GameObject::addSubObject(GameObject *subObj,bool addFront){
 	if(!subObj)return;
-	subObjects.push_back(subObj);
+	addFront ? subObjects.push_front(subObj) : subObjects.push_back(subObj);
 	subObj->parentObject=this;
 }
 void GameObject::removeSubObject(GameObject *subObj){
@@ -43,19 +43,8 @@ void GameObject::mouseWheel(int angle){
 	FOR_SUB_OBJECTS(obj->mouseWheel(angle))
 }
 void GameObject::addTimeSlice(uint usec){
-	timeSlice += usec;
-	if(timeSlice>maxTimeSlice){//限制最大时间片
-		timeSlice=maxTimeSlice;
-	}
-	if(timeSlice >= minTimeSlice){//试图消耗时间片
-		timeSlice -= minTimeSlice;
-		consumeTimeSlice();
-	}
-	//向下传递
 	FOR_SUB_OBJECTS(obj->addTimeSlice(usec))
 }
 void GameObject::render()const{
 	FOR_SUB_OBJECTS(obj->render());
 }
-
-void GameObject::consumeTimeSlice(){}

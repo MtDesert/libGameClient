@@ -1,7 +1,6 @@
 #ifndef EXTERN_H
 #define EXTERN_H
 
-#include"Texture.h"
 #include"ShapeRenderer.h"
 
 //所有要用到的外部变量,主要在于在各种模块中当临时变量用

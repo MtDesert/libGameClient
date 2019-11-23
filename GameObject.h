@@ -58,7 +58,7 @@ public:
 	//警告,subObject相当于树叉,如果把让它形成环状(比如addSubObject(this);)会出现严重的后果,除非你知道你自己在干什么
 	GameObject *parentObject;//父物体
 	List<GameObject*> subObjects;//子物体
-	void addSubObject(GameObject *subObj);
+	void addSubObject(GameObject *subObj,bool addFront=false);
 	void removeSubObject(GameObject *subObj);
 	void clearSubObjects();
 
@@ -76,10 +76,5 @@ public:
 	virtual void addTimeSlice(uint usec);//以毫秒为单位增加时间片,并且试图消耗时间片
 	//渲染,递归进行渲染
 	virtual void render()const;
-protected:
-	virtual void consumeTimeSlice();//消耗时间片
-	uint timeSlice;//目前累积的时间片
-	uint minTimeSlice;//timeSlice超过此值时可调用consumeTimeSlice()
-	uint maxTimeSlice;//timeSlice超过此值则会被限制为此值
 };
 #endif

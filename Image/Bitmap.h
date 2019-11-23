@@ -14,7 +14,7 @@ public:
 	~Bitmap_32bit();
 	//new & delete
 	bool newBitmap(uint width,uint height);
-	bool deleteBitmap();
+	void deleteBitmap();
 	//尺寸
 	uint getWidth()const;
 	uint getHeight()const;

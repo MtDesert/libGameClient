@@ -2,11 +2,13 @@
 #include"extern.h"
 
 GameSprite::GameSprite():color(0xFFFFFFFF),
+	bgColor(nullptr),borderColor(nullptr),
 	rotateAngle(0),
 	scale(1,1,1),
 	anchorPoint(0.5,0.5){}
 GameSprite::~GameSprite(){}
 
+void GameSprite::consumeTimeSlice(){}
 void GameSprite::render()const{
 	//绘制纹理
 	glPushMatrix();//保存矩阵
@@ -16,27 +18,22 @@ void GameSprite::render()const{
 	glRotatex(rotateAngle,rotation.x,rotation.y,position.z);
 	glScalex(scale.x,scale.y,scale.z);
 #else
-	glTranslated(position.x,position.y,position.z);
-	glRotated(rotateAngle,rotation.x,rotation.y,position.z);
-	glScaled(scale.x,scale.y,scale.z);
+	glTranslatef(position.x,position.y,position.z);
+	glRotatef(rotateAngle,rotation.x,rotation.y,position.z);
+	glScalef(scale.x,scale.y,scale.z);
 #endif
 	//绘制纹理
+	rect=rectF();
+	shapeRenderer.drawRectangle(rect,nullptr,bgColor);
 	ShapeRenderer::setColor(color);
-	texture.draw(rectF());
+	texture.draw(rect);
+	shapeRenderer.drawRectangle(rect,borderColor,nullptr);
 	//其它绘制
 	renderX();//特殊绘制
 	GameObject::render();//递归绘制子节点
 	glPopMatrix();//恢复矩阵
 }
 void GameSprite::renderX()const{}
-
-void GameSprite::renderRect(ColorRGBA *edgeColor,ColorRGBA *fillColor)const{
-	shapeRenderer.hasEdge=edgeColor;
-	shapeRenderer.hasFill=fillColor;
-	if(edgeColor)shapeRenderer.edgeColor=*edgeColor;
-	if(fillColor)shapeRenderer.fillColor=*fillColor;
-	shapeRenderer.drawRectangle(rectF());
-}
 
 Point2D<float> GameSprite::posF()const{
 	point2D.x=position.x;

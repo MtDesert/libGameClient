@@ -18,7 +18,6 @@ static uint colAmount,x,y;
 void GameTable::renderX()const{
 	//渲染整个表格内容
 	colAmount=columnAmount();
-	auto selectedColor=ColorRGBA(0xFF,0xFF,0xFF);
 	for(y=0;y<renderItemAmount;++y){
 		//调整渲染参数
 		rct.p0.x=rect.p0.x;
@@ -27,13 +26,13 @@ void GameTable::renderX()const{
 		for(x=0;x<colAmount;++x){
 			rct.p1.x = rct.p0.x + columnWidth(x);//调整渲染参数
 			//渲染边框
-			shapeRenderer.drawRectangle(rct);
+			shapeRenderer.drawRectangle(rct,&ColorRGBA::White,nullptr);
 			//渲染选择态
 			if(renderItemStart+y==selectingItemIndex){
-				shapeRenderer.hasFill=true;
-				shapeRenderer.fillColor=selectedColor;
+				shapeRenderer.fillColor=&ColorRGBA::White;
 				shapeRenderer.drawRectangle(rct);
-				shapeRenderer.hasFill=false;
+			}else{
+				shapeRenderer.fillColor=nullptr;
 			}
 			renderItem(x,y,rct);//渲染子类内容
 			rct.p0.x = rct.p1.x;//调整渲染参数

@@ -1,4 +1,7 @@
 #include "Texture.h"
+//缓冲区
+static DataBlock fileData;
+static Bitmap_32bit bitmap;//图像数据,用于传递给显卡或第三方库
 
 Texture::Texture():texture(0),width(0),height(0){}
 Texture::~Texture(){}
@@ -29,28 +32,20 @@ void Texture::deleteTexture(){
 }
 //创建纹理(根据不同的类)
 void Texture::texImage2D(const FileBMP &fileBmp){
-	Bitmap_32bit bitmap;
 	fileBmp.decodeTo(bitmap);
 	texImage2D(bitmap);
-	bitmap.deleteBitmap();
 }
 void Texture::texImage2D(const FilePNG &filePng){
-	Bitmap_32bit bitmap;
 	filePng.decodeTo(bitmap);
 	texImage2D(bitmap);
-	bitmap.deleteBitmap();
 }
 void Texture::texImage2D(const Pixmap<bool> &pixmap){
-	Bitmap_32bit bitmap;
 	pixmap.toBitmap(bitmap);
 	texImage2D(bitmap);
-	bitmap.deleteBitmap();
 }
 void Texture::texImage2D(const Pixmap<uint8> &pixmap){
-	Bitmap_32bit bitmap;
 	pixmap.toBitmap(bitmap);
 	texImage2D(bitmap);
-	bitmap.deleteBitmap();
 }
 void Texture::texImage2D(const Bitmap_32bit &bitmap){
 	texImage2D(bitmap.getWidth(),bitmap.getHeight(),bitmap.dataPointer);

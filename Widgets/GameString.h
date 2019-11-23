@@ -20,9 +20,10 @@ public:
 
 	//成员变量
 	Point2D<uint> charSize;//文字宽高,请注意这里的宽是ASCII字符的宽度,汉字的话则是两倍此宽度
+	size_t renderCharAmount;//渲染的文字数量
 	//成员函数
 	virtual void setString(const string &str,bool translate=false);//设置文本内容
-	uint stringWidth()const;//文本宽度,即所有文本所生成的字体加起来的总宽度
+	virtual uint stringWidth()const;//文本宽度,即所有文本所生成的字体加起来的总宽度
 	virtual Point2D<float> sizeF()const;//根据文字内容计算尺寸
 	virtual void renderX()const;//实时渲染文字
 
@@ -34,9 +35,9 @@ protected:
 		bool isAscii;
 		Texture tex;
 	};
-	Array<CharAttr> arrayCharAttr;
-	uint strWidth;//文字物理宽度
+	Array<CharAttr> arrayCharAttr;//字符数组
+	uint byteAmount;//字符串的字节数量,主要用于测量宽度
 	//渲染部分文字,从arrayCharAttr的from下标开始,渲染amount个字符
-	void renderX(uint from,uint amount)const;
+	void renderString(uint from,uint amount)const;
 };
 #endif

@@ -1,10 +1,8 @@
 #include"GameScene.h"
 #include"Game.h"
-#include"GameDialog_Message.h"
 #include"GameDialog_Login.h"
 
 //对话框
-static GameDialog_Message *gameDialog_message=nullptr;
 static GameDialog_Login *gameDialog_login=nullptr;
 
 #define GET_USERNAME_PASSWORD \
@@ -31,23 +29,9 @@ GameScene::GameScene(){
 	gameCamera.size=Game::currentGame()->resolution;
 }
 GameScene::~GameScene(){
-	delete gameDialog_message;
 	delete gameDialog_login;
 }
 
-//消息框
-void GameScene::showDialogMessage(const string &content){
-	if(!gameDialog_message){
-		gameDialog_message=new GameDialog_Message();
-		gameDialog_message->setText(content);
-	}
-	addSubObject(gameDialog_message);
-}
-void GameScene::hideDialogMessage(){
-	removeSubObject(gameDialog_message);
-	delete gameDialog_message;
-	gameDialog_message=nullptr;
-}
 void GameScene::showLoginDialog(bool isRegister){
 	if(!gameDialog_login){
 		gameDialog_login=new GameDialog_Login();

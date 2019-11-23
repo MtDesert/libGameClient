@@ -39,9 +39,9 @@ void GameMenu::keyboardKey(Keyboard::KeyboardKey key,bool pressed){
 		}
 		updateRenderParameters();
 	}else if(key==Keyboard::Key_Enter && !pressed){
-		if(onConfirm)onConfirm();
+		if(onConfirm)onConfirm(this);
 	}else if(key==Keyboard::Key_Esc && !pressed){
-		if(onCancel)onCancel();
+		if(onCancel)onCancel(this);
 	}
 }
 

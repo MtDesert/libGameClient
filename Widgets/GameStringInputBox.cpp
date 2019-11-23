@@ -3,8 +3,6 @@
 #include"extern.h"
 #include"Thread.h"
 
-static ColorRGBA borderColor(0xFFFFFFFF);//边框颜色
-
 static void startInput(GameButton *button){
 	auto inputBox=dynamic_cast<GameStringInputBox*>(button);
 	if(inputBox){
@@ -14,7 +12,7 @@ static void startInput(GameButton *button){
 
 GameStringInputBox::GameStringInputBox():passwordChar('\0'){
 	//尺寸
-	size.x=280;size.y=40;
+	size.setXY(280,40);
 	//文字
 	mGameString.position.x=8;
 	mGameString.anchorPoint.x=0;

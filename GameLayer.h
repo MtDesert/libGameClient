@@ -1,9 +1,9 @@
 #ifndef GAMELAYER_H
 #define GAMELAYER_H
 
-#include"GameObject.h"
+#include"GameSprite.h"
 
-class GameLayer:public GameObject{
+class GameLayer:public GameSprite{
 public:
 	GameLayer();
 };
