@@ -2,8 +2,8 @@
 
 TimeSlice::TimeSlice():timeSlice(0),minSlice(0),maxSlice(0),sprite(nullptr){}
 
-void TimeSlice::addTimeSlice(uint usec){
-	timeSlice+=usec;
+void TimeSlice::addTimeSlice(uint msec){
+	timeSlice+=msec;
 	if(timeSlice>maxSlice)timeSlice=maxSlice;//限制最大值
 	if(timeSlice>=minSlice){//时间片足够时,消耗时间片
 		timeSlice-=minSlice;
@@ -26,8 +26,8 @@ void TimeSliceList::removeTimeSlice(GameSprite *sprite){
 	this->remove_if(func);
 }
 
-void TimeSliceList::addTimeSlice(uint usec){
+void TimeSliceList::addTimeSlice(uint msec){
 	for(auto &timer:*this){
-		timer.addTimeSlice(usec);
+		timer.addTimeSlice(msec);
 	}
 }

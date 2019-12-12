@@ -213,7 +213,6 @@ struct FilePNG_code:public FilePNG_Chunk{
 //扫描线,其实是一行字节,用于在扫描线和颜色数据之间相互转化
 struct FilePNG_Scanline:public Bitmap32_Scanline{
 	FilePNG_Scanline();
-	~FilePNG_Scanline();
 
 	uint pixelDepth;
 	bool hasPalette,hasColor,hasAlpha;
@@ -278,7 +277,7 @@ struct FilePNG:public DataBlock{
 	bool decodeTo(Bitmap_32bit &bitmap)const;
 
 	//删除
-	bool deleteDataPointer(bool freeAllChunks=false);
+	void memoryFree(bool freeAllChunks=false);
 };
 
 #endif

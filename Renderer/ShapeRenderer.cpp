@@ -20,7 +20,7 @@ void ShapeRenderer::drawPoint(const Point2D<numType> &p)const{
 }
 void ShapeRenderer::drawPoints(const list<Point2D<numType> > &points)const{
 	numType vertex[points.size()*2];
-	size_t i=0;
+	SizeType i=0;
 	for(auto &p:points){
 		vertex[i]=p.x;
 		vertex[i+1]=p.y;
@@ -69,7 +69,7 @@ void ShapeRenderer::drawLines(const numType vertex[],int n)const{
 void ShapeRenderer::drawBrokenLine(const list<Point2D<numType> > &points)const{
 	if(edgeColor){
 		numType vertex[points.size()*2];
-		size_t i=0;
+		SizeType i=0;
 		for(auto &p:points){
 			vertex[i]=p.x;
 			vertex[i+1]=p.y;

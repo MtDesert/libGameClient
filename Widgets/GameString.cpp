@@ -9,7 +9,7 @@ FontTextureCache GameString::fontTextureCache;
 //渲染用的变量
 static uint8 u8;//存放单字节的字符
 static uint16 u16;//存放双字节的字符
-static size_t w;//渲染时候计算字符长度用的变量
+static SizeType w;//渲染时候计算字符长度用的变量
 
 GameString::GameString():charSize(16,32),renderCharAmount(0),byteAmount(0){}
 GameString::GameString(const string &str):GameString(){
@@ -20,31 +20,30 @@ GameString::~GameString(){}
 void GameString::setString(const string &str,bool translate){
 	//获取字符及其特征
 	auto block=charset.newString(translate ? Game::currentGame()->translate(str) : str.data());
-	//计算特征,生成纹理
-	arrayCharAttr.setSize(block.dataLength);//申请缓冲
-	auto amount=0;//统计字符数
-	for(uint i=0;i<block.dataLength;++i){
-		auto attr=arrayCharAttr.data(amount);
+	auto charAmount=Charset::charAmount((const char*)block.dataPointer,charset.destCharset);
+	//申请缓冲
+	arrayCharAttr.setSize(charAmount,true);
+	renderCharAmount=charAmount;
+	//生成纹理
+	for(uint pos=0,i=0;pos<block.dataLength;++pos,++i){
+		auto attr=arrayCharAttr.data(i);
 		//开始判断
-		block.get_uint8(i,u8);
+		block.get_uint8(pos,u8);
 		if(u8=='\0'){
-			byteAmount=i;
+			byteAmount=pos;
 			break;
 		}
 		attr->isAscii=(u8<0x80);
 		if(attr->isAscii){
 			u16=u8;
 		}else{
-			block.get_uint16(i,u16);
-			++i;
+			block.get_uint16(pos,u16);
+			++pos;
 		}
 		attr->tex=fontTextureCache.renderCharCode(u16);
-		++amount;
 	}
-	arrayCharAttr.setSize(amount);//去掉用不着的空间
-	renderCharAmount=amount;
 }
-uint GameString::stringWidth()const{return charSize.x*byteAmount;}
+SizeType GameString::stringWidth()const{return charSize.x*byteAmount;}
 
 Point2D<float> GameString::sizeF()const{
 	return Point2D<GLfloat>(stringWidth(),charSize.y);

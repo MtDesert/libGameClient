@@ -8,7 +8,7 @@ bool Bitmap_32bit::newBitmap(uint w,uint h){
 	if(w==0||h==0)return false;
 	width=w;
 	height=h;
-	return memoryReallocate(w*h*4);
+	return memoryAllocate(w*h*4,true);
 }
 void Bitmap_32bit::deleteBitmap(){
 	width=0;height=0;
@@ -51,13 +51,15 @@ Bitmap32_Scanline::Bitmap32_Scanline():
 	channelAmount(0),lineSize(0),
 	colorsList(nullptr),
 	leastUint(0),
-	buffer8(nullptr),buffer16(nullptr),buffer32(nullptr),buffer64(nullptr){}
+	buffer8(nullptr),buffer16(nullptr){}
+Bitmap32_Scanline::~Bitmap32_Scanline(){buffer.memoryFree();}
 
 void Bitmap32_Scanline::createBuffer(){
 	precision=pow(2,bitDepth)-1;
 	leastUint=leastUintToStoreBit(bitDepth);
-	deleteBuffer();
-	newBuffer(leastUint*channelAmount*width);
+	buffer.memoryAllocate(leastUint*channelAmount*width,true);
+	buffer8=buffer.dataPointer;
+	buffer16=reinterpret_cast<uint16*>(buffer.dataPointer);
 }
 
 uint8 Bitmap32_Scanline::value2color(decltype(precision) value)const{
@@ -67,20 +69,9 @@ decltype(Bitmap32_Scanline::precision) Bitmap32_Scanline::color2value(uint8 colo
 	return Number::divideRound(color*precision,0xFF);
 }
 
-void Bitmap32_Scanline::newBuffer(SizeType size){
-	buffer8=new uint8[size];
-	buffer16=reinterpret_cast<uint16*>(buffer8);
-}
-void Bitmap32_Scanline::deleteBuffer(){
-	delete []buffer8;
-	buffer8=nullptr;
-}
-
 #define BITMAP_BYTE_BIT(MACRO) \
 	MACRO(1,8)\
-	MACRO(2,16)\
-	MACRO(4,32)\
-	MACRO(8,64)
+	MACRO(2,16)
 
 void Bitmap32_Scanline::encodeLineData(){
 	switch(leastUint){

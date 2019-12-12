@@ -30,7 +30,7 @@ Client::Client():serverIPaddress(nullptr),serverPort(nullptr),whenError(nullptr)
 	//缓冲
 	clientDataBlock.set(sendBuffer,sizeof(sendBuffer));
 }
-void Client::sendData(void *dataPtr,size_t size){
+void Client::sendData(void *dataPtr,SizeType size){
 	switch(socket.getConnectStatus()){
 		case Socket::Unconnected:
 			if(serverIPaddress && serverPort){

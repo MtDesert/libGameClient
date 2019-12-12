@@ -10,6 +10,8 @@
 纹理由显卡直接调度,可以进行快速渲染
 这是OpenGL所使用的纹理,在OpenGL的标准中,操作纹理的依据是GLuint类型的一个值,通过不同的值来区分不同的纹理*/
 class Texture{
+	GLuint texture;//纹理ID
+	GLsizei width,height;//纹理尺寸
 public:
 	//构造/析构
 	Texture();
@@ -49,9 +51,13 @@ public:
 	Point2D<GLfloat> sizeF()const;//宽高
 
 	static void rect2vertex(const Rectangle2D<GLfloat> &rect,GLfloat vertex[]);
-private:
-	GLuint texture;
-	GLsizei width,height;
+};
+
+//文字纹理,主要用于文字渲染
+class FontTexture:public Texture{
+public:
+	FontTexture();
+	uint16 charCode;//文字编码
 };
 
 /*纹理缓冲,缓存各种纹理,为游戏提供各种支持*/

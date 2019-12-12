@@ -16,7 +16,7 @@ public:
 	//更换目录
 	bool changeDirectory(const string &dirName);
 	//重写,以便支持按键操作
-	virtual void keyboardKey(Keyboard::KeyboardKey key,bool pressed);
+	virtual bool keyboardKey(Keyboard::KeyboardKey key,bool pressed);
 
 	GameString textTitle;//标题,告知玩家需要选择什么文件
 	GameString textPath;//路径,用于显示文件位置

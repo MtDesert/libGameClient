@@ -21,8 +21,8 @@ DataBlock Charset::newString(const char *srcStr)const{
 	return targetBlock;
 }
 
-size_t Charset::charAmount(const char *str,EnumCharset charset){
-	size_t ret=0,pos=0,len=0,length=strlen(str);
+SizeType Charset::charAmount(const char *str,EnumCharset charset){
+	SizeType ret=0,pos=0,len=0,length=strlen(str);
 	if(str){
 		uchar byte=str[pos];
 		while(byte){
@@ -50,11 +50,11 @@ size_t Charset::charAmount(const char *str,EnumCharset charset){
 	return ret;
 }
 
-static size_t prefixLen,bytesPerChar;
+static SizeType prefixLen,bytesPerChar;
 //转换过程变量
 static iconv_t convert;
 static char *fromStr,*toStr;
-static size_t fromLen,toLen;
+static SizeType fromLen,toLen;
 
 bool Charset::newString(const char *srcStr,EnumCharset fromCharset,EnumCharset toCharset){
 	if(!srcStr || fromCharset>=AmountOf_EnumCharset || toCharset>=AmountOf_EnumCharset)return false;//防非法输入
@@ -68,11 +68,8 @@ bool Charset::newString(const char *srcStr,EnumCharset fromCharset,EnumCharset t
 	}
 	//获得目标可能的大小,调整缓冲区空间
 	toLen = prefixLen + charAmount(srcStr,fromCharset) * bytesPerChar + 1;//测字符数,确定需要的转换空间
-	if(toLen > targetBlock.dataLength){
-		targetBlock.memoryReallocate(toLen);
-	}else{
-		toLen=targetBlock.dataLength;
-	}
+	targetBlock.memoryAllocate(toLen,true);
+	toLen=targetBlock.dataLength;
 	//申请成功就开始转换
 	if(targetBlock.dataPointer){
 		//准备转换,变量赋值

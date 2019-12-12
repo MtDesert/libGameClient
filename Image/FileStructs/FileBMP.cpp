@@ -8,7 +8,7 @@ using namespace std;
 static ColorRGBA rgba;
 static uint32 value32;
 
-DataBlock::SizeType FileBMP_FileHeader::parseData(){
+SizeType FileBMP_FileHeader::parseData(){
 	if(dataLength>14)dataLength=14;
 	return dataLength;
 }
@@ -28,7 +28,7 @@ bool FileBMP_FileHeader::isValid_Type(uint16 type){
 bool FileBMP_FileHeader::isValid_Reserved1(uint16 value){return value==0;}
 bool FileBMP_FileHeader::isValid_Reserved2(uint16 value){return value==0;}
 
-DataBlock::SizeType FileBMP_InfoHeader::parseData(){
+SizeType FileBMP_InfoHeader::parseData(){
 	uint32 size;
 	getSize(size);
 	dataLength=size;
@@ -126,9 +126,7 @@ bool FileBMP_InfoHeader::isValid_ImageSize()const{
 	}return false;
 }
 
-DataBlock::SizeType FileBMP_BGRAsList::parseData(){
-	return dataLength-dataLength%4;
-}
+SizeType FileBMP_BGRAsList::parseData(){return dataLength-dataLength%4;}
 uint FileBMP_BGRAsList::colorsAmount()const{return dataLength/RGBA_SIZE;}
 bool FileBMP_BGRAsList::getColor(uint index,ColorRGBA &color)const{
 	if(getColor(index,value32)){
@@ -154,6 +152,8 @@ void FileBMP_BGRAsList::getColorsList(List<uint32> &colorsList)const{
 	}
 }
 
+//BMP扫描线
+static FileBMP_Scanline scanLine;
 void FileBMP_Scanline::setInfoHeader(const FileBMP_InfoHeader &infoHeader){
 	int32 h;
 	//获取属性
@@ -223,7 +223,7 @@ bool FileBMP_Scanline::encodeLine(uint y,const Bitmap_32bit &bitmap){
 }
 
 //BMP文件
-DataBlock::SizeType FileBMP::parseData(){
+SizeType FileBMP::parseData(){
 	uint pos=0;
 	//文件头
 	subDataBlock(pos,dataLength-pos,fileHeader);
@@ -304,12 +304,12 @@ bool FileBMP::encodeFrom(const Bitmap_32bit &bitmap,uint16 bitCount,List<uint32>
 	//验证
 	auto width=bitmap.getWidth(),height=bitmap.getHeight();
 	//文件头
-	fileHeader.newDataPointer(14);
+	fileHeader.memoryAllocate(14);
 	fileHeader.setType(FileBMP_FileHeader::Type_BM);
 	fileHeader.setReserved1(0);
 	fileHeader.setReserved2(0);
 	//信息头
-	infoHeader.newDataPointer(FileBMP_InfoHeader::Size::BitmapInfoHeader);
+	infoHeader.memoryAllocate(FileBMP_InfoHeader::Size::BitmapInfoHeader);
 	infoHeader.setSize(infoHeader.dataLength);
 	infoHeader.setWidth(width);
 	infoHeader.setHeight(height);
@@ -333,7 +333,7 @@ bool FileBMP::encodeFrom(const Bitmap_32bit &bitmap,uint16 bitCount,List<uint32>
 			bitmap.getColorsList(*colorsList,colorsCount);
 		}
 		//开始构建颜色表
-		bgrasList.newDataPointer(colorsCount*4);
+		bgrasList.memoryAllocate(colorsCount*4);
 		decltype(colorsCount) i=0;
 		for(auto &value:*colorsList){
 			if(i>=colorsCount)break;
@@ -343,11 +343,10 @@ bool FileBMP::encodeFrom(const Bitmap_32bit &bitmap,uint16 bitCount,List<uint32>
 		}
 	}
 	//扫描线
-	FileBMP_Scanline scanLine;
 	scanLine.setInfoHeader(infoHeader);
 	scanLine.colorsList=colorsList;
 	//开始编码
-	bitmapData.newDataPointer(lineSize*height);
+	bitmapData.memoryAllocate(lineSize*height);
 	SizeType offset;
 	for(decltype(height) y=0;y<height;++y){
 		offset=lineSize*y;
@@ -372,7 +371,7 @@ bool FileBMP::encodeFrom(const Bitmap_32bit &bitmap,uint16 bitCount,List<uint32>
 bool FileBMP::decodeTo(Bitmap_32bit &bitmap)const{
 	//行字节数
 	List<uint32> colorsList;
-	FileBMP_Scanline scanLine;
+	scanLine.colorsList=nullptr;
 	scanLine.setInfoHeader(infoHeader);
 	if(bgrasList.dataLength){
 		bgrasList.getColorsList(colorsList);
@@ -388,12 +387,12 @@ bool FileBMP::decodeTo(Bitmap_32bit &bitmap)const{
 	return true;
 }
 
-bool FileBMP::deleteDataPointer(bool deleteAllChunk){
+void FileBMP::memoryFree(bool deleteAllChunk){
 	if(deleteAllChunk){
 #define FILEBMP_DELETE(chunk) \
-	chunk.deleteDataPointer();
+	chunk.memoryFree();
 		FILEBMP_EACH_BLOCK(FILEBMP_DELETE)
 #undef FILEBMP_DELETE
 	}
-	return DataBlock::deleteDataPointer();
+	DataBlock::memoryFree();
 }

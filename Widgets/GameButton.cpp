@@ -13,19 +13,23 @@ GameButton_String::GameButton_String(){
 }
 GameButton_String::~GameButton_String(){}
 
-void GameButton::mouseMove(int x,int y){
+bool GameButton::mouseMove(int x,int y){
 	if(!isMouseOnButton()){
 		setIsPressed(false);
+		return true;
 	}
+	return false;
 }
-void GameButton::mouseKey(MouseKey key,bool pressed){
+bool GameButton::mouseKey(MouseKey key,bool pressed){
 	if(isMouseOnButton()){
 		bool changed=(isPressed!=pressed);
 		setIsPressed(pressed);
 		if(changed && !isPressed){
 			if(onClicked)onClicked(this);
 		}
+		return true;
 	}
+	return false;
 }
 
 bool GameButton::isMouseOnButton()const{

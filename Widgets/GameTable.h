@@ -19,7 +19,7 @@ public:
 	//函数
 	virtual uint columnAmount()const;//列数,间接决定了尺寸
 	virtual uint columnWidth(uint column)const;//各个列的宽度,在子类中实现
-	virtual void keyboardKey(Keyboard::KeyboardKey key,bool pressed);
+	virtual bool keyboardKey(Keyboard::KeyboardKey key,bool pressed);
 	//渲染
 	virtual void renderX()const;
 	virtual Point2D<float> sizeF()const;

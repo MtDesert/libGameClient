@@ -1,7 +1,14 @@
 #include"Game.h"
 #include"GameDialog_Message.h"
 
-Game::Game():sceneFileList(nullptr){
+#define ALL_COMMON_SCENE(MACRO)\
+MACRO(Logo)\
+MACRO(FileList)
+
+#define SCENE_DECL(name) static GameScene_##name *scene##name=nullptr;//文件场景
+ALL_COMMON_SCENE(SCENE_DECL)
+
+Game::Game():gameSettings(nullptr),layerConversation(nullptr),scenarioScript(nullptr){
 	//加载字体
 	FontTextureCache &cache(GameString::fontTextureCache);
 	cache.bitmapFontAscii.charBlock.loadFile("fonts/ascii");
@@ -11,7 +18,8 @@ Game::Game():sceneFileList(nullptr){
 }
 Game::~Game(){
 	//删除控件
-	deleteScene_FileList();
+	deleteSubObject(sceneLogo);
+	deleteSubObject(sceneFileList);
 	//删除字体
 	FontTextureCache &cache(GameString::fontTextureCache);
 	cache.bitmapFontAscii.charBlock.memoryFree();
@@ -62,22 +70,24 @@ const char* Game::translate(const string &english)const{
 	auto value=translationMap.value(english);
 	return value ? value->data() : english.data();
 }
-
-GameScene_FileList *Game::showScene_FileList(){
-	if(!sceneFileList){
-		sceneFileList=new GameScene_FileList();
-		gotoScene(sceneFileList);
+//脚本执行
+bool Game::executeScript(){
+	if(!scenarioScript)return false;
+	//说话命令
+	if(scenarioScript->strSay){//说话命令
+		if(layerConversation)layerConversation->setDialogText(scenarioScript->strSay);
+		scenarioScript->strSay=nullptr;
 	}
-	return sceneFileList;
-}
-void Game::deleteScene_FileList(){
-	if(sceneFileList){
-		removeSubObject(sceneFileList);
-		delete sceneFileList;
+	//设置形象
+	if(scenarioScript->strBody){
+		if(layerConversation)layerConversation->setBodyImage(gameSettings->bodyImagePath+"/"+scenarioScript->strBody+".png");
+		scenarioScript->strBody=nullptr;
 	}
-	sceneFileList=nullptr;
+	//执行完毕
+	return true;
 }
 
+//客户端
 static Client *client=nullptr;
 Client* Game::currentClient(){
 	if(!client){
@@ -100,21 +110,50 @@ void Game::hideDialogMessage(){
 	delete messageDialog;
 	messageDialog=nullptr;
 }
-
-//重写函数
-void Game::mouseMove(int x,int y){
-	mousePos.x=x;
-	mousePos.y=y;
-	GameObject::mouseMove(x,y);
-}
-void Game::addTimeSlice(uint usec){
-	GameObject::addTimeSlice(usec);
-	timeSliceList.addTimeSlice(usec);
-}
-
+//场景管理
 static bool isScene(GameObject* const &obj){return obj && dynamic_cast<GameScene*>(obj);}
 void Game::clearAllScenes(){subObjects.remove_if(isScene);}
-void Game::gotoScene(GameScene *scene){
+GameScene* Game::gotoScene(GameScene &scene,bool reset){
 	clearAllScenes();
-	addSubObject(scene,true);
+	addSubObject(&scene,true);
+	if(reset)scene.reset();
+	return &scene;
+}
+
+#define SCENE_DEFINE(name)\
+GameScene_##name* Game::gotoScene_##name(){\
+	if(!scene##name){\
+		scene##name=new GameScene_##name();\
+	}\
+	gotoScene(*scene##name);\
+	return scene##name;\
+}
+ALL_COMMON_SCENE(SCENE_DEFINE)
+
+//错误处理
+static StringList allErrorStrings;//所有错误信息
+static const char* errorString=nullptr;
+void Game::whenError(const string &errStr){
+	errorString=nullptr;
+	allErrorStrings.push_back(errStr);
+	//设置首个错误信息
+	errorString=allErrorStrings.front().data();
+}
+void Game::clearErrorMessages(){allErrorStrings.clear();}
+
+//重写函数
+bool Game::mouseMove(int x,int y){
+	mousePos.x=x;
+	mousePos.y=y;
+	return GameObject::mouseMove(x,y);
+}
+void Game::addTimeSlice(uint msec){
+	GameObject::addTimeSlice(msec);//GameObject时间片传递
+	timeSliceList.addTimeSlice(msec);//计时器传递
+	executeScript();
+	//错误显示
+	if(errorString){
+		showDialogMessage(errorString);
+		errorString=nullptr;
+	}
 }

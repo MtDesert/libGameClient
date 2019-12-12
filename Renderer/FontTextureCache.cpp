@@ -1,11 +1,15 @@
 #include"FontTextureCache.h"
 
 FontTextureCache::FontTextureCache(){}
-FontTextureCache::~FontTextureCache(){clearCache();}
+FontTextureCache::~FontTextureCache(){deleteCache();}
 
+//检索函数
+static uint16 targetCharCode=0;
+static bool findTarget(const FontTexture &tex){return tex.charCode==targetCharCode;}
 Texture FontTextureCache::renderCharCode(uint16 character){
-	Texture tex;
-	auto val=mapTextures.value(character);//找重复
+	FontTexture tex;
+	targetCharCode=character;
+	auto val=textureList.data(findTarget);
 	if(val){
 		tex=*val;
 	}else{//找不到,应该生成新的
@@ -16,17 +20,18 @@ Texture FontTextureCache::renderCharCode(uint16 character){
 			bitmapFontGb2312.renderCharCode(character);//绘制文字,绘制的结果在内存中
 			tex.texImage2D(bitmapFontGb2312.charPixmap);//生成纹理,此时数据在显存中
 		}
-		mapTextures.insert(character,tex);//缓存起来,以防重复绘制
+		textureList.push_back(tex);
 	}
 	return tex;
 }
 
+//清除纹理
+static void delTexture(FontTexture &tex){tex.deleteTexture();}
 void FontTextureCache::clearCache(){
-	auto kv=mapTextures.data(0);
-	while(kv){
-		kv->value.deleteTexture();
-		mapTextures.erase(0);
-		kv=mapTextures.data(0);
-	}
-	mapTextures.clear();
+	textureList.forEach(delTexture);
+	textureList.clear();
+}
+void FontTextureCache::deleteCache(){
+	textureList.forEach(delTexture);
+	textureList.deleteData();
 }

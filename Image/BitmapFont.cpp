@@ -16,11 +16,15 @@ BitmapFont::~BitmapFont(){}
 BitmapFont_Ascii::BitmapFont_Ascii(){
 	charPixmap.newData(WIDTH*2,HEIGHT);//宽度乘以2是OpenGL在纹理不为正方形时,绘制会出现问题
 }
-BitmapFont_Ascii::~BitmapFont_Ascii(){}
+BitmapFont_Ascii::~BitmapFont_Ascii(){
+	charPixmap.deleteData();
+}
 BitmapFont_GB2312::BitmapFont_GB2312(){
 	charPixmap.newData(WIDTH*2,HEIGHT);
 }
-BitmapFont_GB2312::~BitmapFont_GB2312(){}
+BitmapFont_GB2312::~BitmapFont_GB2312(){
+	charPixmap.deleteData();
+}
 
 //各种渲染函数
 bool BitmapFont_Ascii::renderCharCode(uint8 charCode){
@@ -30,12 +34,12 @@ bool BitmapFont_Ascii::renderCharCode(uint8 charCode){
 	//获取字形
 	auto charData=charBlock.subDataBlock(index*engGlyphSize,engGlyphSize);
 	if(charData.dataLength!=engGlyphSize)return false;
-	charPixmap.fill(0);//开始绘图
+	charPixmap.fill(false);//开始绘图
 	for(int y=0;y<HEIGHT;++y){
 		for(int x=0;x<WIDTH;++x){
 			index= y*scale + x/8;
 			if(charData.dataPointer[index] & ( 1<<(x%8) )){
-				charPixmap.setColor(x,y,1);
+				charPixmap.setColor(x,y,true);
 			}
 		}
 	}

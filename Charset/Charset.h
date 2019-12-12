@@ -29,7 +29,7 @@ public:
 	DataBlock newString(const char *srcStr)const;
 
 	//统计字符串str的字符数(charset为str的字符集)
-	static size_t charAmount(const char *str,EnumCharset charset);
+	static SizeType charAmount(const char *str,EnumCharset charset);
 	//转换(静态方法)
 	static bool newString(const char *str,EnumCharset fromCharset,EnumCharset toCharset);
 };

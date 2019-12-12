@@ -18,7 +18,6 @@ public:
 
 	Directory directory;//保存当前的目录,以便提供数据显示文件
 	bool changeDir(const string &dirName);//切换目录,并刷新视图
-	string selectingFilename()const;//当前选中的文件的文件名
 	const DirectoryEntry* selectingDirectoryEntry()const;
 
 	//重写
@@ -27,7 +26,7 @@ public:
 	virtual uint rowAmount()const;
 	virtual uint columnAmount()const;//显示文件的属性列数
 	virtual uint columnWidth(uint column)const;//设定各个列宽
-	virtual void keyboardKey(Keyboard::KeyboardKey key,bool pressed);
+	virtual bool keyboardKey(Keyboard::KeyboardKey key,bool pressed);
 protected:
 	//缓存结构
 	struct FileInfo{

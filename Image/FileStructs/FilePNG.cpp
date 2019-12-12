@@ -23,10 +23,9 @@ static uint offset;
 //static uint16 value16;
 static uint32 value32;
 //static uint64 value64;
-static ColorRGB rgb;
 static ColorRGBA rgba;
 
-DataBlock::SizeType FilePNG_Chunk::parseData(){
+SizeType FilePNG_Chunk::parseData(){
 	uint32 chunkLength;
 	if(getChunkLength(chunkLength)){
 		chunkLength=CHUNK_DATA_START+chunkLength+CRC_SIZE;
@@ -89,7 +88,7 @@ uint32 FilePNG_Chunk::makeCRC()const{
 }
 
 void FilePNG_Chunk::makeChunk(uint32 length, const string &name){
-	memoryReallocate(DEFAULT_CHUNK_SIZE+length);
+	memoryAllocate(DEFAULT_CHUNK_SIZE+length);
 	setChunkName(name);
 	setChunkLength(length);
 }
@@ -360,7 +359,7 @@ void FilePNG_IDAT::makeChunk(const DataBlock &idatData){
 
 void FilePNG_IEND::makeChunk(){FilePNG_Chunk::makeChunk(0,"IEND");}
 
-FilePNG_code::SizeType FilePNG_code::parseData(){return 0;}
+SizeType FilePNG_code::parseData(){return 0;}
 void FilePNG_code::makeChunk(const string &textCode){
 	FilePNG_Chunk::makeChunk(textCode.size(),"code");
 }
@@ -383,10 +382,11 @@ DATABLOCK_CUSTOM_TYPE_CPP(FilePNG_sRGB,RenderingIntent,uint8,8,false)
 	pChunk=new FilePNG_##chunkType;\
 	}else
 
+//PNG扫描线
 FilePNG_Scanline::FilePNG_Scanline():
 	pixelDepth(0),
 	hasPalette(false),hasColor(false),hasAlpha(false){}
-FilePNG_Scanline::~FilePNG_Scanline(){deleteBuffer();}
+static FilePNG_Scanline scanLine;
 
 void FilePNG_Scanline::setIHDR(const FilePNG_IHDR &ihdr){
 	uint8 colorType=0;
@@ -513,7 +513,7 @@ void FilePNG_SubImage::filter(){
 	}
 }
 
-DataBlock::SizeType FilePNG::parseData(){
+SizeType FilePNG::parseData(){
 	//check header
 	if(dataLength<8)return 0;
 	uint pos=8;
@@ -584,10 +584,9 @@ uint64 FilePNG::make_Signature(){return 0x0A1A0A0D474E5089;}
 DataBlock FilePNG::encode_makeFilterBlock(const Bitmap_32bit &bitmap,const FilePNG_IHDR &ihdr,List<uint32> *colorsList){
 	DataBlock filterBlock;
 	//设置扫描线数据
-	FilePNG_Scanline scanLine;
 	scanLine.setIHDR(ihdr);
 	scanLine.colorsList=colorsList;
-	filterBlock.newDataPointer(scanLine.lineSize*scanLine.height);
+	filterBlock.memoryAllocate(scanLine.lineSize*scanLine.height);
 	filterBlock.memset(0,filterBlock.dataLength);
 	//开始编码
 	for(uint32 y=0;y<scanLine.height;++y){
@@ -679,7 +678,7 @@ bool FilePNG::decode_makeBitmapAdam7(Bitmap_32bit &bitmap,const DataBlock &filte
 }
 
 bool FilePNG::encodeFrom(const Bitmap_32bit &bitmap,uint8 bitDepth,bool hasPalette,bool hasColor,bool hasAlpha,List<uint32> *colorsList){
-	newDataPointer(8);
+	memoryAllocate(8);
 	setSignature(make_Signature());
 	//IHDR
 	auto ihdr=new FilePNG_IHDR();
@@ -712,7 +711,7 @@ bool FilePNG::encodeFrom(const Bitmap_32bit &bitmap,uint8 bitDepth,bool hasPalet
 	//扫描线
 	auto uncompressData=encode_makeFilterBlock(bitmap,*ihdr,colorsList);
 	auto idatData=DataBlock_deflate::deflate(uncompressData);
-	uncompressData.deleteDataPointer();
+	uncompressData.memoryFree();
 	//删除new出来的列表
 	if(newList){
 		delete colorsList;
@@ -749,7 +748,6 @@ bool FilePNG::decodeTo(Bitmap_32bit &bitmap)const{
 		plte->getColorsList(*ihdr,colorsList);
 	}
 	//设置扫描线信息,准备解码
-	FilePNG_Scanline scanLine;
 	scanLine.setIHDR(*ihdr);
 	scanLine.colorsList=plte ? &colorsList : nullptr;
 	//申请空间
@@ -772,11 +770,10 @@ bool FilePNG::decodeTo(Bitmap_32bit &bitmap)const{
 		}
 	}
 	//结束
-	filterBlock.memoryFree();
 	return ret;
 }
 
-bool FilePNG::deleteDataPointer(bool freeAllChunks){
+void FilePNG::memoryFree(bool freeAllChunks){
 	for(auto chunk:allChunks){
 		if(chunk){
 			if(freeAllChunks){
@@ -786,5 +783,5 @@ bool FilePNG::deleteDataPointer(bool freeAllChunks){
 		}
 	}
 	allChunks.clear();
-	return DataBlock::deleteDataPointer();
+	DataBlock::memoryFree();
 }

@@ -13,6 +13,7 @@ set(GAMECLIENT_DIR
 	Network #网络模块
 	Widgets #控件集,类似于各种平台特有的控件
 	Scenes #场景,提供公共的常见场景(如选择文件场景)
+	Layers #图层,提供公共功能的图层(如游戏中的对话)
 )
 
 if(${TARGET_SYSTEM_NAME} STREQUAL Windows)

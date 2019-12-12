@@ -1,10 +1,11 @@
 #include "Texture.h"
 //缓冲区
-static DataBlock fileData;
+static DataBlock fileDataBlock;//图片文件数据缓冲
 static Bitmap_32bit bitmap;//图像数据,用于传递给显卡或第三方库
 
 Texture::Texture():texture(0),width(0),height(0){}
 Texture::~Texture(){}
+FontTexture::FontTexture():charCode(0){}
 
 static GLfloat vertex[]={0,0,0,0,0,0,0,0};
 static GLfloat texCoord_Default[]  ={0.0,0.0, 1.0,0.0, 1.0,1.0, 0.0,1.0};
@@ -40,6 +41,7 @@ void Texture::texImage2D(const FilePNG &filePng){
 	texImage2D(bitmap);
 }
 void Texture::texImage2D(const Pixmap<bool> &pixmap){
+	bitmap.coordinateType=Bitmap_32bit::CoordinateType_Math;
 	pixmap.toBitmap(bitmap);
 	texImage2D(bitmap);
 }
@@ -53,19 +55,15 @@ void Texture::texImage2D(const Bitmap_32bit &bitmap){
 //创建纹理(根据文件名)
 void Texture::texImage2D_FileBMP(const string &filename){
 	FileBMP fileBmp;
-	if(fileBmp.loadFile(filename)){
-		fileBmp.parseData();
-		texImage2D(fileBmp);
-		fileBmp.deleteDataPointer();
-	}
+	fileBmp.set(fileDataBlock.loadFile(filename));
+	fileBmp.parseData();
+	texImage2D(fileBmp);
 }
 void Texture::texImage2D_FilePNG(const string &filename){
 	FilePNG filePng;
-	if(filePng.loadFile(filename)){
-		filePng.parseData();
-		texImage2D(filePng);
-		filePng.deleteDataPointer();
-	}
+	filePng.set(fileDataBlock.loadFile(filename));
+	filePng.parseData();
+	texImage2D(filePng);
 }
 void Texture::texImage2D_FileName(const string &filename){
 	//根据扩展名来识别

@@ -7,10 +7,11 @@ GameTable::~GameTable(){}
 //函数
 uint GameTable::columnAmount()const{return 0;}
 uint GameTable::columnWidth(uint column)const{return 0;}
-void GameTable::keyboardKey(Keyboard::KeyboardKey key,bool pressed){
-	GameMenu::keyboardKey(key,pressed);
+bool GameTable::keyboardKey(Keyboard::KeyboardKey key,bool pressed){
+	bool ret=GameMenu::keyboardKey(key,pressed);
 	if(key==Keyboard::Key_Left && !pressed){}
 	else if(key==Keyboard::Key_Right && !pressed){}
+	return ret;
 }
 //渲染
 static decltype(rect) rct;

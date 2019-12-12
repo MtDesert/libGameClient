@@ -130,8 +130,8 @@ static int32_t engine_handle_input(struct android_app* app,AInputEvent* event){
 				case AMOTION_EVENT_ACTION_HOVER_ENTER:LOGI("盘旋进入");break;
 				case AMOTION_EVENT_ACTION_HOVER_EXIT:LOGI("盘旋退出");break;
 			}
-			size_t pointerCount=AMotionEvent_getPointerCount(event);
-			size_t i=0;
+			SizeType pointerCount=AMotionEvent_getPointerCount(event);
+			SizeType i=0;
 			for(;i<pointerCount;++i){
 				float x=AMotionEvent_getX(event,i);
 				float y=AMotionEvent_getY(event,i);

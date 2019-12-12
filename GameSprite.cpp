@@ -24,10 +24,10 @@ void GameSprite::render()const{
 #endif
 	//绘制纹理
 	rect=rectF();
-	shapeRenderer.drawRectangle(rect,nullptr,bgColor);
+	shapeRenderer.drawRectangle(rect,nullptr,bgColor);//画背景
 	ShapeRenderer::setColor(color);
 	texture.draw(rect);
-	shapeRenderer.drawRectangle(rect,borderColor,nullptr);
+	shapeRenderer.drawRectangle(rect,borderColor,nullptr);//画边框
 	//其它绘制
 	renderX();//特殊绘制
 	GameObject::render();//递归绘制子节点

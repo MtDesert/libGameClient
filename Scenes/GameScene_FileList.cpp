@@ -37,8 +37,8 @@ bool GameScene_FileList::changeDirectory(const string &dirName){
 	}
 	return false;
 }
-void GameScene_FileList::keyboardKey(Keyboard::KeyboardKey key,bool pressed){
-	GameScene::keyboardKey(key,pressed);
+bool GameScene_FileList::keyboardKey(Keyboard::KeyboardKey key,bool pressed){
+	bool ret=GameScene::keyboardKey(key,pressed);
 	if(key==Keyboard::Key_Enter && !pressed){
 		auto entry=gameTableDir.selectingDirectoryEntry();
 		if(entry){
@@ -50,5 +50,7 @@ void GameScene_FileList::keyboardKey(Keyboard::KeyboardKey key,bool pressed){
 				}
 			}
 		}
+		ret=true;
 	}
+	return ret;
 }

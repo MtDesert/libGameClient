@@ -11,7 +11,7 @@ void GameText::setString(const string &str){
 	updateRenderParameter();
 	renderLineStart=0;
 }
-uint GameText::stringWidth()const{return charSize.x*min(charAmountPerLine,byteAmount);}
+SizeType GameText::stringWidth()const{return charSize.x*min(charAmountPerLine,byteAmount);}
 Point2D<float> GameText::sizeF()const{
 	auto sz=lineStartList.size();
 	sz=min(sz,renderLineAmount);
@@ -24,7 +24,7 @@ void GameText::renderX()const{
 	point2D.y=rect.p1.y-charSize.y;
 	size2D.y=charSize.y;
 	//开始计算
-	size_t line=0,from=0,to=0;
+	SizeType line=0,from=0,to=0;
 	for(auto itr=lineStartList.begin();itr!=lineStartList.end();++itr){
 		//过滤出需要渲染的行
 		if(line<renderLineStart){
@@ -48,7 +48,7 @@ void GameText::renderX()const{
 	}
 }
 
-void GameText::setLineCharAmount(uint lineAmount, uint charAmountPerLine){
+void GameText::setLineCharAmount(SizeType lineAmount,SizeType charAmountPerLine){
 	if(lineAmount){
 		this->renderLineAmount=lineAmount;
 	}
@@ -93,16 +93,16 @@ bool GameText::printNextChar(){
 void GameText::updateRenderParameter(){
 	//在这里立刻计算行数,并将行信息存入数组
 	lineStartList.clear();
-	uint from=0,count=0,charLen=0;
+	uint from=0,lineLen=0,charLen=0;
 	auto len=arrayCharAttr.size();
 	for(uint i=0;i<len;++i){
 		charLen = arrayCharAttr.data(i)->isAscii ? 1 : 2;
-		count += charLen;
+		lineLen += charLen;
 		//这里判断是否需要换行
-		if(count>charAmountPerLine){//超过行上限,要换
+		if(lineLen>charAmountPerLine){//超过行上限,要换
 			lineStartList.push_back(from);//保存起来
 			from=i;//确定新的起点
-			count=charLen;//确定新的长度
+			lineLen=charLen;//确定新的长度
 		}
 	}
 	//保存最后一行,即使没达到上限

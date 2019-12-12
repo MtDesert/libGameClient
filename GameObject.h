@@ -2,7 +2,7 @@
 #define GAMEOBJECT_H
 
 #include"typedef.h"
-#include"List.h"
+#include"Array.h"
 #include"Keyboard.h"
 
 //这是所有的手柄按键,根据需求可能有更多的按键
@@ -57,23 +57,24 @@ public:
 	//保存子类的容器,主要用于事件传递
 	//警告,subObject相当于树叉,如果把让它形成环状(比如addSubObject(this);)会出现严重的后果,除非你知道你自己在干什么
 	GameObject *parentObject;//父物体
-	List<GameObject*> subObjects;//子物体
+	Array<GameObject*> subObjects;//子物体
 	void addSubObject(GameObject *subObj,bool addFront=false);
 	void removeSubObject(GameObject *subObj);
 	void clearSubObjects();
+	void deleteSubObject(GameObject *subObj);
 
 	//如需要响应事件,请在子类重写virtual函数
 	virtual void reset();//重启,相当于游戏机的reset按钮
 	//传递手柄按键事件
-	virtual void joystickKey(JoystickKey key,bool pressed);
-	virtual void keyboardKey(Keyboard::KeyboardKey key,bool pressed);
-	virtual void mouseKey(MouseKey key,bool pressed);
+	virtual bool joystickKey(JoystickKey key,bool pressed);
+	virtual bool keyboardKey(Keyboard::KeyboardKey key,bool pressed);
+	virtual bool mouseKey(MouseKey key,bool pressed);
 	//鼠标有移动事件和滚轮事件
-	virtual void mouseMove(int x,int y);//鼠标移动
-	virtual void mouseWheel(int angle);//单位为角度
+	virtual bool mouseMove(int x,int y);//鼠标移动
+	virtual bool mouseWheel(int angle);//单位为角度
 
 	//时间片,一些基于时间的运动(如匀速移动)
-	virtual void addTimeSlice(uint usec);//以毫秒为单位增加时间片,并且试图消耗时间片
+	virtual void addTimeSlice(uint msec);//以毫秒为单位增加时间片,并且试图消耗时间片
 	//渲染,递归进行渲染
 	virtual void render()const;
 };

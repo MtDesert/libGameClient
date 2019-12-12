@@ -148,6 +148,6 @@ struct FileBMP:public DataBlock{
 	bool decodeTo(Bitmap_32bit &bitmap)const;//将BMP的内容解码到bitmap
 
 	//删除申请的各个数据块内存
-	bool deleteDataPointer(bool deleteAllChunk=false);
+	void memoryFree(bool deleteAllChunk=false);
 };
 #endif

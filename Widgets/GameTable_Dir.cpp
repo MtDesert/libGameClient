@@ -43,10 +43,6 @@ bool GameTable_Dir::changeDir(const string &dirName){
 	}
 	return b;
 }
-string GameTable_Dir::selectingFilename()const{
-	auto itr=getDirentItr(selectingItemIndex);
-	return itr==directory.direntList.end()?"":directory.toString() + "/" + itr->d_name;
-}
 const DirectoryEntry *GameTable_Dir::selectingDirectoryEntry()const{
 	auto itr=getDirentItr(selectingItemIndex);
 	return itr==directory.direntList.end() ? nullptr : &(*itr);
@@ -68,16 +64,19 @@ uint GameTable_Dir::columnWidth(uint col)const{
 		default:return 0;
 	}
 }
-void GameTable_Dir::keyboardKey(Keyboard::KeyboardKey key,bool pressed){
+bool GameTable_Dir::keyboardKey(Keyboard::KeyboardKey key,bool pressed){
 	auto start=renderItemStart,sel=selectingItemIndex;
-	GameTable::keyboardKey(key,pressed);
+	bool ret=GameTable::keyboardKey(key,pressed);
 	//改变状态,这会影响到渲染过程
 	if(start!=renderItemStart){
 		updateBuffer();
+		ret=true;
 	}
 	if(sel!=selectingItemIndex){
 		updateSelecting();
+		ret=true;
 	}
+	return ret;
 }
 
 void GameTable_Dir::updateBuffer(){

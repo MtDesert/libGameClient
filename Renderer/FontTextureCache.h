@@ -4,7 +4,7 @@
 #include"Texture.h"
 #include"BitmapFont.h"
 #include"Charset.h"
-#include"Map.h"
+#include"ArrayList.h"
 
 /*字体纹理缓冲,负责管理特定字体中每个字的纹理
 在程序或者游戏中,并非所有的文字都会用到,我们只需要保存好经常用到的文字的字体,
@@ -17,10 +17,10 @@ public:
 	//成员对象
 	BitmapFont_Ascii bitmapFontAscii;
 	BitmapFont_GB2312 bitmapFontGb2312;//点阵字体生成模块,负责读取点阵数据(暂时使用gb2312)
-	Map<uint16,Texture> mapTextures;//存放纹理的容器
+	ArrayList<FontTexture> textureList;//文字的纹理缓冲
 	//渲染过程
 	Texture renderCharCode(uint16 character);//渲染文字(Unicode字符),返回文字对应的纹理
-	void clearCache();//清除缓冲
+	void clearCache();//清除缓冲(显存清除纹理)
+	void deleteCache();//删除缓冲(内存回收空间)
 };
-
 #endif

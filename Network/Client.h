@@ -18,7 +18,7 @@ public:
 	void (*whenError)();//错误回调
 	void (*whenConnected)();
 	//连接发送过程
-	void sendData(void *dataPtr,size_t size);
+	void sendData(void *dataPtr,SizeType size);
 	//请求
 	void reqSelectGame(const string &name);//选择游戏(名字)
 	void reqRegister(const string &username,const string &password);//注册账户

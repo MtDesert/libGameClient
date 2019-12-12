@@ -38,6 +38,7 @@ private:
 //Bitmap32扫描线,用于编码解码数据
 struct Bitmap32_Scanline:public DataBlock{
 	Bitmap32_Scanline();
+	~Bitmap32_Scanline();
 
 	uint32 width,height;//图像宽度
 	uint8 bitDepth;//位深
@@ -53,9 +54,6 @@ protected:
 	decltype(precision) color2value(uint8 color)const;
 
 	uint8 leastUint;//缓冲区的字节数
-	//缓冲区
-	void newBuffer(SizeType size);
-	void deleteBuffer();
 	//编码解码
 	void encodeLineData();
 	void decodeLineData()const;
@@ -63,10 +61,8 @@ protected:
 	uint64 getBufferValue(uint x,uint8 channel)const;
 	void setBufferValue(uint x,uint8 channel,uint64 value);
 	//uint指针
+	DataBlock buffer;
 	uint8 *buffer8;
 	uint16 *buffer16;
-	uint32 *buffer32;
-	uint64 *buffer64;
 };
-
 #endif
