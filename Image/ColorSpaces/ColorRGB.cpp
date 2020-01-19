@@ -28,8 +28,14 @@ uint8 ColorRGB::gray()const{
 	//return (red+green+blue)/3;//average
 	//return green;//only green
 }
-void ColorRGB::toGray(){
-	red=green=blue=gray();
+void ColorRGB::toGray(){red=green=blue=gray();}
+
+#define COLOR_DELTA(name) name>rgb.name ? name-rgb.name : rgb.name-name;
+int ColorRGB::deltaSum(const ColorRGB &rgb)const{
+	auto ret=COLOR_DELTA(red);
+	ret+=COLOR_DELTA(green);
+	ret+=COLOR_DELTA(blue);
+	return ret;
 }
 
 //operator

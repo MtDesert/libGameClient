@@ -27,11 +27,13 @@ struct ColorRGB{//Red-Green-Blue
 	COLOR_UNSIGNED24(BRG)
 	COLOR_UNSIGNED24(BGR)
 
-	//feature
+	//灰度
 	uint8 gray()const;
 	void toGray();
+	//差异度
+	int deltaSum(const ColorRGB &rgb)const;
 
-	//member variable
+	//红绿蓝
 	uint8 red,green,blue;
 };
 

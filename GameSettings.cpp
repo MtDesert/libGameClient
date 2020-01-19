@@ -13,6 +13,7 @@ bool GameSettings::loadFile(const string &filename){
 	if(!luaState.doFile(filename))return false;
 	//读取通用配置
 	READ_STR(language)
+	READ_STR(headImagePath)
 	READ_STR(bodyImagePath)
 	readCustom(luaState);
 	//结束

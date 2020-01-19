@@ -74,7 +74,7 @@ struct FilePNG_IHDR:public FilePNG_Chunk{//图像头,首个块,一般紧跟在PN
 
 	static uint channels(uint colorType);//通道数,灰度图只有1个通道,RGB有3个通道,如果有ALPHA则再多一个通道
 	static uint pixelDepth(uint8 bitDepth,uint8 colorType);//像素深度,即表示一个像素所用的bit数
-	static uint rowBytes(uint8 width,uint8 bitDepth,uint8 colorType,bool withFilterMethod=false);//行字节数,根据width计算出一行数据需要的字节数,如果包含FilterMethod则多出一个字节
+	static uint rowBytes(uint32 width,uint8 bitDepth,uint8 colorType,bool withFilterMethod=false);//行字节数,根据width计算出一行数据需要的字节数,如果包含FilterMethod则多出一个字节
 	//有效性
 	static bool isValid_BitDepth(uint8 colorType,uint8 bitDepth);
 	static bool isValid_ColorType(uint8 type);

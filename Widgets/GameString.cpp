@@ -29,14 +29,14 @@ void GameString::setString(const string &str,bool translate){
 		auto attr=arrayCharAttr.data(i);
 		//开始判断
 		block.get_uint8(pos,u8);
-		if(u8=='\0'){
+		if(u8=='\0'){//字符串结束
 			byteAmount=pos;
 			break;
 		}
 		attr->isAscii=(u8<0x80);
-		if(attr->isAscii){
+		if(attr->isAscii){//ASCII字母
 			u16=u8;
-		}else{
+		}else{//可能是汉字
 			block.get_uint16(pos,u16);
 			++pos;
 		}

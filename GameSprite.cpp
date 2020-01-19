@@ -43,8 +43,7 @@ Point2D<float> GameSprite::posF()const{
 Point2D<float> GameSprite::sizeF()const{
 	size2D=texture.sizeF();
 	if(size2D.x==0 || size2D.y==0){
-		size2D.x=size.x;
-		size2D.y=size.y;
+		size2D.setXY(size.x,size.y);
 	}
 	return size2D;
 }

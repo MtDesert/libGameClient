@@ -22,8 +22,8 @@ public:
 	uint selectingItemIndex;//当前选择的索引
 	bool recycleMode;//循环模式,末项的下一项是首项,首项的上一项是末项
 	//回调函数
-	void (*onConfirm)(GameMenu*);
-	void (*onCancel)(GameMenu*);
+	function<void(GameMenu*)>onConfirm;
+	function<void(GameMenu*)>onCancel;
 
 	//构造函数
 	GameMenu();

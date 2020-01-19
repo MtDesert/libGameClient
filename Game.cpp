@@ -44,8 +44,7 @@ bool Game::loadTranslationFile(const string &filename){
 	translationMap.clear();
 	auto file=fopen(filename.data(),"r");
 	if(!file){
-		switch(errno){
-		}
+		whenError(filename+": "+strerror(errno));
 		return false;
 	}
 	//开始读取映射
@@ -64,6 +63,7 @@ bool Game::loadTranslationFile(const string &filename){
 		//开始插入映射
 		translationMap.insert(buffer,start);
 	}
+	fclose(file);
 	return true;
 }
 const char* Game::translate(const string &english)const{
@@ -143,8 +143,7 @@ void Game::clearErrorMessages(){allErrorStrings.clear();}
 
 //重写函数
 bool Game::mouseMove(int x,int y){
-	mousePos.x=x;
-	mousePos.y=y;
+	mousePos.setXY(x,y);
 	return GameObject::mouseMove(x,y);
 }
 void Game::addTimeSlice(uint msec){

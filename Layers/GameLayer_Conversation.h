@@ -13,7 +13,7 @@ public:
 	//成员
 	GameSprite dialogBox;//对话框
 	GameText dialogText;//对话框的文本
-	GameSprite bodySprite;//身体形象
+	GameSprite headSprite,bodySprite;//身体形象
 	bool pausePrintText;//是否暂停显示对话
 
 	void setDialogText(const char* text);//设置对话框文本,并做好显示的准备

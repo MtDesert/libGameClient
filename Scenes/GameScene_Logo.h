@@ -12,7 +12,7 @@ public:
 	~GameScene_Logo();
 
 	GameString logoText;//标志文本
-	void (*whenLogoOver)();//标志结束后的动作
+	function<void()> whenLogoOver;//标志结束后的动作
 
 	virtual void reset();
 	virtual void consumeTimeSlice();

@@ -27,6 +27,6 @@ public:
 	GameButton_String buttonDir;//目录按钮,使用目录的常用功能
 	GameButton_String buttonCancel;//取消按钮,关闭本页面
 
-	void (*whenConfirmFile)(const string &filename);//当确定选择的文件后,调用此回调函数,传递选择的文件相对路径到filename
+	function<void(const string &filename)>whenConfirmFile;//当确定选择的文件后,调用此回调函数,传递选择的文件相对路径到filename
 };
 #endif

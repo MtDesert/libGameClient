@@ -106,7 +106,7 @@ DATABLOCK_CUSTOM_BOOL_CPP(FilePNG_IHDR,ColorMask_Color,17,1)
 DATABLOCK_CUSTOM_BOOL_CPP(FilePNG_IHDR,ColorMask_Alpha,17,2)
 
 //根据像素深度和宽度,计算出存储一行所需的字节数
-uint FilePNG_rowBytes(uint pixelDepth,uint width,bool withFilterMethod){
+static uint FilePNG_rowBytes(uint pixelDepth,uint width,bool withFilterMethod){
 	uint rowBits=pixelDepth*width;
 	uint rowBytes=rowBits/8 + (rowBits%8?1:0);
 	if(withFilterMethod)rowBytes+=1;
@@ -138,7 +138,7 @@ uint FilePNG_IHDR::channels(uint colorType){
 	}
 }
 uint FilePNG_IHDR::pixelDepth(uint8 bitDepth,uint8 colorType){return bitDepth*channels(colorType);}
-uint FilePNG_IHDR::rowBytes(uint8 width, uint8 bitDepth, uint8 colorType, bool withFilterMethod){
+uint FilePNG_IHDR::rowBytes(uint32 width, uint8 bitDepth, uint8 colorType, bool withFilterMethod){
 	return FilePNG_rowBytes(pixelDepth(bitDepth,colorType),width,withFilterMethod);
 }
 
@@ -582,19 +582,19 @@ bool FilePNG::isValid_Signature()const{
 uint64 FilePNG::make_Signature(){return 0x0A1A0A0D474E5089;}
 
 DataBlock FilePNG::encode_makeFilterBlock(const Bitmap_32bit &bitmap,const FilePNG_IHDR &ihdr,List<uint32> *colorsList){
-	DataBlock filterBlock;
+	DataBlock filterData;//idatData解压后的数据
 	//设置扫描线数据
 	scanLine.setIHDR(ihdr);
 	scanLine.colorsList=colorsList;
-	filterBlock.memoryAllocate(scanLine.lineSize*scanLine.height);
-	filterBlock.memset(0,filterBlock.dataLength);
+	filterData.memoryAllocate(scanLine.lineSize*scanLine.height);
+	filterData.memset(0,filterData.dataLength);
 	//开始编码
 	for(uint32 y=0;y<scanLine.height;++y){
-		filterBlock.subDataBlock(scanLine.lineSize*y,scanLine.lineSize,scanLine);//获取行数据
+		filterData.subDataBlock(scanLine.lineSize*y,scanLine.lineSize,scanLine);//获取行数据
 		scanLine.subDataBlock(1,scanLine.lineSize-1,scanLine);//去掉filter字节
 		scanLine.encodeLine(y,bitmap);//编码到缓冲中
 	}
-	return filterBlock;
+	return filterData;
 }
 
 DataBlock FilePNG::decode_allIDATs()const{
@@ -719,7 +719,6 @@ bool FilePNG::encodeFrom(const Bitmap_32bit &bitmap,uint8 bitDepth,bool hasPalet
 	//IDAT
 	auto idat=new FilePNG_IDAT();
 	idat->makeChunk(idatData);
-	idatData.memoryFree();
 	//IEND
 	auto iend=new FilePNG_IEND();
 	iend->makeChunk();

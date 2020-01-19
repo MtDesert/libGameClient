@@ -48,7 +48,7 @@ void GameObject::reset(){
 }
 bool GameObject::joystickKey(JoystickKey key,bool pressed){
 	EVENT_TRANSMISSION((*obj)->joystickKey(key,pressed))
-	return false;
+	return intercept;
 }
 bool GameObject::keyboardKey(Keyboard::KeyboardKey key,bool pressed){
 	EVENT_TRANSMISSION((*obj)->keyboardKey(key,pressed))
