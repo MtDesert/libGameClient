@@ -254,7 +254,7 @@ bool FilePNG_PLTE::setColor(uint index,const ColorRGBA &color){
 	return true;
 }
 bool FilePNG_PLTE::setColor(uint index,uint32 color){
-	rgba.fromRGBA(color);
+	rgba.fromBGRA(color);
 	return setColor(index,rgba);
 }
 

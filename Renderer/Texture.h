@@ -28,7 +28,7 @@ public:
 	void texImage2D(const Bitmap_32bit &bitmap);
 	//创建纹理(通过各种文件名)
 	void texImage2D_FileBMP(const string &filename);
-	void texImage2D_FilePNG(const string &filename);
+	void texImage2D_FilePNG(const string &filename,WhenErrorString whenError=nullptr);
 	void texImage2D_FileName(const string &filename);
 
 	//局部绘制枚举
@@ -61,7 +61,12 @@ public:
 };
 
 /*纹理缓冲,缓存各种纹理,为游戏提供各种支持*/
-class TextureCache:public Map<int,Texture>{
+class TextureCache:public Array<Texture>{
+public:
+	void clearCache();
+};
+/*二级纹理缓冲*/
+class TextureCacheArray:public Array<TextureCache>{
 public:
 	void clearCache();
 };

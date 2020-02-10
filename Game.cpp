@@ -1,5 +1,6 @@
 #include"Game.h"
 #include"GameDialog_Message.h"
+#include"ErrorNumber.h"
 
 #define ALL_COMMON_SCENE(MACRO)\
 MACRO(Logo)\
@@ -8,14 +9,7 @@ MACRO(FileList)
 #define SCENE_DECL(name) static GameScene_##name *scene##name=nullptr;//文件场景
 ALL_COMMON_SCENE(SCENE_DECL)
 
-Game::Game():gameSettings(nullptr),layerConversation(nullptr),scenarioScript(nullptr){
-	//加载字体
-	FontTextureCache &cache(GameString::fontTextureCache);
-	cache.bitmapFontAscii.charBlock.loadFile("fonts/ascii");
-	cache.bitmapFontGb2312.symbolBlock.loadFile("fonts/lv0");
-	cache.bitmapFontGb2312.lv1Chinese.loadFile("fonts/lv1");
-	cache.bitmapFontGb2312.lv2Chinese.loadFile("fonts/lv2");
-}
+Game::Game():gameSettings(nullptr),layerConversation(nullptr),scenarioScript(nullptr){}
 Game::~Game(){
 	//删除控件
 	deleteSubObject(sceneLogo);
@@ -39,6 +33,15 @@ STATIC(Game::mousePos);
 
 Game* Game::currentGame(){return Game::game;}
 string Game::gameName()const{return"";}
+void Game::reset(){
+	ErrorNumber::init();//初始化错误字符串
+	//加载字体
+	FontTextureCache &cache(GameString::fontTextureCache);
+	cache.bitmapFontAscii.charBlock.loadFile("fonts/ascii",whenError);
+	cache.bitmapFontGb2312.symbolBlock.loadFile("fonts/lv0",whenError);
+	cache.bitmapFontGb2312.lv1Chinese.loadFile("fonts/lv1",whenError);
+	cache.bitmapFontGb2312.lv2Chinese.loadFile("fonts/lv2",whenError);
+}
 
 bool Game::loadTranslationFile(const string &filename){
 	translationMap.clear();

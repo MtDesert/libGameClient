@@ -59,9 +59,9 @@ void Texture::texImage2D_FileBMP(const string &filename){
 	fileBmp.parseData();
 	texImage2D(fileBmp);
 }
-void Texture::texImage2D_FilePNG(const string &filename){
+void Texture::texImage2D_FilePNG(const string &filename,WhenErrorString whenError){
 	FilePNG filePng;
-	filePng.set(fileDataBlock.loadFile(filename));
+	filePng.set(fileDataBlock.loadFile(filename,whenError));
 	filePng.parseData();
 	texImage2D(filePng);
 }
@@ -123,7 +123,13 @@ void Texture::rect2vertex(const Rectangle2D<GLfloat> &rect,GLfloat vertex[]){
 
 void TextureCache::clearCache(){
 	for(auto &item:*this){
-		item.value.deleteTexture();
+		item.deleteTexture();
+	}
+	clear();
+}
+void TextureCacheArray::clearCache(){
+	for(auto &cache:*this){
+		cache.clearCache();
 	}
 	clear();
 }
