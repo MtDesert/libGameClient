@@ -1,7 +1,7 @@
 #include"GameTable.h"
 #include"extern.h"
 
-GameTable::GameTable():page(0),maxPage(0){}
+GameTable::GameTable():itemHeight(32),page(0),maxPage(0){}
 GameTable::~GameTable(){}
 
 //函数
@@ -17,6 +17,7 @@ bool GameTable::keyboardKey(Keyboard::KeyboardKey key,bool pressed){
 static decltype(rect) rct;
 static uint colAmount,x,y;
 void GameTable::renderX()const{
+	rect=rectF();
 	//渲染整个表格内容
 	colAmount=columnAmount();
 	for(y=0;y<renderItemAmount;++y){
@@ -28,23 +29,7 @@ void GameTable::renderX()const{
 			rct.p1.x = rct.p0.x + columnWidth(x);//调整渲染参数
 			//渲染边框
 			shapeRenderer.drawRectangle(rct,&ColorRGBA::White,nullptr);
-			//渲染选择态
-			if(renderItemStart+y==selectingItemIndex){
-				shapeRenderer.fillColor=&ColorRGBA::White;
-				shapeRenderer.drawRectangle(rct);
-			}else{
-				shapeRenderer.fillColor=nullptr;
-			}
-			renderItem(x,y,rct);//渲染子类内容
 			rct.p0.x = rct.p1.x;//调整渲染参数
 		}
 	}
 }
-Point2D<float> GameTable::sizeF()const{
-	colAmount=columnAmount();
-	size2D.x=0;
-	for(x=0;x<colAmount;++x){size2D.x+=columnWidth(x);}
-	size2D.y=itemHeight*renderItemAmount;
-	return size2D;
-}
-void GameTable::renderItem(uint x,uint y,const Rectangle2D<float> &rectArea)const{}

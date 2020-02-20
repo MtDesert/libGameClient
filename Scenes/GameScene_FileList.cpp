@@ -16,6 +16,18 @@ GameScene_FileList::GameScene_FileList(){
 	addSubObject(&textPath);
 	//文件列表
 	addSubObject(&gameTableDir);
+	gameTableDir.onConfirm=[&](GameMenu*){
+		auto entry=gameTableDir.selectingDirectoryEntry();
+		if(entry){
+			if(entry->isDirectory()){//是目录,进行切换
+				changeDirectory(entry->d_name);
+			}else if(entry->isRegularFile()){//常规文件
+				if(whenConfirmFile){
+					whenConfirmFile(gameTableDir.directory.toString()+"/"+entry->d_name);
+				}
+			}
+		}
+	};
 
 	//按钮
 	auto game=Game::currentGame();
@@ -32,25 +44,10 @@ GameScene_FileList::GameScene_FileList(){
 }
 
 bool GameScene_FileList::changeDirectory(const string &dirName){
-	if(gameTableDir.changeDir(dirName)){
+	if(gameTableDir.changeDir(dirName,Game::whenError)){
 		textPath.setString(gameTableDir.directory.toString());
+	}else if(dirName!="."){
+		changeDirectory(".");//尝试读取程序所在目录
 	}
 	return false;
-}
-bool GameScene_FileList::keyboardKey(Keyboard::KeyboardKey key,bool pressed){
-	bool ret=GameScene::keyboardKey(key,pressed);
-	if(key==Keyboard::Key_Enter && !pressed){
-		auto entry=gameTableDir.selectingDirectoryEntry();
-		if(entry){
-			if(entry->isDirectory()){//是目录,进行切换
-				changeDirectory(entry->d_name);
-			}else if(entry->isRegularFile()){//常规文件
-				if(whenConfirmFile){
-					whenConfirmFile(gameTableDir.directory.toString()+"/"+entry->d_name);
-				}
-			}
-		}
-		ret=true;
-	}
-	return ret;
 }

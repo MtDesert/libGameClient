@@ -4,7 +4,7 @@
 //constructors
 ColorRGB::ColorRGB():ColorRGB(0,0,0){}
 ColorRGB::ColorRGB(uint8 r,uint8 g,uint8 b):red(r),green(g),blue(b){}
-ColorRGB::ColorRGB(unsigned value){fromBGR(value);}
+ColorRGB::ColorRGB(unsigned value){fromRGB(value);}
 
 ColorRGBA::ColorRGBA():ColorRGBA(0,0,0,0){}
 ColorRGBA::ColorRGBA(uint8 r, uint8 g, uint8 b, uint8 a):ColorRGB(r,g,b),alpha(a){}

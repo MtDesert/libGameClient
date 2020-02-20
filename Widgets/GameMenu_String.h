@@ -7,7 +7,7 @@
 /*只显示文字项的菜单,实现方法比较简单,子类可以参考这个例子*/
 class GameMenu_String:public GameMenu{
 	//变量
-	List<GameString> gameStringList;//保存解码的内容
+	List<string> gameStringList;//保存解码的内容
 public:
 	//构造/析构函数
 	GameMenu_String();
@@ -16,10 +16,10 @@ public:
 	void addString(const string &str,bool translate=false);//添加字符串
 
 	//重写
-	uint rowAmount()const;
-	void renderX()const;//渲染方法,主要渲染文字
-	//更新渲染参数
-	virtual void updateRenderParameters();
+	virtual SizeType rowAmount()const;
+protected:
+	virtual void addItem();
+	virtual void updateItemsData();
+	virtual void updateSelectCursor();
 };
-
 #endif

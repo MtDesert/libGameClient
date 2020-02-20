@@ -3,27 +3,38 @@
 
 //构造函数
 GameMenu::GameMenu():
-	renderItemStart(0),renderItemAmount(4),itemWidth(0),itemHeight(32),
+	renderItemStart(0),renderItemAmount(4),
 	selectingItemIndex(0),recycleMode(true),
 	onConfirm(nullptr),onCancel(nullptr){}
-GameMenu::~GameMenu(){}
+GameMenu::~GameMenu(){while(subObjects.size())removeItem();}
 
 void GameMenu::updateRenderParameters(){
-	if(selectingItemIndex<renderItemStart){
-		renderItemStart=selectingItemIndex;
-	}else{
-		auto renderEnd = renderItemStart + renderItemAmount;
-		auto amount=rowAmount();
-		if(renderEnd>amount)renderEnd=amount;
-		if(selectingItemIndex>=renderEnd){
-			renderItemStart=selectingItemIndex - renderItemAmount + 1;
-		}
+	//调整ITEM数量
+	auto dataAmount = rowAmount();//数据总数
+	auto renderAmount = min(dataAmount,renderItemAmount);//实际渲染数<=数据总数
+	while(subObjects.size()<renderAmount)addItem();//添加
+	while(subObjects.size()>renderAmount)removeItem();//删除
+	//更新ITEM选择状态
+	selectingItemIndex = min(selectingItemIndex,dataAmount);
+	auto renderEnd = renderItemStart + renderAmount;
+	if(renderEnd > dataAmount){//修正renderItemStart防止越界
+		renderItemStart = dataAmount - renderAmount;
+		renderEnd = dataAmount;
 	}
+	//更新item内容,更新选择控件
+	if(selectingItemIndex < renderItemStart){
+		renderItemStart = selectingItemIndex;//往前移动
+	}else if(selectingItemIndex >= renderEnd){
+		renderItemStart = selectingItemIndex - renderAmount + 1;//往后移动
+	}
+	updateItemsData();
+	updateSelectCursor();
+	updateSize();
+	updateItemsPos();
 }
 //菜单项数
-uint GameMenu::rowAmount()const{return subObjects.size();}
+SizeType GameMenu::rowAmount()const{return subObjects.size();}
 
-#include"unistd.h"
 //菜单可以响应键盘事件(比如方向键选择,回车键确定,退出键关闭菜单等)
 bool GameMenu::keyboardKey(Keyboard::KeyboardKey key,bool pressed){
 	if(pressed)return false;
@@ -56,9 +67,22 @@ bool GameMenu::keyboardKey(Keyboard::KeyboardKey key,bool pressed){
 	}
 	return ret;
 }
-
-Point2D<float> GameMenu::sizeF()const{//菜单尺寸,根据项尺寸和显示项数决定(子类可能会多出边缘或者间距等部分)
-	size2D.x=itemWidth;
-	size2D.y=itemHeight*renderItemAmount;
-	return size2D;
+void GameMenu::addItem(){addSubObject(new GameSprite());}
+void GameMenu::removeItem(){deleteSubObject(*subObjects.lastData());}
+void GameMenu::updateItemsData(){}
+void GameMenu::updateSelectCursor(){}
+void GameMenu::updateSize(){
+	size.setXY(0,0);
+	forEachSubObj<GameSprite>([&](GameSprite *sprite){
+		size.x = max(size.x,sprite->size.x);
+		size.y += sprite->size.y;
+	});
+}
+void GameMenu::updateItemsPos(){
+	//调整各个控件位置
+	auto y=size.y/2;
+	forEachSubObj<GameSprite>([&](GameSprite *sprite){
+		sprite->position.y=y - sprite->size.y/2;
+		y -= sprite->size.y;
+	});
 }

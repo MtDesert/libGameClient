@@ -74,8 +74,16 @@ public:
 	virtual bool mouseWheel(int angle);//单位为角度
 
 	//时间片,一些基于时间的运动(如匀速移动)
-	virtual void addTimeSlice(uint msec);//以毫秒为单位增加时间片,并且试图消耗时间片
 	//渲染,递归进行渲染
 	virtual void render()const;
+
+	//对subObjects中所有的T类型的对象进行callback操作
+	template<typename T>
+	void forEachSubObj(function<void(T *obj)> callback){
+		if(!callback)return;
+		for(auto &pObj:subObjects){
+			callback(dynamic_cast<T*>(pObj));
+		}
+	}
 };
 #endif

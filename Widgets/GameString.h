@@ -23,8 +23,8 @@ public:
 	SizeType renderCharAmount;//渲染的文字数量
 	//成员函数
 	virtual void setString(const string &str,bool translate=false);//设置文本内容
+	virtual void setRawString(const string &str);//设置原始文本内容(不经过charset转化,不翻译)
 	virtual SizeType stringWidth()const;//文本宽度,即所有文本所生成的字体加起来的总宽度
-	virtual Point2D<float> sizeF()const;//根据文字内容计算尺寸
 	virtual void renderX()const;//实时渲染文字
 
 	//静态变量

@@ -20,6 +20,11 @@ GameString::~GameString(){}
 void GameString::setString(const string &str,bool translate){
 	//获取字符及其特征
 	auto block=charset.newString(translate ? Game::currentGame()->translate(str) : str.data());
+	setRawString((char*)block.dataPointer);
+}
+void GameString::setRawString(const string &str){
+	//获取字符及其特征
+	DataBlock block(str.data(),str.length()+1);
 	auto charAmount=Charset::charAmount((const char*)block.dataPointer,charset.destCharset);
 	//申请缓冲
 	arrayCharAttr.setSize(charAmount,true);
@@ -42,12 +47,10 @@ void GameString::setString(const string &str,bool translate){
 		}
 		attr->tex=fontTextureCache.renderCharCode(u16);
 	}
+	//调整尺寸
+	size.setXY(stringWidth(),charSize.y);
 }
 SizeType GameString::stringWidth()const{return charSize.x*byteAmount;}
-
-Point2D<float> GameString::sizeF()const{
-	return Point2D<GLfloat>(stringWidth(),charSize.y);
-}
 
 void GameString::renderX()const{
 	shapeRenderer.setColor(color);

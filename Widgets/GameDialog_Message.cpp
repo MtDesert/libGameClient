@@ -5,6 +5,7 @@ const int border=16;
 uint GameDialog_Message::maxLineCharAmount = 36;
 static void whenConfirmClicked(GameButton *button){
 	Game::hideDialogMessage();
+	Game::clearErrorMessages();
 }
 
 GameDialog_Message::GameDialog_Message(){

@@ -1,51 +1,41 @@
 #include"GameMenu_String.h"
+#include"Game.h"
 #include"extern.h"
 
 GameMenu_String::GameMenu_String(){borderColor=&ColorRGBA::White;}
 GameMenu_String::~GameMenu_String(){}
 
-void GameMenu_String::addString(const string &str, bool translate){
-	gameStringList.push_back(GameString());
-	auto gString=gameStringList.data(gameStringList.size()-1);
-	gString->setString(str,translate);
+void GameMenu_String::addString(const string &str,bool translate){
+	auto block=GameString::charset.newString(translate ? Game::currentGame()->translate(str) : str.data());
+	gameStringList.push_back((char*)block.dataPointer);
 }
 
-uint GameMenu_String::rowAmount()const{return gameStringList.size();}
-void GameMenu_String::renderX()const{
-	//绘制每一项内容
-	decltype(renderItemStart) i=0,j=0;
-	for(auto &gString:gameStringList){
-		if(i>=renderItemStart){
-			//根据选择状态调整颜色
-			if(selectingItemIndex==i){
-				shapeRenderer.fillColor=&ColorRGBA::White;
-				//计算矩形选择区域
-				rect=gString.rectF();
-				rect.p0.y+=gString.position.y;
-				rect.p1.y+=gString.position.y;
-				shapeRenderer.drawRectangle(rect);
-			}
-			//开始绘制文字
-			gString.render();
-			++j;
+SizeType GameMenu_String::rowAmount()const{return gameStringList.size();}
+void GameMenu_String::addItem(){addSubObject(new GameString());}
+void GameMenu_String::updateItemsData(){
+	auto pos=renderItemStart;
+	forEachSubObj<GameString>([&](GameString *gameString){
+		auto pStr=gameStringList.data(pos);
+		if(pStr){
+			gameString->setRawString(*pStr);
 		}
-		if(j>=renderItemAmount)break;
-		++i;//下一个
-	}
+		++pos;
+	});
 }
-void GameMenu_String::updateRenderParameters(){
-	GameMenu::updateRenderParameters();
-	//调整渲染状态
-	point2D=rectF().topCenter();
-	decltype(renderItemStart) i=0,j=0;
-	for(auto &gString:gameStringList){
-		if(i>=renderItemStart){
-			gString.position.y = point2D.y - itemHeight*j - itemHeight/2;
-			//根据选择状态调整颜色
-			gString.color=(selectingItemIndex==i ? ColorRGBA::Black : ColorRGBA::White);
-			++j;
+void GameMenu_String::updateSelectCursor(){
+	auto pos=renderItemStart;
+	forEachSubObj<GameString>([&](GameString *gameString){
+		auto pStr=gameStringList.data(pos);
+		if(pStr){
+			//修改样式
+			if(pos==selectingItemIndex){//选中态,白底黑字
+				gameString->color=ColorRGBA::Black;
+				gameString->bgColor=&ColorRGBA::White;
+			}else{//非选中态,无底白字
+				gameString->color=ColorRGBA::White;
+				gameString->bgColor=nullptr;
+			}
 		}
-		if(j>=renderItemAmount)break;
-		++i;//下一个
-	}
+		++pos;
+	});
 }

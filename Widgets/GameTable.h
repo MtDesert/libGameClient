@@ -10,7 +10,8 @@
 class GameTable:public GameMenu{
 public:
 	//变量
-	uint page,maxPage;//当前页,最大页数(某些游戏数据庞大,一页是显示不完的)
+	SizeType itemHeight;//菜单项的寬高
+	SizeType page,maxPage;//当前页,最大页数(某些游戏数据庞大,一页是显示不完的)
 
 	//构造/析构函数
 	GameTable();
@@ -22,7 +23,5 @@ public:
 	virtual bool keyboardKey(Keyboard::KeyboardKey key,bool pressed);
 	//渲染
 	virtual void renderX()const;
-	virtual Point2D<float> sizeF()const;
-	virtual void renderItem(uint x,uint y,const Rectangle2D<float> &rectArea)const;
 };
 #endif

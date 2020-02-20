@@ -6,7 +6,7 @@ GameObject::~GameObject(){clearSubObjects();}
 
 //遍历子GameObject指针
 #define FOR_SUB_OBJECTS(code)\
-for(auto obj:subObjects){\
+for(auto &obj:subObjects){\
 	if(obj){code;}\
 }
 
@@ -17,10 +17,14 @@ while(objPos>0){\
 	--objPos;\
 	auto obj=subObjects.data(objPos);\
 	if(obj && *obj){\
-		intercept=code;\
+		intercept=(*obj)->GameObject::code;\
+		if(!intercept){\
+			intercept=(*obj)->code;\
+		}\
 		if(intercept)break;\
 	}\
-}
+}\
+return intercept;
 
 void GameObject::addSubObject(GameObject *subObj,bool addFront){
 	if(!subObj)return;
@@ -46,28 +50,21 @@ void GameObject::deleteSubObject(GameObject *subObj){
 void GameObject::reset(){
 	FOR_SUB_OBJECTS(obj->reset())
 }
+
 bool GameObject::joystickKey(JoystickKey key,bool pressed){
-	EVENT_TRANSMISSION((*obj)->joystickKey(key,pressed))
-	return intercept;
+	EVENT_TRANSMISSION(joystickKey(key,pressed))
 }
 bool GameObject::keyboardKey(Keyboard::KeyboardKey key,bool pressed){
-	EVENT_TRANSMISSION((*obj)->keyboardKey(key,pressed))
-	return intercept;
+	EVENT_TRANSMISSION(keyboardKey(key,pressed))
 }
 bool GameObject::mouseKey(MouseKey key, bool pressed){
-	EVENT_TRANSMISSION((*obj)->mouseKey(key,pressed))
-	return intercept;
+	EVENT_TRANSMISSION(mouseKey(key,pressed))
 }
 bool GameObject::mouseMove(int x,int y){
-	EVENT_TRANSMISSION((*obj)->mouseMove(x,y))
-	return intercept;
+	EVENT_TRANSMISSION(mouseMove(x,y))
 }
 bool GameObject::mouseWheel(int angle){
-	EVENT_TRANSMISSION((*obj)->mouseWheel(angle))
-	return intercept;
-}
-void GameObject::addTimeSlice(uint msec){
-	FOR_SUB_OBJECTS(obj->addTimeSlice(msec))
+	EVENT_TRANSMISSION(mouseWheel(angle))
 }
 void GameObject::render()const{
 	FOR_SUB_OBJECTS(obj->render());

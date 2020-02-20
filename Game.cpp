@@ -141,6 +141,7 @@ void Game::whenError(const string &errStr){
 	allErrorStrings.push_back(errStr);
 	//设置首个错误信息
 	errorString=allErrorStrings.front().data();
+	printf("error: %s\n",errStr.data());
 }
 void Game::clearErrorMessages(){allErrorStrings.clear();}
 
@@ -150,7 +151,6 @@ bool Game::mouseMove(int x,int y){
 	return GameObject::mouseMove(x,y);
 }
 void Game::addTimeSlice(uint msec){
-	GameObject::addTimeSlice(msec);//GameObject时间片传递
 	timeSliceList.addTimeSlice(msec);//计时器传递
 	executeScript();
 	//错误显示
