@@ -8,6 +8,11 @@ GameSprite::GameSprite():color(0xFFFFFFFF),
 	anchorPoint(0.5,0.5){}
 GameSprite::~GameSprite(){}
 
+void GameSprite::setTexture(const Texture &tex){
+	texture=tex;
+	size.setXY(tex.getWidth(),tex.getHeight());
+}
+
 void GameSprite::consumeTimeSlice(){}
 void GameSprite::render()const{
 	//绘制纹理
@@ -36,21 +41,12 @@ void GameSprite::render()const{
 void GameSprite::renderX()const{}
 
 Point2D<float> GameSprite::posF()const{
-	point2D.x=position.x;
-	point2D.y=position.y;
+	point2D.setXY(position.x,position.y);
 	return point2D;
 }
-Point2D<float> GameSprite::sizeF()const{
-	size2D=texture.sizeF();
-	if(size2D.x==0 || size2D.y==0){
-		size2D.setXY(size.x,size.y);
-	}
-	return size2D;
-}
 Rectangle2D<float> GameSprite::rectF()const{
-	size2D=sizeF();
-	rect.p0.x=-anchorPoint.x*size2D.x;
-	rect.p0.y=-anchorPoint.y*size2D.y;
-	rect.p1 = rect.p0 + size2D;
+	rect.p0.x=-anchorPoint.x * size.x;
+	rect.p0.y=-anchorPoint.y * size.y;
+	rect.p1 = rect.p0 + size;
 	return rect;
 }

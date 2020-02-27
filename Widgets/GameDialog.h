@@ -10,5 +10,9 @@ class GameDialog:public GameSprite{
 public:
 	GameDialog();
 	~GameDialog();
+
+	virtual bool keyboardKey(Keyboard::KeyboardKey key,bool pressed);
+
+	void allSubObjects_verticalLayout(SizeType spacing);//所有控件进行纵向布局
 };
 #endif

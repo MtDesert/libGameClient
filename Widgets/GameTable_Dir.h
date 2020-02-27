@@ -12,12 +12,12 @@ public:
 	GameString stringFileName;//文件名
 	GameString stringFileSize;//文件大小
 
+	void updateData(SizeType pos);
 	void setSelected(bool b);//设置选中状态
 };
 
 /*显示目录内容的表格,有的时候我们需要在游戏中动态加载文件*/
-class GameTable_Dir:public GameTable{
-	GameTable_DirItem *itemArray;//显示用的控件组
+class GameTable_Dir:public GameTableTemplate<GameTable_DirItem>{
 public:
 	GameTable_Dir();
 	~GameTable_Dir();
@@ -28,13 +28,9 @@ public:
 
 	//重写
 	virtual SizeType rowAmount()const;
-	virtual uint columnAmount()const;//显示文件的属性列数
-	virtual uint columnWidth(uint column)const;//设定各个列宽
+	virtual SizeType columnAmount()const;//显示文件的属性列数
+	virtual SizeType columnWidth(uint column)const;//设定各个列宽
 protected:
-	virtual void addItem();
-	virtual void removeItem();
-	virtual void updateItemsData();
-	virtual void updateSelectCursor();
 	virtual void updateSize();
 };
 #endif

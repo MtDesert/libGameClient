@@ -12,17 +12,12 @@ void GameText::setString(const string &str){
 	renderLineStart=0;
 }
 SizeType GameText::stringWidth()const{return charSize.x*min(charAmountPerLine,byteAmount);}
-Point2D<float> GameText::sizeF()const{
-	auto sz=lineStartList.size();
-	sz=min(sz,renderLineAmount);
-	return Point2D<float>(stringWidth(),charSize.y*sz);
-}
+
 void GameText::renderX()const{
 	ShapeRenderer::setColor(color);
 	rect=rectF();
 	point2D=rect.p0;
 	point2D.y=rect.p1.y-charSize.y;
-	size2D.y=charSize.y;
 	//开始计算
 	SizeType line=0,from=0,to=0;
 	for(auto itr=lineStartList.begin();itr!=lineStartList.end();++itr){
@@ -107,4 +102,6 @@ void GameText::updateRenderParameter(){
 	}
 	//保存最后一行,即使没达到上限
 	lineStartList.push_back(from);
+	//更新尺寸信息
+	size.setXY(stringWidth(),charSize.y * min(lineStartList.size(),renderLineAmount));
 }

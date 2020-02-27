@@ -18,14 +18,11 @@ void TimeSliceList::pushTimeSlice(GameSprite *sprite, uint minSlice, uint maxSli
 	slice.maxSlice=maxSlice;
 	this->push_back(slice);
 }
-
-static GameSprite *toRemoveSprite=nullptr;
-static bool func(const TimeSlice &slice){return slice.sprite==toRemoveSprite;}
 void TimeSliceList::removeTimeSlice(GameSprite *sprite){
-	toRemoveSprite=sprite;
-	this->remove_if(func);
+	remove_if([&](const TimeSlice &slice){
+		return slice.sprite==sprite;
+	});
 }
-
 void TimeSliceList::addTimeSlice(uint msec){
 	for(auto &timer:*this){
 		timer.addTimeSlice(msec);

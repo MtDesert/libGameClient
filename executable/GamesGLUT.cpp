@@ -4,6 +4,7 @@
 #include<stdio.h>
 
 Game *game=nullptr;
+int window=0;//glut的window
 const Keyboard keyboard;
 
 enum{
@@ -88,8 +89,11 @@ void glutMouseFunction(int button,int state,int x,int y){
 		case GLUT_LEFT_BUTTON:game->mouseKey(Game::Mouse_LeftButton,state==GLUT_DOWN);break;
 		case GLUT_MIDDLE_BUTTON:game->mouseKey(Game::Mouse_MiddleButton,state==GLUT_DOWN);break;
 		case GLUT_RIGHT_BUTTON:game->mouseKey(Game::Mouse_RightButton,state==GLUT_DOWN);break;
-		case 3:game->mouseWheel(1);break;//mouse wheel roll frontward
-		case 4:game->mouseWheel(-1);break;//mouse wheel roll backward
+		case 3:case 4://鼠标滚轮,3为往前,4为往后(没办法没找到滚轮的宏)
+			if(state==GLUT_UP){
+				game->mouseWheel(button==3 ? 1 : -1);
+			}
+		break;
 		default:printf("unknown mouse button: %d\n",button);
 	}
 }
@@ -192,6 +196,8 @@ void printGlutDeviceGet(){
 
 #define GAMESGLUT_GLUTFUNC(name) glut##name##Func(glut##name##Function)
 
+static void whenExit(){delete game;}
+
 int main(int argc,char* argv[]){
 	//游戏参数初始化
 	int width=640,height=480;
@@ -201,7 +207,7 @@ int main(int argc,char* argv[]){
 	glutInitDisplayMode(GLUT_SINGLE|GLUT_RGBA|GLUT_DEPTH);
 	glutInitWindowSize(Game::resolution.x,Game::resolution.y);
 	glutInitWindowPosition(100,100);
-	int window=glutCreateWindow("GamesGLUT");
+	window=glutCreateWindow("GamesGLUT");
 	//计时器回调函数
 	GAMESGLUT_GLUTFUNC(Idle);
 	glutTimerFunc(timerInterval[TimerCPU],glutTimerFunction,TimerCPU);
@@ -249,8 +255,10 @@ int main(int argc,char* argv[]){
 	//开始事件循环
 	game=Game::newGame();
 	game->reset();
+	atexit(whenExit);
 	glutMainLoop();
-	glutDestroyWindow(window);
-	delete game;
+	//永远不会执行到这里,可以考虑用glutLeaveMainLoop(),但某些老版本可能没有此函数
+	//网上说有种方案是在调用glutMainLoop()前执行下面一行代码
+	//glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
 	return 0;
 }

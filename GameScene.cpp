@@ -5,25 +5,10 @@
 //对话框
 static GameDialog_Login *gameDialog_login=nullptr;
 
-#define GET_USERNAME_PASSWORD \
-auto name=gameDialog_login->inputBoxUsername.mString;\
-auto pass=gameDialog_login->inputBoxPassword.mString;
 //注册
-static void doRegister(GameButton*){
-	GET_USERNAME_PASSWORD
-}
+static void doRegister(){}
 //登陆
-static void doLogin(GameButton*){
-	GET_USERNAME_PASSWORD
-	Game::currentClient()->reqLogin(name,pass);
-}
-//取消登陆
-static void cancelLogin(GameButton*){
-	auto scene=dynamic_cast<GameScene*>(gameDialog_login->parentObject);
-	if(scene){
-		scene->hideLoginDialog();
-	}
-}
+static void doLogin(){}
 
 GameScene::GameScene(){
 	gameCamera.size=Game::currentGame()->resolution;
@@ -35,10 +20,15 @@ GameScene::~GameScene(){
 void GameScene::showLoginDialog(bool isRegister){
 	if(!gameDialog_login){
 		gameDialog_login=new GameDialog_Login();
-		gameDialog_login->buttonCancel.onClicked=cancelLogin;
+		gameDialog_login->buttonsConfirmCancel.buttonCancel.onClicked=[&](){
+			auto scene=dynamic_cast<GameScene*>(parentObject);
+			if(scene){
+				scene->hideLoginDialog();
+			}
+		};
 	}
 	gameDialog_login->setIsRegister(isRegister);
-	gameDialog_login->buttonConfirm.onClicked=isRegister ? doRegister : doLogin;
+	gameDialog_login->buttonsConfirmCancel.buttonConfirm.onClicked=isRegister ? doRegister : doLogin;
 	addSubObject(gameDialog_login);
 }
 void GameScene::hideLoginDialog(){

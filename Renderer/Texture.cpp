@@ -133,3 +133,12 @@ void TextureCacheArray::clearCache(){
 	}
 	clear();
 }
+Texture TextureCacheArray::getTexture(SizeType idxA,SizeType idxB)const{
+	Texture ret;
+	auto arr=data(idxA);
+	if(arr){
+		auto tex=arr->data(idxB);
+		if(tex)ret=*tex;
+	}
+	return ret;
+}

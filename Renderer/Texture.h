@@ -69,6 +69,7 @@ public:
 class TextureCacheArray:public Array<TextureCache>{
 public:
 	void clearCache();
-};
 
-#endif // TEXTURE_H
+	Texture getTexture(SizeType idxA,SizeType idxB)const;//根据idxA和idxB获取纹理
+};
+#endif// TEXTURE_H

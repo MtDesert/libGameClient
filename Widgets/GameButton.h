@@ -13,7 +13,8 @@ public:
 	//成员变量
 	bool isPressed;//是否处于按下状态
 	//回调函数(button用于指示哪个按钮被按下)
-	void (*onClicked)(GameButton *button);
+	typedef function<void()> ClickCallback;
+	ClickCallback onClicked;
 
 	//以下函数有可能子类差异化
 	virtual bool mouseMove(int x,int y);//鼠标移动出区域的时候恢复为不按下状态
@@ -35,4 +36,14 @@ public:
 	virtual void setIsPressed(bool pressed);
 };
 
+//"确定""取消"按钮组
+class GameButtonGroup_ConfirmCancel:public GameSprite{
+public:
+	GameButtonGroup_ConfirmCancel();
+
+	typedef GameButton::ClickCallback ClickCallback;
+
+	GameButton_String buttonConfirm,buttonCancel;//确定按钮,取消按钮
+	void setConfirmCancelFunction(ClickCallback confirmCallback,ClickCallback cancelCallback);//设置"确定""取消"函数
+};
 #endif

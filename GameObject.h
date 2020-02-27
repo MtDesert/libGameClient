@@ -79,10 +79,13 @@ public:
 
 	//对subObjects中所有的T类型的对象进行callback操作
 	template<typename T>
-	void forEachSubObj(function<void(T *obj)> callback){
+	void forEachSubObj(function<void(T &obj)> callback){
 		if(!callback)return;
 		for(auto &pObj:subObjects){
-			callback(dynamic_cast<T*>(pObj));
+			auto pType=dynamic_cast<T*>(pObj);
+			if(pType){
+				callback(*pType);
+			}
 		}
 	}
 };

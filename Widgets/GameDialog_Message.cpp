@@ -3,32 +3,24 @@
 
 const int border=16;
 uint GameDialog_Message::maxLineCharAmount = 36;
-static void whenConfirmClicked(GameButton *button){
-	Game::hideDialogMessage();
-	Game::clearErrorMessages();
-}
 
 GameDialog_Message::GameDialog_Message(){
 	addSubObject(&mGameText);
 	addSubObject(&mGameButton);
 	mGameText.setLineCharAmount(maxLineCharAmount,maxLineCharAmount);
 	mGameButton.setString("Confirm",true);
-	mGameButton.onClicked=whenConfirmClicked;
+	mGameButton.onClicked=[](){//按下按钮后清除消息
+		Game::hideDialogMessage();
+		Game::clearErrorMessages();
+	};
 }
 GameDialog_Message::~GameDialog_Message(){}
 
-Point2D<float> GameDialog_Message::sizeF()const{
-	Point2D<float> ret;
-	auto textRect=mGameText.rectF();
-	ret.x=textRect.width() + border*2;
-	ret.y=textRect.height() + mGameButton.sizeF().y+border*3;
-	return ret;
-}
 void GameDialog_Message::setText(const string &text){
 	mGameText.setString(text);
-	//设置mGameText的几何位置
-	auto rct=rectF();
-	mGameText.position.y=rct.p1.y - border - mGameText.sizeF().y/2;
-	//设置mGameButton的几何位置
-	mGameButton.position.y=rct.p0.y + border + mGameButton.sizeF().y/2;
+	//计算高度
+	size.setXY(mGameText.size.x + border*2,mGameText.size.y + mGameButton.size.y + border*3);
+	auto halfHeight = size.y/2;
+	mGameText.position.y = halfHeight - border - mGameText.size.y/2;//设置mGameText的几何位置
+	mGameButton.position.y= -halfHeight + border + mGameButton.size.y/2;//设置mGameButton的几何位置
 }

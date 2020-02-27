@@ -1,4 +1,5 @@
 #include"Game.h"
+#include"GameInputBox.h"
 #include"GameDialog_Message.h"
 #include"ErrorNumber.h"
 
@@ -153,6 +154,8 @@ bool Game::mouseMove(int x,int y){
 void Game::addTimeSlice(uint msec){
 	timeSliceList.addTimeSlice(msec);//计时器传递
 	executeScript();
+	//处理数据输入
+	GameInputBox::updateInput();
 	//错误显示
 	if(errorString){
 		showDialogMessage(errorString);

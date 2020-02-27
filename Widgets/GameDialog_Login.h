@@ -2,19 +2,16 @@
 #define GAMEDIALOG_LOGIN_H
 
 #include"GameDialog.h"
-#include"GameStringInputBox.h"
+#include"GameInputBox.h"
 
 //登陆对话框
 class GameDialog_Login:public GameDialog{
 public:
 	GameDialog_Login();
 	//控件部分
-	GameString strUsername;
-	GameString strPassword;
-	GameStringInputBox inputBoxUsername;
-	GameStringInputBox inputBoxPassword;
-	GameButton_String buttonConfirm;
-	GameButton_String buttonCancel;
+	GameAttr_InputBoxString inputBoxUsername;
+	GameAttr_InputBoxString inputBoxPassword;
+	GameButtonGroup_ConfirmCancel buttonsConfirmCancel;
 
 	void setIsRegister(bool b);
 };

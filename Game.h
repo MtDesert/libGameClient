@@ -28,7 +28,7 @@ Scene_##name* Game_##GameName::gotoScene_##name(bool reset){\
 class Game:public GameObject{
 public:
 	Game();
-	~Game();
+	virtual ~Game();
 
 	static Game* newGame();//创建游戏,请在子类实现
 	static Game* currentGame();//当前游戏,子类实现时候注意返回值

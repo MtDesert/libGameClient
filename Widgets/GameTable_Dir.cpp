@@ -21,13 +21,19 @@ GameTable_DirItem::GameTable_DirItem(){
 	addSubObject(&stringFileSize);
 }
 
-GameTable_Dir::GameTable_Dir():itemArray(nullptr){
-	//设定数据源
-	renderItemAmount=10;
-	itemArray=new GameTable_DirItem[renderItemAmount];
-}
-GameTable_Dir::~GameTable_Dir(){delete []itemArray;}
+GameTable_Dir::GameTable_Dir(){setRenderItemAmount(10);}
+GameTable_Dir::~GameTable_Dir(){}
 
+void GameTable_DirItem::updateData(SizeType pos){
+	auto dirTable=dynamic_cast<GameTable_Dir*>(parentObject);
+	if(dirTable){
+		auto entry=dirTable->directory.direntList.data(pos);
+		if(entry){
+			stringFileName.setString(entry->name());
+			stringFileSize.setString(entry->strSize());
+		}
+	}
+}
 void GameTable_DirItem::setSelected(bool b){
 	bgColor=b ? &ColorRGBA::White : nullptr;
 	stringFileName.color = b ? ColorRGBA::Black : ColorRGBA::White;
@@ -39,7 +45,7 @@ bool GameTable_Dir::changeDir(const string &dirName,WhenErrorString whenError){
 	if(b){
 		directory.direntList.sortBy(DirentList::ByTypeAndName);
 		renderItemStart=selectingItemIndex=0;
-		updateRenderParameters();
+		updateRenderParameters(true);
 	}
 	return b;
 }
@@ -47,38 +53,14 @@ const DirectoryEntry* GameTable_Dir::selectingDirectoryEntry()const{
 	return directory.direntList.data(selectingItemIndex);
 }
 
-void GameTable_Dir::addItem(){
-	addSubObject(&itemArray[subObjects.size()]);
-}
-void GameTable_Dir::removeItem(){
-	removeSubObject(&itemArray[subObjects.size()-1]);
-}
-void GameTable_Dir::updateItemsData(){
-	auto pos=renderItemStart;
-	forEachSubObj<GameTable_DirItem>([&](GameTable_DirItem *dirItem){
-		auto data=directory.direntList.data(pos);
-		if(data){
-			dirItem->stringFileName.setString(data->name());
-			dirItem->stringFileSize.setString(data->strSize());
-		}
-		++pos;//下一个
-	});
-}
-void GameTable_Dir::updateSelectCursor(){
-	auto pos=renderItemStart;
-	forEachSubObj<GameTable_DirItem>([&](GameTable_DirItem *dirItem){
-		dirItem->setSelected(pos==selectingItemIndex);
-		++pos;//下一个
-	});
-}
 void GameTable_Dir::updateSize(){//定死尺寸
 	auto &item=itemArray[0];
 	size.setXY(item.size.x,item.size.y*renderItemAmount);
 }
 
 SizeType GameTable_Dir::rowAmount()const{return directory.direntList.size();}
-uint GameTable_Dir::columnAmount()const{return 3;}
-uint GameTable_Dir::columnWidth(uint col)const{
+SizeType GameTable_Dir::columnAmount()const{return 2;}
+SizeType GameTable_Dir::columnWidth(uint col)const{
 	switch(col){
 		case FileName:return 400;
 		case FileSize:return 120;

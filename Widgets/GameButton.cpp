@@ -25,7 +25,7 @@ bool GameButton::mouseKey(MouseKey key,bool pressed){
 		bool changed=(isPressed!=pressed);
 		setIsPressed(pressed);
 		if(changed && !isPressed){
-			if(onClicked)onClicked(this);
+			if(onClicked)onClicked();
 		}
 		return true;
 	}
@@ -53,10 +53,30 @@ void GameButton::setIsPressed(bool pressed){isPressed=pressed;}
 
 void GameButton_String::setString(const string &str,bool translate){
 	mGameString.setString(str,translate);
+	size.setXY(max(size.x,mGameString.size.x),max(size.y,mGameString.size.y));//设置完成后,调整自身大小
 }
 
 void GameButton_String::setIsPressed(bool pressed){
 	GameButton::setIsPressed(pressed);
 	bgColor=&(isPressed ? ColorRGBA::White:ColorRGBA::Black);
 	mGameString.color=(isPressed ? ColorRGBA::Black:ColorRGBA::White);
+}
+
+//Confirm,Cancel
+GameButtonGroup_ConfirmCancel::GameButtonGroup_ConfirmCancel(){
+	//设置文字
+	buttonConfirm.setString("Confirm",true);
+	buttonCancel.setString("Cancel",true);
+	//设置控件尺寸位置
+	const SizeType spacing=16;
+	size.setXY(buttonConfirm.size.x + spacing + buttonCancel.size.x,max(buttonConfirm.size.y,buttonCancel.size.y));
+	buttonConfirm.position.x = -size.x/2 + buttonConfirm.size.x/2;
+	buttonCancel.position.x = -buttonConfirm.position.x;
+	//添加
+	addSubObject(&buttonConfirm);
+	addSubObject(&buttonCancel);
+}
+void GameButtonGroup_ConfirmCancel::setConfirmCancelFunction(ClickCallback confirmCallback,ClickCallback cancelCallback){
+	buttonConfirm.onClicked=confirmCallback;
+	buttonCancel.onClicked=cancelCallback;
 }

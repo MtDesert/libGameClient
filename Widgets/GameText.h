@@ -16,7 +16,6 @@ public:
 	//重写
 	virtual void setString(const string &str);
 	virtual SizeType stringWidth()const;
-	virtual Point2D<float> sizeF()const;//根据文字内容计算尺寸
 	virtual void renderX()const;//实时渲染文字
 	//换行相关
 	void setLineCharAmount(SizeType renderLineAmount,SizeType charAmountPerLine);//设置显示的行数和每行的字符数,超过行数的内容不会被绘制
