@@ -1,5 +1,5 @@
 #include"GameSprite.h"
-#include"extern.h"
+#include"Game.h"
 
 GameSprite::GameSprite():color(0xFFFFFFFF),
 	bgColor(nullptr),borderColor(nullptr),
@@ -11,6 +11,23 @@ GameSprite::~GameSprite(){}
 void GameSprite::setTexture(const Texture &tex){
 	texture=tex;
 	size.setXY(tex.getWidth(),tex.getHeight());
+}
+bool GameSprite::isMouseOnSprite()const{
+	rect=rectF();
+	auto &pos(Game::currentGame()->mousePos);
+	//判断前需要进行平移
+	rect.translate(position.x,position.y);
+	auto parent=this->parentObject;
+	while(parent){
+		auto sprite=dynamic_cast<GameSprite*>(parent);
+		if(sprite){
+			rect.translate(sprite->position.x,sprite->position.y);
+			parent=sprite->parentObject;
+		}else{
+			parent=nullptr;
+		}
+	}
+	return rect.containPoint(pos.x,pos.y);
 }
 
 void GameSprite::consumeTimeSlice(){}
@@ -40,10 +57,6 @@ void GameSprite::render()const{
 }
 void GameSprite::renderX()const{}
 
-Point2D<float> GameSprite::posF()const{
-	point2D.setXY(position.x,position.y);
-	return point2D;
-}
 Rectangle2D<float> GameSprite::rectF()const{
 	rect.p0.x=-anchorPoint.x * size.x;
 	rect.p0.y=-anchorPoint.y * size.y;

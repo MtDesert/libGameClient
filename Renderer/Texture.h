@@ -64,12 +64,12 @@ public:
 class TextureCache:public Array<Texture>{
 public:
 	void clearCache();
+	Texture getTexture(SizeType index)const;//根据index获取纹理
 };
 /*二级纹理缓冲*/
 class TextureCacheArray:public Array<TextureCache>{
 public:
 	void clearCache();
-
 	Texture getTexture(SizeType idxA,SizeType idxB)const;//根据idxA和idxB获取纹理
 };
 #endif// TEXTURE_H

@@ -1,14 +1,18 @@
 #include"Game.h"
 #include"GameInputBox.h"
-#include"GameDialog_Message.h"
+#include"Dialog_Message.h"
 #include"ErrorNumber.h"
 
 #define ALL_COMMON_SCENE(MACRO)\
 MACRO(Logo)\
 MACRO(FileList)
+#define ALL_COMMON_DIALOG(MACRO)\
+MACRO(Login)\
+MACRO(Message)
+//宏定义结束
 
-#define SCENE_DECL(name) static GameScene_##name *scene##name=nullptr;//文件场景
-ALL_COMMON_SCENE(SCENE_DECL)
+ALL_COMMON_SCENE(GAME_SCENE_DECLARE)
+ALL_COMMON_DIALOG(GAME_DIALOG_DECLARE)
 
 Game::Game():gameSettings(nullptr),layerConversation(nullptr),scenarioScript(nullptr){}
 Game::~Game(){
@@ -100,23 +104,12 @@ Client* Game::currentClient(){
 	return client;
 }
 
-//消息框
-static GameDialog_Message *messageDialog=nullptr;
-void Game::showDialogMessage(const string &content){
-	if(!messageDialog){
-		messageDialog=new GameDialog_Message();
-		currentGame()->addSubObject(messageDialog);
-	}
-	messageDialog->setText(content);
-}
-void Game::hideDialogMessage(){
-	currentGame()->removeSubObject(messageDialog);
-	delete messageDialog;
-	messageDialog=nullptr;
-}
 //场景管理
-static bool isScene(GameObject* const &obj){return obj && dynamic_cast<GameScene*>(obj);}
-void Game::clearAllScenes(){subObjects.remove_if(isScene);}
+void Game::clearAllScenes(){
+	subObjects.remove_if([](GameObject* const &obj){
+		return obj && dynamic_cast<GameScene*>(obj);
+	});
+}
 GameScene* Game::gotoScene(GameScene &scene,bool reset){
 	clearAllScenes();
 	addSubObject(&scene,true);
@@ -124,15 +117,16 @@ GameScene* Game::gotoScene(GameScene &scene,bool reset){
 	return &scene;
 }
 
-#define SCENE_DEFINE(name)\
-GameScene_##name* Game::gotoScene_##name(){\
-	if(!scene##name){\
-		scene##name=new GameScene_##name();\
-	}\
-	gotoScene(*scene##name);\
-	return scene##name;\
+GAME_GOTOSCENE_DEFINE(Game,Logo)
+GAME_GOTOSCENE_DEFINE(Game,FileList)
+GAME_SHOWDIALOG_DEFINE(Game,Login)
+GAME_SHOWDIALOG_DEFINE(Game,Message)
+
+//对话框
+GameDialog* Game::showDialog(GameDialog &dialog){
+	addSubObject(&dialog);
+	return &dialog;
 }
-ALL_COMMON_SCENE(SCENE_DEFINE)
 
 //错误处理
 static StringList allErrorStrings;//所有错误信息
@@ -158,7 +152,12 @@ void Game::addTimeSlice(uint msec){
 	GameInputBox::updateInput();
 	//错误显示
 	if(errorString){
-		showDialogMessage(errorString);
-		errorString=nullptr;
+		auto dialog=showDialog_Message();
+		dialog->setText(errorString);
+		dialog->setConfirmCallback([&,dialog](){
+			dialog->removeFromParentObject();
+			clearErrorMessages();
+		});
+		errorString=nullptr;//防止频繁进入
 	}
 }

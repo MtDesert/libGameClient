@@ -5,10 +5,9 @@
 GameDialog::GameDialog(){
 	bgColor=&ColorRGBA::Black;
 	borderColor=&ColorRGBA::White;
+	forceIntercept=true;//对话框一般来说需要关闭掉,才让操作事件往下传递
 }
 GameDialog::~GameDialog(){}
-
-bool GameDialog::keyboardKey(Keyboard::KeyboardKey key,bool pressed){return true;}
 
 void GameDialog::allSubObjects_verticalLayout(SizeType spacing){
 	//计算高度

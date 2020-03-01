@@ -14,14 +14,13 @@ GameButton_String::GameButton_String(){
 GameButton_String::~GameButton_String(){}
 
 bool GameButton::mouseMove(int x,int y){
-	if(!isMouseOnButton()){
+	if(!isMouseOnSprite()){//鼠标移开按钮时候,取消其按下状态
 		setIsPressed(false);
-		return true;
 	}
 	return false;
 }
 bool GameButton::mouseKey(MouseKey key,bool pressed){
-	if(isMouseOnButton()){
+	if(isMouseOnSprite()){//改变按钮按下状态,并检查时候要触发onClicked函数
 		bool changed=(isPressed!=pressed);
 		setIsPressed(pressed);
 		if(changed && !isPressed){
@@ -32,23 +31,6 @@ bool GameButton::mouseKey(MouseKey key,bool pressed){
 	return false;
 }
 
-bool GameButton::isMouseOnButton()const{
-	rect=rectF();
-	auto &pos(Game::currentGame()->mousePos);
-	//判断前需要进行平移
-	rect.translate(position.x,position.y);
-	auto parent=this->parentObject;
-	while(parent){
-		auto sprite=dynamic_cast<GameSprite*>(parent);
-		if(sprite){
-			rect.translate(sprite->position.x,sprite->position.y);
-			parent=sprite->parentObject;
-		}else{
-			parent=nullptr;
-		}
-	}
-	return rect.containPoint(pos.x,pos.y);
-}
 void GameButton::setIsPressed(bool pressed){isPressed=pressed;}
 
 void GameButton_String::setString(const string &str,bool translate){

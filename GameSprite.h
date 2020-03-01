@@ -24,12 +24,12 @@ public:
 	Point2D<float> anchorPoint;//锚点(百分比)
 
 	void setTexture(const Texture &tex);
+	bool isMouseOnSprite()const;
 
 	//以下函数有可能子类差异化
 	virtual void consumeTimeSlice();
 	virtual void render()const;//渲染texture
 	virtual void renderX()const;//子类特殊的渲染方式
-	virtual Point2D<float> posF()const;//返回精灵的位置,值由成员变量推断
 	virtual Rectangle2D<float> rectF()const;//返回精灵在屏幕上的矩形区域,值由成员变量推断
 };
 #endif

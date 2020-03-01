@@ -34,11 +34,11 @@ void GameStringInputBox::startInput(){}
 #else
 
 #include<gtk-3.0/gtk/gtk.h>
-static GtkWidget *window=nullptr,*entry=nullptr,*spinBox=nullptr;//GTK控件:窗体,文本输入,
+static GtkWidget *window=nullptr,*entry=nullptr,*spinBox=nullptr;//GTK控件:窗体,文本输入,数字输入
 //GamesEngines的输入控件
 static GameInputBox *gInputBox=nullptr;
 static int gInputInt=0;
-static const char *gInputStr=nullptr;
+static const gchar *gInputStr=nullptr;
 
 //隐藏窗体
 static gboolean hideWindow(){
@@ -57,6 +57,10 @@ gboolean whenWidgetEvent(GtkWidget *widget,GdkEvent *event,gpointer user_data){
 			switch(eventKey->keyval){
 				case GDK_KEY_Escape:return hideWindow();//ESC退出
 				case GDK_KEY_Return:case GDK_KEY_KP_Enter:
+					if(entry){
+						gInputStr=gtk_entry_get_text(GTK_ENTRY(entry));//确认输入
+						return hideWindow();//输入完毕后隐藏控件
+					}
 					if(spinBox){//获取spinBox的输入信息
 						gInputStr=gtk_entry_get_text(GTK_ENTRY(spinBox));
 						gInputInt=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(spinBox));
@@ -87,19 +91,12 @@ static void waitInputFinish(GameInputBox *pInputBox){
 		gInputBox=pInputBox;//updateInput负责更新
 	}
 }
-//输入完成
-static void whenEntryActivate(GtkEntry *entry,gpointer userData){
-	gInputStr=gtk_entry_get_text(entry);//确认输入
-	hideWindow();//输入完毕后隐藏控件
-}
-
 static Thread inputBoxThread;//输入过程用线程处理,保证在用户输入数据的同时后台游戏也能运行
 static void* inputStringThreadFunc(void *box){
 	auto pInputBox=reinterpret_cast<GameInputBox_String*>(box);
 	createWindow();
 	//根据类型创建控件
 	entry=gtk_entry_new();
-	g_signal_connect(entry,"activate",G_CALLBACK(whenEntryActivate),NULL);//按回车键触发
 	gtk_container_add(GTK_CONTAINER(window),GTK_WIDGET(entry));
 	//设置文字内容
 	gtk_entry_set_visibility(GTK_ENTRY(entry),!pInputBox->passwordChar);
@@ -135,6 +132,7 @@ void GameInputBox::updateInput(){
 		auto inputBoxInteger=dynamic_cast<GameInputBox_Integer*>(gInputBox);
 		if(inputBoxInteger){
 			inputBoxInteger->setInteger(gInputInt);
+			gInputBox=nullptr;
 		}
 	}
 }

@@ -1,13 +1,13 @@
-#ifndef GAMEDIALOG_LOGIN_H
-#define GAMEDIALOG_LOGIN_H
+#ifndef DIALOG_LOGIN_H
+#define DIALOG_LOGIN_H
 
 #include"GameDialog.h"
 #include"GameInputBox.h"
 
 //登陆对话框
-class GameDialog_Login:public GameDialog{
+class Dialog_Login:public GameDialog{
 public:
-	GameDialog_Login();
+	Dialog_Login();
 	//控件部分
 	GameAttr_InputBoxString inputBoxUsername;
 	GameAttr_InputBoxString inputBoxPassword;

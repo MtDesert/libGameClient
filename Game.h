@@ -3,26 +3,45 @@
 
 #include"GameObject.h"
 #include"GameSettings.h"
-#include"GameScene_FileList.h"
-#include"GameScene_Logo.h"
+#include"Scene_FileList.h"
+#include"Scene_Logo.h"
 #include"GameLayer_Conversation.h"
+#include"Dialog_Login.h"
+#include"Dialog_Message.h"
 #include"GameTimer.h"
 #include"GameScript.h"
 #include"Client.h"
 
+//以下宏定义建议放在Game子类的.cpp文件
+//场景声明,对话框声明
+#define GAME_SCENE_DECLARE(name) static Scene_##name *scene##name=nullptr;
+#define GAME_DIALOG_DECLARE(name) static Dialog_##name *dialog##name=nullptr;
 //场景跳转定义
-#define GAME_GOTOSCENE_DEFINE(GameName,name)\
-Scene_##name* Game_##GameName::gotoScene_##name(bool reset){\
+#define GAME_GOTOSCENE_DEFINE(GameClass,name)\
+Scene_##name* GameClass::gotoScene_##name(bool reset){\
 	if(!scene##name){\
 		scene##name=new Scene_##name();\
 	}\
 	gotoScene(*scene##name,reset);\
 	return scene##name;\
 }
+//对话框显示定义
+#define GAME_SHOWDIALOG_DEFINE(GameClass,name)\
+Dialog_##name* GameClass::showDialog_##name(){\
+	if(!dialog##name){\
+		dialog##name=new Dialog_##name();\
+	}\
+	showDialog(*dialog##name);\
+	return dialog##name;\
+}
+//场景删除,对话框删除
+#define GAME_DELETE_SCENE(name) deleteSubObject(scene##name);
+#define GAME_DELETE_DIALOG(name) deleteSubObject(dialog##name);
 
 /** Game是整个游戏运行的环境，游戏的主要数据都在本类中
 该类主要是内存操作，与现有的游戏（或非游戏）图形环境等只做对接，比如glfw,glut,Qt,SDL,SFML等各种数不清的图形环境
 可以接受控制设备的输入，但是控制设备是怎么工作的，这是图形库或者系统相关的图形界面程序要去考虑的事情，本类并不考虑，只提供成员函数来接受输入
+该类主要负责:配置读写,翻译,资源文件调度,场景,对话框等资源
 */
 
 class Game:public GameObject{
@@ -72,14 +91,15 @@ public:
 	//客户端
 	static Client* currentClient();
 
-	//提示框
-	static void showDialogMessage(const string &content);
-	static void hideDialogMessage();
 	//场景管理
 	void clearAllScenes();//清除所有场景
-	GameScene* gotoScene(GameScene &scene,bool reset=false);//场景跳转
-	GameScene_Logo* gotoScene_Logo();//游戏标志
-	GameScene_FileList* gotoScene_FileList();//文件选择场景
+	GameScene* gotoScene(GameScene &scene,bool reset=false);//场景跳转,返回scene的指针
+	Scene_Logo* gotoScene_Logo(bool reset=false);//场景:游戏标志
+	Scene_FileList* gotoScene_FileList(bool reset=false);//场景:文件选择
+	//对话框
+	GameDialog* showDialog(GameDialog &dialog);
+	Dialog_Login* showDialog_Login();
+	Dialog_Message* showDialog_Message();
 	//错误处理
 	static void whenError(const string &errStr);
 	static void clearErrorMessages();

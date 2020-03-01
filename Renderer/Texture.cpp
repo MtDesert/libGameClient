@@ -27,9 +27,9 @@ void Texture::texImage2D(GLsizei width, GLsizei height, const GLvoid *pixels){
 	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,pixels);
 }
 void Texture::deleteTexture(){
-	if(glIsTexture(texture)){
-		glDeleteTextures(1,&texture);
-	}
+	//glIsTexture(texture);在驱动有问题的情况下返回值会有问题,这里的处理方法是直接删除
+	glDeleteTextures(1,&texture);
+	texture=0;
 }
 //创建纹理(根据不同的类)
 void Texture::texImage2D(const FileBMP &fileBmp){
@@ -127,6 +127,10 @@ void TextureCache::clearCache(){
 	}
 	clear();
 }
+Texture TextureCache::getTexture(SizeType index)const{
+	auto tex=data(index);
+	return tex ? *tex : Texture();
+}
 void TextureCacheArray::clearCache(){
 	for(auto &cache:*this){
 		cache.clearCache();
@@ -134,11 +138,6 @@ void TextureCacheArray::clearCache(){
 	clear();
 }
 Texture TextureCacheArray::getTexture(SizeType idxA,SizeType idxB)const{
-	Texture ret;
 	auto arr=data(idxA);
-	if(arr){
-		auto tex=arr->data(idxB);
-		if(tex)ret=*tex;
-	}
-	return ret;
+	return arr ? arr->getTexture(idxB) : Texture();
 }

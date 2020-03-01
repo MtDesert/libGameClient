@@ -1,7 +1,7 @@
 #include"GameObject.h"
 #include<stdio.h>
 
-GameObject::GameObject():parentObject(nullptr){}
+GameObject::GameObject():parentObject(nullptr),forceIntercept(false){}
 GameObject::~GameObject(){clearSubObjects();}
 
 //遍历子GameObject指针
@@ -10,6 +10,16 @@ for(auto &obj:subObjects){\
 	if(obj){code;}\
 }
 
+/*事件传递,代码解释如下
+拦截状态=不拦截
+while(有子物体时){
+	拦截状态=子物体执行GameObject的事件函数
+	若没有拦截,则拦截状态=子物体执行自己class的同名事件函数
+	若子物体要求强行拦截,则拦截状态=真
+	若拦截,则break此whlie循环
+}
+返回拦截状态
+*/
 #define EVENT_TRANSMISSION(code)\
 bool intercept=false;\
 SizeType objPos=subObjects.size();\
@@ -21,6 +31,7 @@ while(objPos>0){\
 		if(!intercept){\
 			intercept=(*obj)->code;\
 		}\
+		if((*obj)->forceIntercept)intercept=true;\
 		if(intercept)break;\
 	}\
 }\
@@ -45,6 +56,13 @@ void GameObject::deleteSubObject(GameObject *subObj){
 		removeSubObject(subObj);
 		delete subObj;
 	}
+}
+void GameObject::removeFromParentObject(){
+	if(parentObject)parentObject->removeSubObject(this);
+}
+void GameObject::deleteFromParentObject(){
+	removeFromParentObject();
+	delete this;
 }
 
 void GameObject::reset(){

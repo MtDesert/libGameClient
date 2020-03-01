@@ -58,10 +58,13 @@ public:
 	//警告,subObject相当于树叉,如果把让它形成环状(比如addSubObject(this);)会出现严重的后果,除非你知道你自己在干什么
 	GameObject *parentObject;//父物体
 	Array<GameObject*> subObjects;//子物体
+	bool forceIntercept;//是否进行事件拦截
 	void addSubObject(GameObject *subObj,bool addFront=false);
 	void removeSubObject(GameObject *subObj);
 	void clearSubObjects();
 	void deleteSubObject(GameObject *subObj);
+	void removeFromParentObject();
+	void deleteFromParentObject();
 
 	//如需要响应事件,请在子类重写virtual函数
 	virtual void reset();//重启,相当于游戏机的reset按钮

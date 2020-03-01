@@ -1,4 +1,4 @@
-#include"GameScene_Logo.h"
+#include"Scene_Logo.h"
 #include"Game.h"
 
 //流程控制
@@ -9,21 +9,21 @@ enum Status{
 	StatusOver
 };
 
-GameScene_Logo::GameScene_Logo():status(0),whenLogoOver(nullptr){
+Scene_Logo::Scene_Logo():status(0),whenLogoOver(nullptr){
 	addSubObject(&logoText);
 }
-GameScene_Logo::~GameScene_Logo(){
+Scene_Logo::~Scene_Logo(){
 	Game::currentGame()->timeSliceList.removeTimeSlice(this);
 }
 
-void GameScene_Logo::reset(){
+void Scene_Logo::reset(){
 	logoText.color.alpha=0;
 	status=FadeIn;
 	auto &sliceList=Game::currentGame()->timeSliceList;
 	sliceList.removeTimeSlice(this);
 	sliceList.pushTimeSlice(this,20,40);
 }
-void GameScene_Logo::consumeTimeSlice(){
+void Scene_Logo::consumeTimeSlice(){
 	auto &alpha=logoText.color.alpha;
 	switch(status){
 		case FadeIn:

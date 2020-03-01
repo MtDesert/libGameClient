@@ -5,7 +5,12 @@
 GameMenu::GameMenu():
 	renderItemStart(0),renderItemAmount(0),
 	selectingItemIndex(0),recycleMode(true),
-	onConfirm(nullptr),onCancel(nullptr),pSpriteSelector(nullptr){}
+	onConfirm(nullptr),onCancel(nullptr),pSpriteSelector(nullptr){
+	forceIntercept=true;//防止事件穿透
+	onCancel=[&](GameMenu *menu){//默认取消事件
+		removeFromParentObject();
+	};
+}
 GameMenu::~GameMenu(){}
 
 void GameMenu::cursorMoveUp(){
@@ -59,26 +64,26 @@ SizeType GameMenu::rowAmount()const{return subObjects.size();}
 
 //菜单可以响应键盘事件(比如方向键选择,回车键确定,退出键关闭菜单等)
 bool GameMenu::keyboardKey(Keyboard::KeyboardKey key,bool pressed){
-	if(pressed)return false;
-	bool ret=true;
-	switch(key){
-		//上下键
-		case Keyboard::Key_Up:cursorMoveUp();break;
-		case Keyboard::Key_Down:cursorMoveDown();break;
-		case Keyboard::Key_Enter:
-			if(onConfirm)onConfirm(this);
-		break;
-		case Keyboard::Key_Esc:
-			if(onCancel)onCancel(this);
-		break;
-		default:ret=false;
+	if(!pressed){
+		switch(key){
+			//上下键
+			case Keyboard::Key_Up:cursorMoveUp();break;
+			case Keyboard::Key_Down:cursorMoveDown();break;
+			case Keyboard::Key_Enter:
+				if(onConfirm)onConfirm(this);
+			break;
+			case Keyboard::Key_Esc:
+				if(onCancel)onCancel(this);
+			break;
+			default:;
+		}
 	}
-	return ret;
+	return forceIntercept;
 }
 bool GameMenu::mouseWheel(int angle){
 	if(angle>0)cursorMoveUp();
 	else if(angle<0)cursorMoveDown();
-	return true;
+	return forceIntercept;
 }
 void GameMenu::updateItemsData(){}
 void GameMenu::updateSelectCursor(){

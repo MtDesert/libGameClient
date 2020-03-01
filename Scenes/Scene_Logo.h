@@ -1,15 +1,15 @@
-#ifndef GAMESCENE_LOGO_H
-#define GAMESCENE_LOGO_H
+#ifndef SCENE_LOGO_H
+#define SCENE_LOGO_H
 
 #include"GameScene.h"
 #include"GameText.h"
 
 //显示游戏标志,本类只简单显示文本
-class GameScene_Logo:public GameScene{
+class Scene_Logo:public GameScene{
 	int status,countDown;
 public:
-	GameScene_Logo();
-	~GameScene_Logo();
+	Scene_Logo();
+	~Scene_Logo();
 
 	GameString logoText;//标志文本
 	function<void()> whenLogoOver;//标志结束后的动作
