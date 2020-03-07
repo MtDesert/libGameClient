@@ -23,8 +23,11 @@ public:
 	Point3D<int> scale;//缩放
 	Point2D<float> anchorPoint;//锚点(百分比)
 
-	void setTexture(const Texture &tex);
-	bool isMouseOnSprite()const;
+	void setTexture(const Texture &tex);//设置纹理
+	bool isMouseOnSprite()const;//判断当前的鼠标位置有没有在精灵上
+	//布局相关,针对所有子物体
+	void horizontalLayout(SizeType start,SizeType spacing);
+	void verticalLayout(SizeType start,SizeType spacing);
 
 	//以下函数有可能子类差异化
 	virtual void consumeTimeSlice();

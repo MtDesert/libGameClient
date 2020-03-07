@@ -105,15 +105,16 @@ Client* Game::currentClient(){
 }
 
 //场景管理
-void Game::clearAllScenes(){
-	subObjects.remove_if([](GameObject* const &obj){
-		return obj && dynamic_cast<GameScene*>(obj);
-	});
+static bool isGameScene(GameObject *obj){return obj && dynamic_cast<GameScene*>(obj);}
+void Game::clearAllScenes(){subObjects.remove_if(isGameScene);}
+GameScene* Game::findFirstScene()const{
+	auto pObj=subObjects.data(isGameScene);
+	return pObj ? dynamic_cast<GameScene*>(*pObj) : nullptr;
 }
 GameScene* Game::gotoScene(GameScene &scene,bool reset){
+	if(reset)scene.reset();
 	clearAllScenes();
 	addSubObject(&scene,true);
-	if(reset)scene.reset();
 	return &scene;
 }
 

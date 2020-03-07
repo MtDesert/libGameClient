@@ -27,11 +27,12 @@ while(objPos>0){\
 	--objPos;\
 	auto obj=subObjects.data(objPos);\
 	if(obj && *obj){\
+		bool force=(*obj)->forceIntercept;\
 		intercept=(*obj)->GameObject::code;\
 		if(!intercept){\
-			intercept=(*obj)->code;\
+			intercept=(*obj)->code;/*这里的操作有可能导致*obj的地址发生变化,故之后的代码不要再操作*obj*/\
 		}\
-		if((*obj)->forceIntercept)intercept=true;\
+		if(force)intercept=true;\
 		if(intercept)break;\
 	}\
 }\

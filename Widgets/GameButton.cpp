@@ -1,6 +1,5 @@
 #include"GameButton.h"
 #include"Game.h"
-#include"extern.h"
 
 GameButton::GameButton():isPressed(false),onClicked(nullptr){
 	size.setXY(160,32);
@@ -37,7 +36,7 @@ void GameButton_String::setString(const string &str,bool translate){
 	mGameString.setString(str,translate);
 	size.setXY(max(size.x,mGameString.size.x),max(size.y,mGameString.size.y));//设置完成后,调整自身大小
 }
-
+void GameButton_String::resizeAsString(){size=mGameString.size;}
 void GameButton_String::setIsPressed(bool pressed){
 	GameButton::setIsPressed(pressed);
 	bgColor=&(isPressed ? ColorRGBA::White:ColorRGBA::Black);

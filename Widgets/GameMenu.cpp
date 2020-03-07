@@ -1,29 +1,43 @@
 #include"GameMenu.h"
-#include"extern.h"
 
-//构造函数
+//构造/析构函数
+GameMenuItem::GameMenuItem(){
+	bgColor=borderColor=nullptr;
+	onClicked=[&](){//菜单项可以通过点击事件反馈给其所属菜单
+		auto menu=dynamic_cast<GameMenu*>(parentObject);
+		if(menu){
+			menu->onItemClicked(this);
+		}
+	};
+}
+GameMenuItem::~GameMenuItem(){}
 GameMenu::GameMenu():
 	renderItemStart(0),renderItemAmount(0),
 	selectingItemIndex(0),recycleMode(true),
 	onConfirm(nullptr),onCancel(nullptr),pSpriteSelector(nullptr){
+	bgColor = &ColorRGBA::Black;
+	borderColor = &ColorRGBA::White;
 	forceIntercept=true;//防止事件穿透
-	onCancel=[&](GameMenu *menu){//默认取消事件
+	onCancel=[&](GameMenu*){//默认取消事件
 		removeFromParentObject();
 	};
 }
 GameMenu::~GameMenu(){}
 
+void GameMenuItem::updateData(SizeType pos){}
+void GameMenuItem::setSelected(bool b){}
+
 void GameMenu::cursorMoveUp(){
 	if(selectingItemIndex>0){
 		--selectingItemIndex;
 	}else{
-		selectingItemIndex = recycleMode ? rowAmount()-1 : 0;
+		selectingItemIndex = recycleMode ? itemAmount()-1 : 0;
 	}
 	updateRenderParameters();
 }
 void GameMenu::cursorMoveDown(){
 	++selectingItemIndex;
-	if(selectingItemIndex>=rowAmount()){
+	if(selectingItemIndex>=itemAmount()){
 		selectingItemIndex = recycleMode ? 0 : selectingItemIndex-1;
 	}
 	updateRenderParameters();
@@ -31,7 +45,7 @@ void GameMenu::cursorMoveDown(){
 
 void GameMenu::updateRenderParameters(bool forceUpdate){
 	//调整ITEM数量
-	auto dataAmount = rowAmount();//数据总数
+	auto dataAmount = itemAmount();//数据总数
 	auto renderAmount = min(dataAmount,renderItemAmount);//实际渲染数<=数据总数
 	removeSubObject(pSpriteSelector);
 	if(!forceUpdate)forceUpdate=(subObjects.size()!=renderAmount);//如果数量产生变化,则需要渲染
@@ -60,11 +74,13 @@ void GameMenu::updateRenderParameters(bool forceUpdate){
 	updateSelectCursor();
 }
 //菜单项数
-SizeType GameMenu::rowAmount()const{return subObjects.size();}
+SizeType GameMenu::itemAmount()const{return subObjects.size();}
 
 //菜单可以响应键盘事件(比如方向键选择,回车键确定,退出键关闭菜单等)
 bool GameMenu::keyboardKey(Keyboard::KeyboardKey key,bool pressed){
+	bool ret=false;
 	if(!pressed){
+		ret=true;//先拦截,根据情况再决定最后是否拦截
 		switch(key){
 			//上下键
 			case Keyboard::Key_Up:cursorMoveUp();break;
@@ -75,16 +91,42 @@ bool GameMenu::keyboardKey(Keyboard::KeyboardKey key,bool pressed){
 			case Keyboard::Key_Esc:
 				if(onCancel)onCancel(this);
 			break;
-			default:;
+			default:ret=false;
 		}
 	}
-	return forceIntercept;
+	return ret;
+}
+bool GameMenu::mouseKey(MouseKey key,bool pressed){
+	bool ret=false;
+	if(!pressed && !isMouseOnSprite()){
+		if(onCancel){//有取消事件则调用之
+			onCancel(this);
+			ret=true;
+		}
+	}
+	return ret;
 }
 bool GameMenu::mouseWheel(int angle){
+	bool ret=true;
 	if(angle>0)cursorMoveUp();
 	else if(angle<0)cursorMoveDown();
-	return forceIntercept;
+	else ret=false;
+	return ret;
 }
+void GameMenu::onItemClicked(GameMenuItem *menuItem){
+	//先找出是第几个菜单项被点了
+	auto index=subObjects.indexOf([&](GameObject* const &obj){return obj==menuItem;});
+	if(index<0)return;//按理说不可能找不到...
+	//改变当前选择项,或者响应确认事件
+	index += renderItemStart;
+	if(selectingItemIndex==(SizeType)index){
+		if(onConfirm)onConfirm(this);
+	}else{
+		selectingItemIndex=index;
+		updateRenderParameters(true);
+	}
+}
+
 void GameMenu::updateItemsData(){}
 void GameMenu::updateSelectCursor(){
 	if(!pSpriteSelector)return;
@@ -127,4 +169,3 @@ void GameMenuItem_IconName::setCursorWidth(SizeType cursorWidth){
 	spriteIcon.anchorPoint.x=0;
 	stringName.anchorPoint.x=0;
 }
-void GameMenuItem_IconName::setSelected(bool b){}

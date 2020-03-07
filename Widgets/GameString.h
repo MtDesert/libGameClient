@@ -38,6 +38,6 @@ protected:
 	Array<CharAttr> arrayCharAttr;//字符数组
 	SizeType byteAmount;//字符串的字节数量,主要用于测量宽度
 	//渲染部分文字,从arrayCharAttr的from下标开始,渲染amount个字符
-	void renderString(uint from,uint amount)const;
+	void renderString(uint from,uint amount,const Point2D<float> &pos2D)const;
 };
 #endif

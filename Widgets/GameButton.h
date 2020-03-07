@@ -1,7 +1,6 @@
 #ifndef GAMEBUTTON_H
 #define GAMEBUTTON_H
 
-#include"GameSprite.h"
 #include"GameString.h"
 
 /*游戏中的按钮,可以响应鼠标或触摸事件*/
@@ -31,7 +30,8 @@ public:
 	GameButton_String();
 	~GameButton_String();
 
-	void setString(const string &str,bool translate=false);
+	void setString(const string &str,bool translate=false);//设置字符串内容
+	void resizeAsString();//调整成和字符串一样的大小
 	virtual void setIsPressed(bool pressed);
 };
 

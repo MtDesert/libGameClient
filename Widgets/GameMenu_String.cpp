@@ -1,7 +1,9 @@
 #include"GameMenu_String.h"
 #include"Game.h"
 
-GameMenu_String::GameMenu_String(){borderColor=&ColorRGBA::White;}
+GameMenuItem_String::GameMenuItem_String(){addSubObject(&gameString);}
+GameMenuItem_String::~GameMenuItem_String(){}
+GameMenu_String::GameMenu_String(){}
 GameMenu_String::~GameMenu_String(){}
 
 void GameMenuItem_String::updateData(SizeType pos){
@@ -9,13 +11,14 @@ void GameMenuItem_String::updateData(SizeType pos){
 	if(menu){
 		auto pStr=menu->gameStringList.data(pos);
 		if(pStr){
-			setRawString(*pStr);
+			gameString.setRawString(*pStr);
 		}
 	}
 }
 void GameMenuItem_String::setSelected(bool b){
 	color = b ? ColorRGBA::Black : ColorRGBA::White;
 	bgColor = b ? &ColorRGBA::White : nullptr;
+	gameString.color = b ? ColorRGBA::Black : ColorRGBA::White;
 }
 
 void GameMenu_String::addString(const string &str,bool translate){
@@ -23,4 +26,4 @@ void GameMenu_String::addString(const string &str,bool translate){
 	gameStringList.push_back((char*)block.dataPointer);
 }
 
-SizeType GameMenu_String::rowAmount()const{return gameStringList.size();}
+SizeType GameMenu_String::itemAmount()const{return gameStringList.size();}

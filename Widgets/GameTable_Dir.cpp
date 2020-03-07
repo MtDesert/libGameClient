@@ -1,5 +1,4 @@
 #include"GameTable_Dir.h"
-#include"extern.h"
 
 enum ColumnType{
 	FileName,FileSize,AmountOfColumnType
@@ -21,7 +20,9 @@ GameTable_DirItem::GameTable_DirItem(){
 	addSubObject(&stringFileSize);
 }
 
-GameTable_Dir::GameTable_Dir(){setRenderItemAmount(10);}
+GameTable_Dir::GameTable_Dir(){
+	setRenderItemAmount(10);
+}
 GameTable_Dir::~GameTable_Dir(){}
 
 void GameTable_DirItem::updateData(SizeType pos){
@@ -58,9 +59,9 @@ void GameTable_Dir::updateSize(){//定死尺寸
 	size.setXY(item.size.x,item.size.y*renderItemAmount);
 }
 
-SizeType GameTable_Dir::rowAmount()const{return directory.direntList.size();}
+SizeType GameTable_Dir::itemAmount()const{return directory.direntList.size();}
 SizeType GameTable_Dir::columnAmount()const{return 2;}
-SizeType GameTable_Dir::columnWidth(uint col)const{
+SizeType GameTable_Dir::columnWidth(SizeType col)const{
 	switch(col){
 		case FileName:return 400;
 		case FileSize:return 120;

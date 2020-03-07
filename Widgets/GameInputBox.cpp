@@ -1,17 +1,21 @@
 #include"GameInputBox.h"
 #include"Game.h"
-#include"extern.h"
 #include"Number.h"
 #include"Thread.h"
 
-GameInputBox::GameInputBox(){
+GameInputBox::GameInputBox():whenInputConfirm(nullptr){
 	//点击时候触发输入
 	onClicked=[&](){startInput();};
 }
+GameInputBox_Bool::GameInputBox_Bool():boolValue(false),falseStr("false"),trueStr("true"){setValue(boolValue);}
 GameInputBox_String::GameInputBox_String():passwordChar('\0'){}
 GameInputBox_Integer::GameInputBox_Integer():mInteger(0),minInteger(0),maxInteger(0x7FFFFFFF){}
 
-void GameInputBox_String::setString(const string &str){
+void GameInputBox_Bool::setValue(bool b){
+	boolValue=b;
+	GameInputBox::setString(b ? trueStr : falseStr,true);
+}
+void GameInputBox_String::setValue(const string &str){
 	if(passwordChar){//以密码的方式显示
 		char buffer[str.size()+1];
 		memset(buffer,passwordChar,str.size());
@@ -21,10 +25,12 @@ void GameInputBox_String::setString(const string &str){
 		GameButton_String::setString(str);
 	}
 	mString=str;
+	if(whenInputConfirm)whenInputConfirm();
 }
-void GameInputBox_Integer::setInteger(int num){
+void GameInputBox_Integer::setValue(int num){
 	GameButton_String::setString(Number::toString(num));
 	mInteger=num;
+	if(whenInputConfirm)whenInputConfirm();
 }
 
 //线程实现输入
@@ -119,6 +125,7 @@ static void* inputIntegerThreadFunc(void *box){
 	return nullptr;
 }
 
+void GameInputBox_Bool::startInput(){setValue(!boolValue);}
 void GameInputBox_String::startInput(){inputBoxThread.start(inputStringThreadFunc,this);}
 void GameInputBox_Integer::startInput(){inputBoxThread.start(inputIntegerThreadFunc,this);}
 
@@ -126,12 +133,12 @@ void GameInputBox::updateInput(){
 	if(gInputBox){
 		auto inputBoxString=dynamic_cast<GameInputBox_String*>(gInputBox);
 		if(inputBoxString){
-			inputBoxString->setString(gInputStr);
+			inputBoxString->setValue(gInputStr);
 			gInputBox=nullptr;
 		}
 		auto inputBoxInteger=dynamic_cast<GameInputBox_Integer*>(gInputBox);
 		if(inputBoxInteger){
-			inputBoxInteger->setInteger(gInputInt);
+			inputBoxInteger->setValue(gInputInt);
 			gInputBox=nullptr;
 		}
 	}
@@ -220,5 +227,7 @@ void GameStringInputBox::startInput(){
 #endif
 #endif
 
+bool GameAttr_InputBoxBool::getValue()const{return inputBox.boolValue;}
 string GameAttr_InputBoxString::getValue()const{return inputBox.mString;}
 int GameAttr_InputBoxInteger::getValue()const{return inputBox.mInteger;}
+unsigned GameAttr_InputBoxInteger::getUnsignedValue()const{return inputBox.mInteger;}

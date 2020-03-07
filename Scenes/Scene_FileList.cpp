@@ -1,6 +1,5 @@
 #include "Scene_FileList.h"
 #include"Game.h"
-#include"extern.h"
 
 #include<unistd.h>
 
@@ -20,7 +19,7 @@ Scene_FileList::Scene_FileList():lastScene(nullptr){
 	gameTableDir.position.y += 16;
 	addSubObject(&gameTableDir);
 	//保存文件名
-	attrSaveFilename.setLabel_Spacing_MaxWidth("Filename",true,16,600);
+	attrSaveFilename.setLabelName_ValueWidth_MaxWidth("Filename",true,440,600);
 	attrSaveFilename.position.y = -res.y/2 + attrSaveFilename.size.y*2;
 	//按钮
 	const char* names[]={"Confirm","File","Directory","Cancel"};
@@ -58,7 +57,8 @@ Scene_FileList::Scene_FileList():lastScene(nullptr){
 				if(needAskOverWrite){
 					auto dialog=Game::currentGame()->showDialog_Message();
 					dialog->setText(fullPath+" is exist, overwrite?");
-					dialog->setConfirmCallback([&,fullPath](){
+					dialog->setConfirmCallback([&,dialog,fullPath](){
+						dialog->removeFromParentObject();
 						if(whenConfirmFile)whenConfirmFile(fullPath);
 					});
 				}else{
@@ -84,7 +84,7 @@ void Scene_FileList::reset(){
 	GameScene::reset();
 	stringTitle.setString("");
 	gameTableDir.directory.clear();
-	lastScene=nullptr;
+	lastScene=Game::currentGame()->findFirstScene();
 	whenConfirmFile=nullptr;
 }
 bool Scene_FileList::changeDirectory(const string &dirName){
@@ -102,3 +102,10 @@ void Scene_FileList::setSaveMode(bool saveMode){
 	}
 }
 bool Scene_FileList::isSaveMode()const{return attrSaveFilename.parentObject==this;}
+
+void Scene_FileList::selectFile(bool saveMode,const string &title,const string &path,decltype(whenConfirmFile) callback){
+	setSaveMode(saveMode);
+	stringTitle.setString(title,true);
+	changeDirectory(path);
+	whenConfirmFile=callback;
+}

@@ -1,11 +1,11 @@
 #include"GameString.h"
 #include"Charset.h"
 #include"Game.h"
-#include"extern.h"
 
 //静态变量
 Charset GameString::charset;
 FontTextureCache GameString::fontTextureCache;
+static Point2D<float> point2D,size2D;
 
 GameString::GameString():charSize(16,32),renderCharAmount(0),byteAmount(0){}
 GameString::GameString(const string &str):GameString(){
@@ -52,14 +52,13 @@ void GameString::setRawString(const string &str){
 SizeType GameString::stringWidth()const{return charSize.x*byteAmount;}
 
 void GameString::renderX()const{
-	shapeRenderer.setColor(color);
-	point2D=rectF().p0;
-	//开始计算
-	renderString(0,renderCharAmount);
+	ShapeRenderer::setColor(color);//设置颜色
+	renderString(0,renderCharAmount,rectF().p0);//开始渲染
 }
 
-void GameString::renderString(uint from,uint amount)const{
-	size2D.y=charSize.y;
+void GameString::renderString(uint from,uint amount,const Point2D<float> &pos2D)const{
+	point2D=pos2D;
+	size2D.setXY(0,charSize.y);
 	for(decltype(amount) i=0;i<amount;++i){
 		//获取文字纹理
 		auto attr=arrayCharAttr.data(from+i);

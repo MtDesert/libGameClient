@@ -5,7 +5,7 @@
 #include"Directory.h"
 
 //文件表项控件
-class GameTable_DirItem:public GameSprite{
+class GameTable_DirItem:public GameMenuItem{
 public:
 	GameTable_DirItem();
 
@@ -27,9 +27,9 @@ public:
 	const DirectoryEntry* selectingDirectoryEntry()const;
 
 	//重写
-	virtual SizeType rowAmount()const;
+	virtual SizeType itemAmount()const;
 	virtual SizeType columnAmount()const;//显示文件的属性列数
-	virtual SizeType columnWidth(uint column)const;//设定各个列宽
+	virtual SizeType columnWidth(SizeType column)const;//设定各个列宽
 protected:
 	virtual void updateSize();
 };

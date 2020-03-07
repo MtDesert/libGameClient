@@ -1,6 +1,7 @@
 #include"GameText.h"
-#include"Charset.h"
-#include"extern.h"
+#include"ShapeRenderer.h"
+
+static Point2D<float> point2D;
 
 GameText::GameText():charAmountPerLine(16),renderLineStart(0),renderLineAmount(0){}
 GameText::GameText(const string &text):GameString(text){}
@@ -15,9 +16,8 @@ SizeType GameText::stringWidth()const{return charSize.x*min(charAmountPerLine,by
 
 void GameText::renderX()const{
 	ShapeRenderer::setColor(color);
-	rect=rectF();
-	point2D=rect.p0;
-	point2D.y=rect.p1.y-charSize.y;
+	auto rect=rectF();
+	point2D.setXY(rect.p0.x,rect.p1.y);
 	//开始计算
 	SizeType line=0,from=0,to=0;
 	for(auto itr=lineStartList.begin();itr!=lineStartList.end();++itr){
@@ -31,15 +31,16 @@ void GameText::renderX()const{
 		auto itrNext=itr;++itrNext;
 		from=*itr;
 		to=(itrNext!=lineStartList.end()?*itrNext:arrayCharAttr.size());
+		//开始渲染
+		point2D.y -= charSize.y;
 		if(renderCharAmount<to){
-			renderString(from,renderCharAmount-from);
+			renderString(from,renderCharAmount-from,point2D);
 			break;
 		}else{
-			renderString(from,to-from);
+			renderString(from,to-from,point2D);
 		}
 		//准备下一行渲染
 		++line;
-		point2D.setXY(rect.p0.x,point2D.y-charSize.y);
 	}
 }
 

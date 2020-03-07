@@ -4,8 +4,8 @@
 Dialog_Login::Dialog_Login(){
 	const SizeType itemWidth=400,spacing=16;
 	//内容
-	inputBoxUsername.setLabel_Spacing_MaxWidth("Username",true,spacing,itemWidth);
-	inputBoxPassword.setLabel_Spacing_MaxWidth("Password",true,spacing,itemWidth);
+	inputBoxUsername.setLabelName_ValueWidth_MaxWidth("Username",true,280,itemWidth);
+	inputBoxPassword.setLabelName_ValueWidth_MaxWidth("Password",true,280,itemWidth);
 	inputBoxPassword.inputBox.passwordChar='*';
 	//添加
 	addSubObject(&inputBoxUsername);

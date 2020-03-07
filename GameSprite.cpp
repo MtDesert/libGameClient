@@ -1,5 +1,8 @@
 #include"GameSprite.h"
+#include"ShapeRenderer.h"
 #include"Game.h"
+
+static Rectangle2D<float> rect;
 
 GameSprite::GameSprite():color(0xFFFFFFFF),
 	bgColor(nullptr),borderColor(nullptr),
@@ -29,6 +32,20 @@ bool GameSprite::isMouseOnSprite()const{
 	}
 	return rect.containPoint(pos.x,pos.y);
 }
+void GameSprite::horizontalLayout(SizeType start,SizeType spacing){
+	forEachSubObj<GameSprite>([&](GameSprite &sprite){
+		auto w=sprite.size.x;
+		sprite.position.x = start + w/2;
+		start += w + spacing;
+	});
+}
+void GameSprite::verticalLayout(SizeType start, SizeType spacing){
+	forEachSubObj<GameSprite>([&](GameSprite &sprite){
+		auto h=sprite.size.y;
+		sprite.position.y = start - h/2;
+		start -= h + spacing;
+	});
+}
 
 void GameSprite::consumeTimeSlice(){}
 void GameSprite::render()const{
@@ -46,10 +63,10 @@ void GameSprite::render()const{
 #endif
 	//绘制纹理
 	rect=rectF();
-	shapeRenderer.drawRectangle(rect,nullptr,bgColor);//画背景
+	ShapeRenderer::drawRectangle(rect,nullptr,bgColor);//画背景
 	ShapeRenderer::setColor(color);
 	texture.draw(rect);
-	shapeRenderer.drawRectangle(rect,borderColor,nullptr);//画边框
+	ShapeRenderer::drawRectangle(rect,borderColor,nullptr);//画边框
 	//其它绘制
 	renderX();//特殊绘制
 	GameObject::render();//递归绘制子节点

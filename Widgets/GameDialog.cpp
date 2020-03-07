@@ -1,6 +1,5 @@
 #include"GameDialog.h"
 #include"Game.h"
-#include"extern.h"
 
 GameDialog::GameDialog(){
 	bgColor=&ColorRGBA::Black;
@@ -10,6 +9,10 @@ GameDialog::GameDialog(){
 GameDialog::~GameDialog(){}
 
 void GameDialog::allSubObjects_verticalLayout(SizeType spacing){
+	//计算宽度
+	SizeType maxWidth=0;
+	forEachSubObj<GameSprite>([&](GameSprite &sprite){maxWidth = max(maxWidth,sprite.size.x);});
+	size.x = maxWidth + spacing * 2;
 	//计算高度
 	size.y = spacing * (subObjects.size()+1);
 	forEachSubObj<GameSprite>([&](GameSprite &sprite){size.y += sprite.size.y;});

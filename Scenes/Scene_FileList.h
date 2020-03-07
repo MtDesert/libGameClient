@@ -34,5 +34,7 @@ public:
 	GameScene *lastScene;//上一个场景,即进入本场景之前的场景
 
 	function<void(const string &filename)>whenConfirmFile;//当确定选择的文件后,调用此回调函数,传递选择的文件相对路径到filename
+
+	void selectFile(bool saveMode,const string &title,const string& path,decltype(whenConfirmFile) callback);
 };
 #endif

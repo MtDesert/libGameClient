@@ -1,11 +1,17 @@
 #include"ShapeRenderer.h"
 #include"gl.h"
 
+ShapeRenderer ShapeRenderer::shapeRenderer;
 ShapeRenderer::ShapeRenderer():edgeColor(nullptr),fillColor(nullptr),texture(0){}
 ShapeRenderer::~ShapeRenderer(){}
 
 void ShapeRenderer::setColor(const ColorRGBA &color){
 	glColor4ub(color.red,color.green,color.blue,color.alpha);
+}
+void ShapeRenderer::drawRectangle(const Rectangle2D<numType> &rect,const ColorRGBA *border,const ColorRGBA *background){
+	shapeRenderer.edgeColor=border;
+	shapeRenderer.fillColor=background;
+	shapeRenderer.drawRectangle(rect);
 }
 
 //画点
@@ -131,11 +137,6 @@ void ShapeRenderer::drawRectangle(const numType vertex[])const{
 	drawPolygen(vertex,4);
 }
 
-void ShapeRenderer::drawRectangle(const Rectangle2D<numType> &rect,const ColorRGBA *border,const ColorRGBA *background){
-	edgeColor=border;
-	fillColor=background;
-	drawRectangle(rect);
-}
 //多边形
 void ShapeRenderer::drawPolygen(const numType vertex[],int n)const{
 	glBindTexture(GL_TEXTURE_2D,texture);

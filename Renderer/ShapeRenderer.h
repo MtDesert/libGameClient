@@ -11,6 +11,7 @@ using namespace std;
 //图形渲染器,利用现有的绘图引擎(比如OpenGL)来绘制图形
 //不同的绘图引擎可能会有差异
 class ShapeRenderer{
+	static ShapeRenderer shapeRenderer;
 public:
 	ShapeRenderer();
 	~ShapeRenderer();
@@ -23,6 +24,7 @@ public:
 	int texture;//OpenGL的当前纹理,可混合填充色
 	
 	static void setColor(const ColorRGBA &color);//设置当前绘制的颜色(OpenGL的话则是传给状态机)
+	static void drawRectangle(const Rectangle2D<numType> &rect,const ColorRGBA *border,const ColorRGBA *background);
 
 	//画点
 	void drawPoint(numType x,numType y)const;
@@ -49,7 +51,7 @@ public:
 	void drawRectangle(const Rectangle2D<numType> &rect)const;
 	void drawRectangle(const numType vertex[])const;
 
-	void drawRectangle(const Rectangle2D<numType> &rect,const ColorRGBA *border,const ColorRGBA *background);
+	//void drawRectangle(const Rectangle2D<numType> &rect,const ColorRGBA *border,const ColorRGBA *background);
 	//画多边形(顶点数组,顶点数量)
 	void drawPolygen(const numType vertex[],int n)const;//注意:n是顶点数,不是数组大小
 };

@@ -5,8 +5,12 @@
 #include"GameString.h"
 
 //文字菜单项
-class GameMenuItem_String:public GameString{
+class GameMenuItem_String:public GameMenuItem{
+	GameString gameString;//显示文字用的控件
 public:
+	GameMenuItem_String();
+	~GameMenuItem_String();
+
 	void updateData(SizeType pos);
 	void setSelected(bool b);
 };
@@ -23,6 +27,6 @@ public:
 	void addString(const string &str,bool translate=false);//添加字符串
 
 	//重写
-	virtual SizeType rowAmount()const;
+	virtual SizeType itemAmount()const;
 };
 #endif
