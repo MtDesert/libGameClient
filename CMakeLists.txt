@@ -45,7 +45,7 @@ if(GAME_NAME)
 			set(LIBS_LIST ${LIBS_LIST} ${GLUT_NAME})
 			#linux相关依赖
 			if(${TARGET_SYSTEM_NAME} STREQUAL Linux)
-				set(LIBS_LIST ${LIBS_LIST} GL gtk-3 gobject-2.0)
+				set(LIBS_LIST ${LIBS_LIST} GLU GL gtk-3 gobject-2.0)
 			endif()
 			#以下为各种可执行文件的编译过程,根据情况选择编译自己需要的可执行文件即可
 			add_executable(GamesGLUT ./executable/GamesGLUT.cpp)

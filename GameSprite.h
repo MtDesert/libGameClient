@@ -20,7 +20,7 @@ public:
 	Point3D<int> position;//位置(用来表现在屏幕上的位置)
 	double rotateAngle;//旋转角度
 	Point3D<int> rotation;//旋转方向
-	Point3D<int> scale;//缩放
+	Point3D<float> scale;//缩放
 	Point2D<float> anchorPoint;//锚点(百分比)
 
 	void setTexture(const Texture &tex);//设置纹理
