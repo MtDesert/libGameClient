@@ -1,35 +1,55 @@
-#include "Texture.h"
+#include"Texture.h"
 //缓冲区
 static DataBlock fileDataBlock;//图片文件数据缓冲
 static Bitmap_32bit bitmap;//图像数据,用于传递给显卡或第三方库
+#ifdef __MINGW32__
+HDC Texture::deviceContext=nullptr,Texture::compatibleDeviceContex=nullptr;
+static BLENDFUNCTION blendFunction={AC_SRC_OVER,0,255,AC_SRC_ALPHA};
+#endif
 
-Texture::Texture():texture(0),width(0),height(0){}
+Texture::Texture():
+#ifdef __MINGW32__
+hBitmap(NULL),
+#else
+texture(0),
+#endif
+width(0),height(0){}
 Texture::~Texture(){}
 FontTexture::FontTexture():charCode(0){}
 
-static GLfloat vertex[]={0,0,0,0,0,0,0,0};
-static GLfloat texCoord_Default[]  ={0.0,0.0, 1.0,0.0, 1.0,1.0, 0.0,1.0};
-static GLfloat texCoord_LeftHalf[] ={0.0,0.0, 0.5,0.0, 0.5,1.0, 0.0,1.0};
-static GLfloat texCoord_RightHalf[]={0.5,0.0, 1.0,0.0, 1.0,1.0, 0.5,1.0};
-static GLfloat texCoord_UpHalf[]   ={0.0,0.5, 1.0,0.5, 1.0,1.0, 0.0,1.0};
-static GLfloat texCoord_DownHalf[] ={0.0,0.0, 1.0,0.0, 1.0,0.5, 0.0,0.5};
+static float vertex[]={0,0,0,0,0,0,0,0};
+static float texCoord_Default[]  ={0.0,0.0, 1.0,0.0, 1.0,1.0, 0.0,1.0};
+static float texCoord_LeftHalf[] ={0.0,0.0, 0.5,0.0, 0.5,1.0, 0.0,1.0};
+static float texCoord_RightHalf[]={0.5,0.0, 1.0,0.0, 1.0,1.0, 0.5,1.0};
+static float texCoord_UpHalf[]   ={0.0,0.5, 1.0,0.5, 1.0,1.0, 0.0,1.0};
+static float texCoord_DownHalf[] ={0.0,0.0, 1.0,0.0, 1.0,0.5, 0.0,0.5};
 
 //创建纹理
-void Texture::texImage2D(GLsizei width, GLsizei height, const GLvoid *pixels){
+void Texture::texImage2D(int width,int height,const void *pixels){
+#ifdef __MINGW32__
+	deleteTexture();
+	hBitmap=CreateBitmap(width,height,1,32,pixels);
+#else
 	if(!glIsTexture(texture)){//防止多次申请从而导致原texture值丢失
 		glGenTextures(1,&texture);//申请纹理序号
 	}
 	glBindTexture(GL_TEXTURE_2D,texture);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,pixels);
+#endif//__MINGW32__
 	this->width=width;
 	this->height=height;
-	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,pixels);
 }
 void Texture::deleteTexture(){
+#ifdef __MINGW32__
+	DeleteObject(hBitmap);
+	hBitmap=nullptr;
+#else
 	//glIsTexture(texture);在驱动有问题的情况下返回值会有问题,这里的处理方法是直接删除
 	glDeleteTextures(1,&texture);
 	texture=0;
+#endif//__MINGW32__
 }
 //创建纹理(根据不同的类)
 void Texture::texImage2D(const FileBMP &fileBmp){
@@ -82,13 +102,17 @@ void Texture::texImage2D_FileName(const string &filename){
 	}
 }
 
-void Texture::draw(const Point2D<GLfloat> &p,TexCoord coord)const{
+void Texture::draw(const Point2D<float> &p,TexCoord coord)const{
 	draw(p,sizeF()-Point2D<float>(1,1),coord);
 }
-void Texture::draw(const Point2D<GLfloat> &p,const Point2D<GLfloat> &size,TexCoord coord)const{
-	draw(Rectangle2D<GLfloat>(p,p+size),coord);
+void Texture::draw(const Point2D<float> &p,const Point2D<float> &size,TexCoord coord)const{
+	draw(Rectangle2D<float>(p,p+size),coord);
 }
-void Texture::draw(const Rectangle2D<GLfloat> &rect,TexCoord coord)const{
+void Texture::draw(const Rectangle2D<float> &rect,TexCoord coord)const{
+#ifdef __MINGW32__
+	SelectObject(compatibleDeviceContex,hBitmap);
+	GdiAlphaBlend(deviceContext,rect.left(),rect.bottom(),rect.width(),rect.height(),compatibleDeviceContex,0,0,rect.width(),rect.height(),blendFunction);
+#else
 	if(!glIsTexture(texture))return;
 	glBindTexture(GL_TEXTURE_2D,texture);
 	//顶点数组
@@ -107,14 +131,15 @@ void Texture::draw(const Rectangle2D<GLfloat> &rect,TexCoord coord)const{
 	}
 	//绘制
 	glDrawArrays(GL_TRIANGLE_FAN,0,4);
+#endif//__MINGW32__
 }
 
-GLsizei Texture::getWidth()const{return width;}
-GLsizei Texture::getHeight()const{return height;}
-Point2D<GLsizei> Texture::size()const{return Point2D<GLsizei>(width,height);}
-Point2D<GLfloat> Texture::sizeF()const{return Point2D<GLfloat>(width,height);}
+int Texture::getWidth()const{return width;}
+int Texture::getHeight()const{return height;}
+Point2D<int> Texture::size()const{return Point2D<int>(width,height);}
+Point2D<float> Texture::sizeF()const{return Point2D<float>(width,height);}
 
-void Texture::rect2vertex(const Rectangle2D<GLfloat> &rect,GLfloat vertex[]){
+void Texture::rect2vertex(const Rectangle2D<float> &rect,float vertex[]){
 	vertex[0]=vertex[6]=rect.p0.x;
 	vertex[1]=vertex[3]=rect.p0.y;
 	vertex[2]=vertex[4]=rect.p1.x;
@@ -140,4 +165,14 @@ void TextureCacheArray::clearCache(){
 Texture TextureCacheArray::getTexture(SizeType idxA,SizeType idxB)const{
 	auto arr=data(idxA);
 	return arr ? arr->getTexture(idxB) : Texture();
+}
+void TextureCache_String::clearCache(){
+	for(auto &item:*this){
+		item.value.deleteTexture();
+	}
+	clear();
+}
+Texture TextureCache_String::getTexture(const string &texName)const{
+	auto tex=value(texName);
+	return tex ? *tex : Texture();
 }

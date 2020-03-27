@@ -1,6 +1,9 @@
 #ifndef SHADER_H
 #define SHADER_H
 
+#ifdef __MINGW32__
+#else
+
 #include"DataBlock.h"
 #include"Array.h"
 //注:在包含gl.h前,此宏必须定义,不然shader相关的内容则无法使用
@@ -32,4 +35,5 @@ public:
 	bool useProgram(WhenErrorString whenError=nullptr)const;
 	void deleteProgram();//删除shader程序
 };
+#endif//__MINGW32__
 #endif//SHADER_H

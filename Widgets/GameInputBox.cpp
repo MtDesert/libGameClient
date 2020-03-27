@@ -33,18 +33,18 @@ void GameInputBox_Integer::setValue(int num){
 	if(whenInputConfirm)whenInputConfirm();
 }
 
+//GamesEngines的输入控件
+static GameInputBox *gInputBox=nullptr;
+static int gInputInt=0;
+static const char *gInputStr=nullptr;
 //线程实现输入
-#ifdef __linux__
+#ifndef __MINGW32__
 #ifdef __ANDROID__
 void GameStringInputBox::startInput(){}
 #else
 
 #include<gtk-3.0/gtk/gtk.h>
 static GtkWidget *window=nullptr,*entry=nullptr,*spinBox=nullptr;//GTK控件:窗体,文本输入,数字输入
-//GamesEngines的输入控件
-static GameInputBox *gInputBox=nullptr;
-static int gInputInt=0;
-static const gchar *gInputStr=nullptr;
 
 //隐藏窗体
 static gboolean hideWindow(){
@@ -129,25 +129,8 @@ void GameInputBox_Bool::startInput(){setValue(!boolValue);}
 void GameInputBox_String::startInput(){inputBoxThread.start(inputStringThreadFunc,this);}
 void GameInputBox_Integer::startInput(){inputBoxThread.start(inputIntegerThreadFunc,this);}
 
-void GameInputBox::updateInput(){
-	if(gInputBox){
-		auto inputBoxString=dynamic_cast<GameInputBox_String*>(gInputBox);
-		if(inputBoxString){
-			inputBoxString->setValue(gInputStr);
-			gInputBox=nullptr;
-		}
-		auto inputBoxInteger=dynamic_cast<GameInputBox_Integer*>(gInputBox);
-		if(inputBoxInteger){
-			inputBoxInteger->setValue(gInputInt);
-			gInputBox=nullptr;
-		}
-	}
-}
-
 #endif //__ANDROID__
-#else //__linux__
-
-#ifdef __MINGW32__
+#else //__MINGW32__
 
 #include<stdio.h>
 #include<windows.h>
@@ -175,7 +158,7 @@ void inputOK(const char *str){
 
 static Thread inputBoxThread;
 static void* inputBoxThreadFunc(void *box){
-	auto inputBox=reinterpret_cast<GameStringInputBox*>(box);
+	auto inputBox=reinterpret_cast<GameInputBox_String*>(box);
 	window=editBox=0;
 	//注册WindowClass
 	WNDCLASS wc;
@@ -220,12 +203,28 @@ static void* inputBoxThreadFunc(void *box){
 	return nullptr;
 }
 
-void GameStringInputBox::startInput(){
+void GameInputBox_Bool::startInput(){}
+void GameInputBox_String::startInput(){
 	inputBoxThread.start(inputBoxThreadFunc,this);
 }
+void GameInputBox_Integer::startInput(){}
 
 #endif
-#endif
+
+void GameInputBox::updateInput(){
+	if(gInputBox){
+		auto inputBoxString=dynamic_cast<GameInputBox_String*>(gInputBox);
+		if(inputBoxString){
+			inputBoxString->setValue(gInputStr);
+			gInputBox=nullptr;
+		}
+		auto inputBoxInteger=dynamic_cast<GameInputBox_Integer*>(gInputBox);
+		if(inputBoxInteger){
+			inputBoxInteger->setValue(gInputInt);
+			gInputBox=nullptr;
+		}
+	}
+}
 
 bool GameAttr_InputBoxBool::getValue()const{return inputBox.boolValue;}
 string GameAttr_InputBoxString::getValue()const{return inputBox.mString;}

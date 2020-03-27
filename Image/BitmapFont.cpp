@@ -34,12 +34,16 @@ bool BitmapFont_Ascii::renderCharCode(uint8 charCode){
 	//获取字形
 	auto charData=charBlock.subDataBlock(index*engGlyphSize,engGlyphSize);
 	if(charData.dataLength!=engGlyphSize)return false;
-	charPixmap.fill(false);//开始绘图
+	charPixmap.fill(0);//开始绘图
 	for(int y=0;y<HEIGHT;++y){
 		for(int x=0;x<WIDTH;++x){
 			index= y*scale + x/8;
 			if(charData.dataPointer[index] & ( 1<<(x%8) )){
-				charPixmap.setColor(x,y,true);
+#ifdef __MINGW32__
+				charPixmap.setColor(x,HEIGHT-1-y,1);
+#else
+				charPixmap.setColor(x,y,1);
+#endif
 			}
 		}
 	}
@@ -67,7 +71,11 @@ bool BitmapFont_GB2312::renderCharCode(uint16 charCode){
 		for(uint x=0;x<w;++x){
 			index = y*scale + x/8;
 			if(charData.dataPointer[index] & ( 1<<(x%8) )){
+#ifdef __MINGW32__
+				charPixmap.setColor(x,HEIGHT-1-y,1);
+#else
 				charPixmap.setColor(x,y,1);
+#endif
 			}
 		}
 	}

@@ -1,3 +1,5 @@
+#ifdef __MINGW32__
+#else
 #include"Shader.h"
 #include"DataBlock.h"
 #include"define.h"
@@ -100,3 +102,4 @@ void ShaderProgram::deleteProgram(){
 	glDeleteProgram(program);
 	program=0;
 }
+#endif

@@ -433,7 +433,11 @@ bool FilePNG_Scanline::decodeLine(uint y,Bitmap_32bit &bitmap)const{
 			}
 		}
 		//保存像素值
+#ifdef __MINGW32__
+		value32=rgba.toBGRA();
+#else
 		value32=rgba.toRGBA();
+#endif
 		bitmap.setColor(x,y,value32);
 	}
 	return true;
@@ -751,7 +755,12 @@ bool FilePNG::decodeTo(Bitmap_32bit &bitmap)const{
 	scanLine.colorsList=plte ? &colorsList : nullptr;
 	//申请空间
 	bitmap.newBitmap(scanLine.width,scanLine.height);
-	bitmap.coordinateType=Bitmap_32bit::CoordinateType_Screen;//PNG使用屏幕坐标系
+	//PNG使用屏幕坐标系
+#ifdef __MINGW32__
+	bitmap.coordinateType=Bitmap_32bit::CoordinateType_Math;//GDI32格式
+#else
+	bitmap.coordinateType=Bitmap_32bit::CoordinateType_Screen;//OpenGL格式
+#endif
 	//找出所有IDAT数据块并解压
 	bool ret=false;
 	auto filterBlock=decode_allIDATs();

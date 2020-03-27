@@ -1,12 +1,24 @@
 #include"ShapeRenderer.h"
+#ifdef __MINGW32__
+#include"windows.h"
+HDC ShapeRenderer::deviceContext;
+static HPEN pen;
+#else
 #include"gl.h"
+#endif
 
 ShapeRenderer ShapeRenderer::shapeRenderer;
 ShapeRenderer::ShapeRenderer():edgeColor(nullptr),fillColor(nullptr),texture(0){}
 ShapeRenderer::~ShapeRenderer(){}
 
 void ShapeRenderer::setColor(const ColorRGBA &color){
+#ifdef __MINGW32__
+	DeleteObject(pen);
+	pen=CreatePen(PS_SOLID,1,color.toRGB());
+	SelectObject(deviceContext,pen);
+#else
 	glColor4ub(color.red,color.green,color.blue,color.alpha);
+#endif
 }
 void ShapeRenderer::drawRectangle(const Rectangle2D<numType> &rect,const ColorRGBA *border,const ColorRGBA *background){
 	shapeRenderer.edgeColor=border;
@@ -24,23 +36,16 @@ void ShapeRenderer::drawPoint(numType x,numType y)const{
 void ShapeRenderer::drawPoint(const Point2D<numType> &p)const{
 	drawPoints(&p.x,1);
 }
-void ShapeRenderer::drawPoints(const list<Point2D<numType> > &points)const{
-	numType vertex[points.size()*2];
-	SizeType i=0;
-	for(auto &p:points){
-		vertex[i]=p.x;
-		vertex[i+1]=p.y;
-		i+=2;
-	}
-	drawPoints(vertex,points.size());
-}
 void ShapeRenderer::drawPoints(const numType vertex[],int n)const{
+#ifdef __MINGW32__
+#else
 	if(edgeColor){
 		glBindTexture(GL_TEXTURE_2D,0);
 		setColor(*edgeColor);
 		glVertexPointer(2,GL_FLOAT,0,vertex);
 		glDrawArrays(GL_POINTS,0,n);
 	}
+#endif
 }
 
 //画线
@@ -63,29 +68,28 @@ void ShapeRenderer::drawLine(const Line2D<numType> &line)const{
 }
 
 void ShapeRenderer::drawLines(const numType vertex[],int n)const{
+#ifdef __MINGW32__
+#else
 	if(edgeColor){
 		glBindTexture(GL_TEXTURE_2D,0);
 		setColor(*edgeColor);
 		glVertexPointer(2,GL_FLOAT,0,vertex);
 		glDrawArrays(GL_LINES,0,n*2);
 	}
+#endif
 }
 
 //折线
-void ShapeRenderer::drawBrokenLine(const list<Point2D<numType> > &points)const{
+void ShapeRenderer::drawBrokenLine(const numType vertex[],int n)const{
+#ifdef __MINGW32__
+#else
 	if(edgeColor){
-		numType vertex[points.size()*2];
-		SizeType i=0;
-		for(auto &p:points){
-			vertex[i]=p.x;
-			vertex[i+1]=p.y;
-			i+=2;
-		}
 		glBindTexture(GL_TEXTURE_2D,0);
 		setColor(*edgeColor);
 		glVertexPointer(2,GL_FLOAT,0,vertex);
-		glDrawArrays(GL_LINE_STRIP,0,points.size()*2);
+		glDrawArrays(GL_LINE_STRIP,0,n*2);
 	}
+#endif
 }
 
 //三角形
@@ -139,6 +143,16 @@ void ShapeRenderer::drawRectangle(const numType vertex[])const{
 
 //多边形
 void ShapeRenderer::drawPolygen(const numType vertex[],int n)const{
+#ifdef __MINGW32__
+	if(edgeColor){
+		setColor(*edgeColor);
+		MoveToEx(deviceContext,vertex[0],vertex[1],NULL);
+		for(int i=1;i<=n;++i){
+			auto idx=i%n;
+			LineTo(deviceContext,vertex[idx*2],vertex[idx*2+1]);
+		}
+	}
+#else
 	glBindTexture(GL_TEXTURE_2D,texture);
 	glVertexPointer(2,GL_FLOAT,0,vertex);
 	if(fillColor){//绘制底色或纹理
@@ -149,4 +163,5 @@ void ShapeRenderer::drawPolygen(const numType vertex[],int n)const{
 		setColor(*edgeColor);
 		glDrawArrays(GL_LINE_LOOP,0,n);
 	}
+#endif
 }

@@ -49,6 +49,8 @@ void GameSprite::verticalLayout(SizeType start, SizeType spacing){
 
 void GameSprite::consumeTimeSlice(){}
 void GameSprite::render()const{
+#ifdef __MINGW32__
+#else
 	//绘制纹理
 	glPushMatrix();//保存矩阵
 	//变换
@@ -60,7 +62,8 @@ void GameSprite::render()const{
 	glTranslatef(position.x,position.y,position.z);
 	glRotatef(rotateAngle,rotation.x,rotation.y,position.z);
 	glScalef(scale.x,scale.y,scale.z);
-#endif
+#endif//__ANDROID__
+#endif//__MINGW32__
 	//绘制纹理
 	rect=rectF();
 	ShapeRenderer::drawRectangle(rect,nullptr,bgColor);//画背景
@@ -70,7 +73,10 @@ void GameSprite::render()const{
 	//其它绘制
 	renderX();//特殊绘制
 	GameObject::render();//递归绘制子节点
+#ifdef __MINGW32__
+#else
 	glPopMatrix();//恢复矩阵
+#endif
 }
 void GameSprite::renderX()const{}
 
