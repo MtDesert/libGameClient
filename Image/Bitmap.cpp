@@ -30,7 +30,12 @@ if(coordinateType==CoordinateType_Math){\
 return getORset##_uint32(pos,color);
 
 bool Bitmap_32bit::getColor(uint x,uint y,uint32 &color)const{BITMAP_GET_SET_COLOR(get)}
-bool Bitmap_32bit::setColor(uint x,uint y,uint32 &color){BITMAP_GET_SET_COLOR(set)}
+bool Bitmap_32bit::setColor(uint x, uint y,const uint32 &color){BITMAP_GET_SET_COLOR(set)}
+void Bitmap_32bit::fillColor(const uint32 &color){
+	for(SizeType pos=0;pos<dataLength;pos+=4){
+		set_uint32(pos,color);
+	}
+}
 
 void Bitmap_32bit::getColorsList(List<uint32> &colorsList,uint maxAmount)const{
 	colorsList.clear();

@@ -37,8 +37,8 @@ void GameTable_DirItem::updateData(SizeType pos){
 }
 void GameTable_DirItem::setSelected(bool b){
 	bgColor=b ? &ColorRGBA::White : nullptr;
-	stringFileName.color = b ? ColorRGBA::Black : ColorRGBA::White;
-	stringFileSize.color = stringFileName.color;
+	stringFileName.setColor(b ? ColorRGBA::Black : ColorRGBA::White);
+	stringFileSize.setColor(stringFileName.color);
 }
 
 bool GameTable_Dir::changeDir(const string &dirName,WhenErrorString whenError){

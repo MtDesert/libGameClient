@@ -28,7 +28,8 @@ public:
 
 	//颜色读写,返回读写是否成功
 	bool getColor(uint x,uint y,uint32 &color)const;
-	bool setColor(uint x,uint y,uint32 &color);
+	bool setColor(uint x,uint y,const uint32 &color);
+	void fillColor(const uint32 &color);
 	//色表,获取所有用到的颜色保存到colorsList,maxAmount为colorsList的上线,0为无限制
 	void getColorsList(List<uint32> &colorsList,uint maxAmount=0)const;
 private:

@@ -5,43 +5,94 @@
 #include"wingdi.h"
 
 Game *game=nullptr;//游戏本体
+Point2D<int> res,halfRes;//分辨率,半分辨率
+HDC hdc=nullptr;//设备环境,直接显示屏幕
+RECT clientRect;//客户端绘画区域
 PAINTSTRUCT paintStruct;//绘制专用结构体
 int timerID;//计时器ID
+const int timerInterval=20;
+
+#define CASE(name,keyName) case VK_##name:k=Keyboard::Key_##keyName;break;
+void windowsMessage_Key(WPARAM key,bool isPressed){
+	Keyboard::KeyboardKey k=Keyboard::Amount_KeyboardKey;
+	switch(key){
+		CASE(RETURN,Enter)
+		CASE(ESCAPE,Esc)
+		CASE(UP,Up)
+		CASE(DOWN,Down)
+		CASE(LEFT,Left)
+		CASE(RIGHT,Right)
+		default:printf("key %d????\n",key);
+	}
+	game->keyboardKey(k,isPressed);
+}
 
 //事件回调函数
 LRESULT __stdcall windowProcedure(HWND window,unsigned int msg,WPARAM wp,LPARAM lp){
 	switch(msg){
 		case WM_CREATE:{
 			printf("WM_CREATE\n");
-			timerID=SetTimer(window,0,250,NULL);
+			res.setP(Game::resolution);
+			halfRes.setXY(res.x/2,res.y/2);
+			timerID=SetTimer(window,0,timerInterval,NULL);
 			//设置设备环境
-			HDC hdc=GetDC(window);
-			Texture::deviceContext=ShapeRenderer::deviceContext=hdc;
-			Texture::compatibleDeviceContex=CreateCompatibleDC(hdc);
+			hdc=GetDC(window);
+			Texture::deviceContext=ShapeRenderer::deviceContext=CreateCompatibleDC(hdc);
+			auto bufferBitmap=CreateCompatibleBitmap(hdc,res.x,res.y);
+			SelectObject(Texture::deviceContext,bufferBitmap);
+			//设置图像模式为高级,不然矩阵变换无法使用
+			SetGraphicsMode(hdc,GM_ADVANCED);
+			SetGraphicsMode(Texture::deviceContext,GM_ADVANCED);
 			//调整窗口大小
-			RECT clientRect;
 			GetClientRect(window,&clientRect);
 			MoveWindow(window,0,0,
-				game->resolution.x*2-(clientRect.right-clientRect.left),
-				game->resolution.y*2-(clientRect.bottom-clientRect.top),true);
+				res.x*2-(clientRect.right-clientRect.left),
+				res.y*2-(clientRect.bottom-clientRect.top),true);
 			//设置绘图中心
-			SetViewportOrgEx(hdc,game->resolution.x/2,game->resolution.y/2,NULL);
+			SetViewportOrgEx(Texture::deviceContext,halfRes.x,halfRes.y,NULL);
+			clientRect.left=-halfRes.x;
+			clientRect.right=halfRes.x;
+			clientRect.top=-halfRes.y;
+			clientRect.bottom=halfRes.y;
 		}break;
 		case WM_DESTROY:
 			printf("WM_DESTROY\n");
 			KillTimer(window,timerID);
 			PostQuitMessage(0);
 		break;
-		case WM_TIMER:
-			printf("WM_TIMER\n");
-			SendMessage(window,WM_PAINT,0,0);
-		break;
-		case WM_PAINT:
+		case WM_TIMER:{
+			game->addTimeSlice(timerInterval);
+			//SendMessage(window,WM_PAINT,0,0);
+			InvalidateRect(window,NULL,true);
+		}break;
+		case WM_PAINT:{
 			BeginPaint(window,&paintStruct);
+			//绘制黑色背景
+			FillRect(Texture::deviceContext,&clientRect,(HBRUSH)GetStockObject(BLACK_BRUSH));
 			game->render();
+			BitBlt(hdc,0,0,res.x,res.x,Texture::deviceContext,-halfRes.x,-halfRes.y,SRCCOPY);
 			EndPaint(window,&paintStruct);
-		break;
-		default:;
+		}break;
+		//键盘事件
+		case WM_KEYDOWN:windowsMessage_Key(wp,true);break;
+		case WM_KEYUP:windowsMessage_Key(wp,false);break;
+		//鼠标移动
+		case WM_MOUSEMOVE:{
+			auto xPos = LOWORD(lp);
+			auto yPos = HIWORD(lp);
+			game->mouseMove(xPos-halfRes.x,halfRes.y-yPos);
+		}break;
+		//鼠标点击
+		case WM_LBUTTONDOWN:game->mouseKey(Game::Mouse_LeftButton,true);break;
+		case WM_LBUTTONUP:game->mouseKey(Game::Mouse_LeftButton,false);break;
+		case WM_RBUTTONDOWN:game->mouseKey(Game::Mouse_RightButton,true);break;
+		case WM_RBUTTONUP:game->mouseKey(Game::Mouse_RightButton,false);break;
+		//鼠标滚轮
+		case WM_MOUSEWHEEL:{
+			short angle=HIWORD(wp);//这里必须用short,WORD其实就是BYTE的两倍
+			if(angle)angle/=abs(angle);
+			game->mouseWheel(angle);break;
+		}default:;
 	}
 	//printf("msg:%d\n",msg);
 	return DefWindowProc(window,msg,wp,lp);
@@ -66,20 +117,21 @@ int main(int argc,char* argv[]){
 	wc.hInstance = GetModuleHandle(0);
 	wc.hIcon = LoadIcon(0,IDI_APPLICATION);
 	wc.hCursor = LoadCursor(0,IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
+	wc.hbrBackground = 0;
 	wc.lpszMenuName = 0;
 	wc.lpszClassName = "GamesGDI";
 	RegisterClass(&wc);
-	//创建窗体
+	//启动游戏
 	Game::resolution.setXY(640,480);
-	HWND window = CreateWindow("GamesGDI","title",WS_SYSMENU,CW_USEDEFAULT,CW_USEDEFAULT,Game::resolution.x,Game::resolution.y,NULL,NULL,wc.hInstance,0);
+	game=Game::newGame();
+	game->reset();
+	//创建窗口
+	HWND window = CreateWindow("GamesGDI",game->gameName().data(),WS_SYSMENU,CW_USEDEFAULT,CW_USEDEFAULT,Game::resolution.x,Game::resolution.y,NULL,NULL,wc.hInstance,0);
 	if(!window){
 		printf("window error %lu\n",GetLastError());
 		return -1;
 	}
 	ShowWindow(window,SW_SHOWDEFAULT);
-	game=Game::newGame();
-	game->reset();
 	//事件循环
 	MSG msg;
 	while(GetMessage(&msg,NULL,0,0)!=-1){

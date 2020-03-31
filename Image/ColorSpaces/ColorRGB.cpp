@@ -1,6 +1,8 @@
 #include"ColorRGB.h"
 #include"Number.h"
 
+#define COLOR_MAX 0xFF
+
 //constructors
 ColorRGB::ColorRGB():ColorRGB(0,0,0){}
 ColorRGB::ColorRGB(uint8 r,uint8 g,uint8 b):red(r),green(g),blue(b){}
@@ -30,11 +32,54 @@ uint8 ColorRGB::gray()const{
 }
 void ColorRGB::toGray(){red=green=blue=gray();}
 
+#define COLOR_DARK(name) ret.name = Number::divideRound((int)name*color.name,COLOR_MAX);
+ColorRGB ColorRGB::darkColor(const ColorRGB &color)const{
+	ColorRGB ret;
+	COLOR_DARK(red)
+	COLOR_DARK(green)
+	COLOR_DARK(blue)
+	return ret;
+}
+#define COLOR_LIGHT(name) ret.name = name + Number::divideRound((COLOR_MAX-name)*color.name,COLOR_MAX);
+ColorRGB ColorRGB::lightColor(const ColorRGB &color)const{
+	ColorRGB ret;
+	COLOR_LIGHT(red)
+	COLOR_LIGHT(green)
+	COLOR_LIGHT(blue)
+	return ret;
+}
+
 #define COLOR_DELTA(name) name>rgb.name ? name-rgb.name : rgb.name-name;
 int ColorRGB::deltaSum(const ColorRGB &rgb)const{
 	auto ret=COLOR_DELTA(red);
 	ret+=COLOR_DELTA(green);
 	ret+=COLOR_DELTA(blue);
+	return ret;
+}
+
+ColorRGBA ColorRGBA::darkColor(const ColorRGBA &color)const{
+	ColorRGBA ret;
+	COLOR_DARK(red)
+	COLOR_DARK(green)
+	COLOR_DARK(blue)
+	COLOR_DARK(alpha)
+	return ret;
+}
+ColorRGBA ColorRGBA::lightColor(const ColorRGBA &color)const{
+	ColorRGBA ret;
+	COLOR_LIGHT(red)
+	COLOR_LIGHT(green)
+	COLOR_LIGHT(blue)
+	COLOR_LIGHT(alpha)
+	return ret;
+}
+
+#define COLOR_ALPHA_BLEND(name) ret.name = ((int)name*alpha + (int)rgba.name*rgba.alpha)/0xFF;
+ColorRGBA ColorRGBA::alphaBlend(const ColorRGBA &rgba){
+	ColorRGBA ret;
+	COLOR_ALPHA_BLEND(red)
+	COLOR_ALPHA_BLEND(green)
+	COLOR_ALPHA_BLEND(blue)
 	return ret;
 }
 

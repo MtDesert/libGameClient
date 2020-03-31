@@ -2,8 +2,6 @@
 #include"ShapeRenderer.h"
 #include"Game.h"
 
-static Rectangle2D<float> rect;
-
 GameSprite::GameSprite():color(0xFFFFFFFF),
 	bgColor(nullptr),borderColor(nullptr),
 	rotateAngle(0),
@@ -15,8 +13,14 @@ void GameSprite::setTexture(const Texture &tex){
 	texture=tex;
 	size.setXY(tex.getWidth(),tex.getHeight());
 }
+void GameSprite::setColor(const ColorRGBA &clr){
+	color=clr;
+#ifdef __MINGW32__
+	texture.setColor(clr);
+#endif
+}
 bool GameSprite::isMouseOnSprite()const{
-	rect=rectF();
+	auto rect=rectF();
 	auto &pos(Game::currentGame()->mousePos);
 	//判断前需要进行平移
 	rect.translate(position.x,position.y);
@@ -49,23 +53,19 @@ void GameSprite::verticalLayout(SizeType start, SizeType spacing){
 
 void GameSprite::consumeTimeSlice(){}
 void GameSprite::render()const{
-#ifdef __MINGW32__
-#else
-	//绘制纹理
 	glPushMatrix();//保存矩阵
 	//变换
 #ifdef __ANDROID__
-	glTranslatex(position.x,position.y,position.z);
-	glRotatex(rotateAngle,rotation.x,rotation.y,position.z);
 	glScalex(scale.x,scale.y,scale.z);
+	glRotatex(rotateAngle,rotation.x,rotation.y,position.z);
+	glTranslatex(position.x,position.y,position.z);
 #else
-	glTranslatef(position.x,position.y,position.z);
-	glRotatef(rotateAngle,rotation.x,rotation.y,position.z);
 	glScalef(scale.x,scale.y,scale.z);
+	glRotatef(rotateAngle,rotation.x,rotation.y,position.z);
+	glTranslatef(position.x,position.y,position.z);
 #endif//__ANDROID__
-#endif//__MINGW32__
 	//绘制纹理
-	rect=rectF();
+	auto rect=rectF();
 	ShapeRenderer::drawRectangle(rect,nullptr,bgColor);//画背景
 	ShapeRenderer::setColor(color);
 	texture.draw(rect);
@@ -73,16 +73,20 @@ void GameSprite::render()const{
 	//其它绘制
 	renderX();//特殊绘制
 	GameObject::render();//递归绘制子节点
-#ifdef __MINGW32__
-#else
 	glPopMatrix();//恢复矩阵
-#endif
 }
 void GameSprite::renderX()const{}
 
 Rectangle2D<float> GameSprite::rectF()const{
-	rect.p0.x=-anchorPoint.x * size.x;
-	rect.p0.y=-anchorPoint.y * size.y;
+	Rectangle2D<float> rect;
+#ifdef __MINGW32__
+	rect.p0.x = -anchorPoint.x * size.x;
+	rect.p0.y = anchorPoint.y * size.y - size.y;
 	rect.p1 = rect.p0 + size;
+#else
+	rect.p0.x=-anchorPoint.x * size.x;
+	rect.p0.y= -anchorPoint.y * size.y;
+	rect.p1 = rect.p0 + size;
+#endif
 	return rect;
 }

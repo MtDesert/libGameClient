@@ -3,6 +3,12 @@
 
 #ifdef __MINGW32__
 #include"windows.h"
+//模拟OpenGL的矩阵变换
+void glPushMatrix();
+void glPopMatrix();
+void glTranslatef(float,float,float);
+void glRotatef(float angle,float,float,float);
+void glScalef(float,float,float);
 #else
 #include"gl.h"
 #endif
@@ -17,7 +23,10 @@ Windows->GDI32
 */
 class Texture{
 #ifdef __MINGW32__
-	HBITMAP hBitmap;//句柄
+	HBITMAP hBitmap;//纹理句柄
+	ColorRGBA bitmapColor;//当前纹理的颜色
+	HBITMAP hBitmapShadow;//根据hBitmap推出来的影子
+	ColorRGBA shadowColor;//影子的颜色,影响渲染
 #else
 	GLuint texture;//纹理ID
 #endif//__MINGW32__
@@ -59,10 +68,13 @@ public:
 	int getHeight()const;//高
 	Point2D<int> size()const;//宽高
 	Point2D<float> sizeF()const;//宽高
-
+	//格式转换
 	static void rect2vertex(const Rectangle2D<float> &rect,float vertex[]);
+
+	static Texture makeSolidTexture(int width,int height,const uint32 &u32);//生成特定颜色的纹理
 #ifdef __MINGW32__
-	static HDC deviceContext,compatibleDeviceContex;//绘图设备,及其兼容设备
+	void setColor(const ColorRGBA &color);//设置纹理颜色,以便生成变色后的纹理
+	static HDC deviceContext;//绘图设备
 #endif
 };
 

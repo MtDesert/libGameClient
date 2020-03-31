@@ -6,7 +6,7 @@
 #include"ColorRGB.h"
 
 #ifdef __MINGW32__
-#include"windows.h"
+#include<windows.h>
 #endif
 
 //图形渲染器,利用现有的绘图引擎(比如OpenGL)来绘制图形
@@ -24,6 +24,7 @@ public:
 	const ColorRGBA *fillColor;//这是闭合图形的填充色
 	int texture;//OpenGL的当前纹理,可混合填充色
 #ifdef __MINGW32__
+	static ColorRGBA color;
 	static HDC deviceContext;
 #endif
 	
@@ -53,7 +54,6 @@ public:
 	void drawRectangle(const Rectangle2D<numType> &rect)const;
 	void drawRectangle(const numType vertex[])const;
 
-	//void drawRectangle(const Rectangle2D<numType> &rect,const ColorRGBA *border,const ColorRGBA *background);
 	//画多边形(顶点数组,顶点数量)
 	void drawPolygen(const numType vertex[],int n)const;//注意:n是顶点数,不是数组大小
 };

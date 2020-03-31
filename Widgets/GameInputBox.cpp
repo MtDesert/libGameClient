@@ -22,7 +22,14 @@ void GameInputBox_String::setValue(const string &str){
 		buffer[str.size()]='\0';
 		GameButton_String::setString(buffer);
 	}else{
+#ifdef __MINGW32__
+		auto old=GameString::charset.srcCharset;//备份
+		GameString::charset.srcCharset=Charset::GBK;//改变字符集
+		GameButton_String::setString(str);//输入
+		GameString::charset.srcCharset=old;//还原字符集
+#else
 		GameButton_String::setString(str);
+#endif
 	}
 	mString=str;
 	if(whenInputConfirm)whenInputConfirm();
@@ -33,6 +40,7 @@ void GameInputBox_Integer::setValue(int num){
 	if(whenInputConfirm)whenInputConfirm();
 }
 
+void GameInputBox_Bool::startInput(){setValue(!boolValue);}
 //GamesEngines的输入控件
 static GameInputBox *gInputBox=nullptr;
 static int gInputInt=0;
@@ -125,7 +133,6 @@ static void* inputIntegerThreadFunc(void *box){
 	return nullptr;
 }
 
-void GameInputBox_Bool::startInput(){setValue(!boolValue);}
 void GameInputBox_String::startInput(){inputBoxThread.start(inputStringThreadFunc,this);}
 void GameInputBox_Integer::startInput(){inputBoxThread.start(inputIntegerThreadFunc,this);}
 
@@ -135,79 +142,62 @@ void GameInputBox_Integer::startInput(){inputBoxThread.start(inputIntegerThreadF
 #include<stdio.h>
 #include<windows.h>
 
-HWND window,editBox;
-static const char *inputStr=nullptr;
-char strInput[BUFSIZ];
-
-LRESULT __stdcall WindowProcedure(HWND window, unsigned int msg, WPARAM wp, LPARAM lp){
-	switch(msg){
-		case WM_CREATE:
-			editBox=CreateWindow("edit","text",WS_BORDER|WS_CHILD|WS_VISIBLE,0,0,400,20,window,0,0,0);
-		break;
-		case WM_DESTROY:
-			PostQuitMessage(0);
-		default:return DefWindowProc(window,msg,wp,lp);
-	}
-	return 0;
-}
-
-void inputOK(const char *str){
-	printf("input %s\n",str);
-	fflush(stdout);
-}
+static HWND window;
+static int dwStyle=0;//决定输入内容限制
+static char strInputBuffer[BUFSIZ];
 
 static Thread inputBoxThread;
-static void* inputBoxThreadFunc(void *box){
-	auto inputBox=reinterpret_cast<GameInputBox_String*>(box);
-	window=editBox=0;
-	//注册WindowClass
-	WNDCLASS wc;
-	wc.style = CS_DBLCLKS;
-	wc.lpfnWndProc = WindowProcedure;
-	wc.cbClsExtra = 0;
-	wc.cbWndExtra = 0;
-	wc.hInstance = GetModuleHandle(0);
-	wc.hIcon = LoadIcon(0, IDI_APPLICATION);
-	wc.hCursor = LoadCursor(0, IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW);
-	wc.lpszMenuName = 0;
-	wc.lpszClassName = "myclass";
-	RegisterClass(&wc);
-	//window
-	window = CreateWindow("myclass","title",WS_POPUPWINDOW|WS_OVERLAPPEDWINDOW,CW_USEDEFAULT,CW_USEDEFAULT,420,60,0,0,GetModuleHandle(0),0);
-	if(window){
-		ShowWindow(window,SW_SHOWDEFAULT) ;
+static void showInputBox(GameInputBox* pInputBox,const char* str){
+	gInputStr=nullptr;
+	//输入框
+	window = CreateWindow("edit",str,WS_POPUPWINDOW|WS_OVERLAPPEDWINDOW|dwStyle,CW_USEDEFAULT,CW_USEDEFAULT,420,20,0,0,GetModuleHandle(0),0);
+	if(window){//开始输入
+		ShowWindow(window,SW_SHOWDEFAULT);
 		MSG msg;
-		//事件循环
-		while(GetMessage(&msg,0,0,0)){
-			if(msg.message==WM_CHAR){
+		while(GetMessage(&msg,0,0,0)!=-1){
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+			if(msg.message==WM_CHAR){//只能在这里截获WM_CHAR
 				if(msg.wParam==VK_RETURN){
-					GetWindowText(editBox,strInput,BUFSIZ);
+					GetWindowText(window,strInputBuffer,BUFSIZ);//获得输入内容
+					gInputStr=strInputBuffer;
 					PostQuitMessage(0);
 				}
 				if(msg.wParam==VK_ESCAPE){
 					PostQuitMessage(0);
 				}
 			}
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+			if(msg.message==WM_QUIT)break;//退出
 		}
 	}else{
 		printf("window error %lu\n",GetLastError());
 	}
-	UnregisterClass("myclass",wc.hInstance);
+	CloseWindow(window);
 	//输入结束
-	if(inputStr){
-		if(inputBox)inputBox->setString(inputStr);
+	if(gInputStr){
+		gInputBox=pInputBox;
+	}
+}
+static void* inputStringThreadFunc(void *box){
+	dwStyle=0;
+	auto pInputBox=reinterpret_cast<GameInputBox_String*>(box);
+	showInputBox(pInputBox,pInputBox->mString.data());
+	return nullptr;
+}
+
+static void* inputIntegerThreadFunc(void *box){
+	dwStyle=ES_NUMBER;//只能输入数字
+	auto pInputBox=reinterpret_cast<GameInputBox_Integer*>(box);
+	showInputBox(pInputBox,Number::toString(pInputBox->mInteger).data());
+	//输入结束后,想办法获取数字
+	if(gInputStr){
+		sscanf(gInputStr,"%d",&gInputInt);
 	}
 	return nullptr;
 }
 
-void GameInputBox_Bool::startInput(){}
-void GameInputBox_String::startInput(){
-	inputBoxThread.start(inputBoxThreadFunc,this);
-}
-void GameInputBox_Integer::startInput(){}
+void GameInputBox_String::startInput(){inputBoxThread.start(inputStringThreadFunc,this);}
+void GameInputBox_Integer::startInput(){inputBoxThread.start(inputIntegerThreadFunc,this);}
 
 #endif
 

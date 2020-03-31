@@ -18,7 +18,7 @@ void GameMenuItem_String::updateData(SizeType pos){
 void GameMenuItem_String::setSelected(bool b){
 	color = b ? ColorRGBA::Black : ColorRGBA::White;
 	bgColor = b ? &ColorRGBA::White : nullptr;
-	gameString.color = b ? ColorRGBA::Black : ColorRGBA::White;
+	gameString.setColor(b ? ColorRGBA::Black : ColorRGBA::White);
 }
 
 void GameMenu_String::addString(const string &str,bool translate){

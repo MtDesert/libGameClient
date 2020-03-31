@@ -1,15 +1,44 @@
 #include"Texture.h"
+#include<math.h>
 //缓冲区
 static DataBlock fileDataBlock;//图片文件数据缓冲
 static Bitmap_32bit bitmap;//图像数据,用于传递给显卡或第三方库
+
 #ifdef __MINGW32__
-HDC Texture::deviceContext=nullptr,Texture::compatibleDeviceContex=nullptr;
+#include"ShapeRenderer.h"
+HDC Texture::deviceContext=nullptr;//绘图设备
 static BLENDFUNCTION blendFunction={AC_SRC_OVER,0,255,AC_SRC_ALPHA};
+//模拟OpenGL的驱动
+static const XFORM orgXForm = {1,0,0,1,0,0};
+static XFORM currentXForm = orgXForm;
+
+void glPushMatrix(){
+	SaveDC(Texture::deviceContext);
+}
+void glPopMatrix(){
+	RestoreDC(Texture::deviceContext,-1);
+	GetWorldTransform(Texture::deviceContext,&currentXForm);
+}
+void glTranslatef(float x,float y,float z){
+	currentXForm.eDx+=x;
+	currentXForm.eDy+=-y;
+	//执行顺序是scale,rotate,translate
+	SetWorldTransform(Texture::deviceContext,&currentXForm);
+}
+void glScalef(float x,float y,float z){
+	currentXForm.eM11*=x;
+	currentXForm.eM22*=y;
+}
+void glRotatef(float angle,float x,float y,float z){
+	/*auto arc=angle*PI/180;
+	currentXForm.eM11=cos(arc);
+	currentXForm.eM22=sin(arc);*/
+}
 #endif
 
 Texture::Texture():
 #ifdef __MINGW32__
-hBitmap(NULL),
+hBitmap(NULL),bitmapColor(0xFF,0xFF,0xFF),hBitmapShadow(NULL),shadowColor(0xFF,0xFF,0xFF),
 #else
 texture(0),
 #endif
@@ -44,7 +73,8 @@ void Texture::texImage2D(int width,int height,const void *pixels){
 void Texture::deleteTexture(){
 #ifdef __MINGW32__
 	DeleteObject(hBitmap);
-	hBitmap=nullptr;
+	DeleteObject(hBitmapShadow);
+	hBitmap=hBitmapShadow=nullptr;
 #else
 	//glIsTexture(texture);在驱动有问题的情况下返回值会有问题,这里的处理方法是直接删除
 	glDeleteTextures(1,&texture);
@@ -110,8 +140,14 @@ void Texture::draw(const Point2D<float> &p,const Point2D<float> &size,TexCoord c
 }
 void Texture::draw(const Rectangle2D<float> &rect,TexCoord coord)const{
 #ifdef __MINGW32__
-	SelectObject(compatibleDeviceContex,hBitmap);
-	GdiAlphaBlend(deviceContext,rect.left(),rect.bottom(),rect.width(),rect.height(),compatibleDeviceContex,0,0,rect.width(),rect.height(),blendFunction);
+	HDC cdc=CreateCompatibleDC(deviceContext);
+	if(bitmapColor==ColorRGBA::White){//本色演出
+		SelectObject(cdc,hBitmap);
+	}else{//给图片绘制上影子
+		SelectObject(cdc,hBitmapShadow);
+	}
+	GdiAlphaBlend(deviceContext,rect.left(),rect.bottom(),rect.width(),rect.height(),cdc,0,0,rect.width(),rect.height(),{AC_SRC_OVER,0,ShapeRenderer::color.alpha,AC_SRC_ALPHA});
+	DeleteDC(cdc);
 #else
 	if(!glIsTexture(texture))return;
 	glBindTexture(GL_TEXTURE_2D,texture);
@@ -145,6 +181,46 @@ void Texture::rect2vertex(const Rectangle2D<float> &rect,float vertex[]){
 	vertex[2]=vertex[4]=rect.p1.x;
 	vertex[5]=vertex[7]=rect.p1.y;
 }
+
+Texture Texture::makeSolidTexture(int width, int height, const uint32 &u32){
+	Texture tex;
+	bitmap.newBitmap(width,height);
+	bitmap.fillColor(u32);
+	tex.texImage2D(bitmap);
+	return tex;
+}
+#ifdef __MINGW32__
+void Texture::setColor(const ColorRGBA &color){
+	//调整颜色
+	if(bitmapColor==color)return;//无变化
+	bitmapColor=color;
+	//判断是否要生成影子
+	if(color==ColorRGBA::White)return;//全白为本色,不用生成影子
+	if(!(shadowColor==ColorRGBA::White) && bitmapColor==shadowColor)return;//和影色一样,则不需要再生成影子
+	//生成影子
+	if(!bitmap.newBitmap(width,height))return;//申请空间
+	if(!GetBitmapBits(hBitmap,bitmap.dataLength,bitmap.dataPointer)==bitmap.dataLength)return;//获取图像数据
+	//开始调色
+	uint32 u32=0;
+	ColorRGBA tmpColor;
+	for(int y=0;y<height;++y){
+		for(int x=0;x<width;++x){
+			bitmap.getColor(x,y,u32);//读取
+			if(u32 & 0xFF000000){//非透明,使用color
+				tmpColor.fromBGRA(u32);
+				tmpColor=tmpColor.darkColor(color);
+				u32=tmpColor.toBGRA() | 0xFF000000;//不要改变alpha
+			}else{
+				u32=0;
+			}
+			bitmap.setColor(x,y,u32);//写入
+		}
+	}
+	//写回图形驱动
+	DeleteObject(hBitmapShadow);
+	hBitmapShadow=CreateBitmap(width,height,1,32,bitmap.dataPointer);
+}
+#endif
 
 void TextureCache::clearCache(){
 	for(auto &item:*this){

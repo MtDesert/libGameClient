@@ -1,8 +1,9 @@
 #include"ShapeRenderer.h"
 #ifdef __MINGW32__
-#include"windows.h"
-HDC ShapeRenderer::deviceContext;
-static HPEN pen;
+ColorRGBA ShapeRenderer::color;
+HDC ShapeRenderer::deviceContext=nullptr;
+static HPEN pen=nullptr;
+static HBRUSH brush=nullptr;
 #else
 #include"gl.h"
 #endif
@@ -13,9 +14,13 @@ ShapeRenderer::~ShapeRenderer(){}
 
 void ShapeRenderer::setColor(const ColorRGBA &color){
 #ifdef __MINGW32__
+	ShapeRenderer::color=color;
 	DeleteObject(pen);
+	DeleteObject(brush);
 	pen=CreatePen(PS_SOLID,1,color.toRGB());
+	brush=CreateSolidBrush(color.toRGB());
 	SelectObject(deviceContext,pen);
+	SelectObject(deviceContext,brush);
 #else
 	glColor4ub(color.red,color.green,color.blue,color.alpha);
 #endif
@@ -144,6 +149,16 @@ void ShapeRenderer::drawRectangle(const numType vertex[])const{
 //多边形
 void ShapeRenderer::drawPolygen(const numType vertex[],int n)const{
 #ifdef __MINGW32__
+	if(fillColor){
+		setColor(*fillColor);
+		//绘制多边形
+		POINT ptArr[n];
+		for(int i=0;i<n;++i){
+			ptArr[i].x=vertex[i*2];
+			ptArr[i].y=vertex[i*2+1];
+		}
+		Polygon(deviceContext,ptArr,n);
+	}
 	if(edgeColor){
 		setColor(*edgeColor);
 		MoveToEx(deviceContext,vertex[0],vertex[1],NULL);
