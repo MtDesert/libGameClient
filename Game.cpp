@@ -3,9 +3,12 @@
 #include"Dialog_Message.h"
 #include"ErrorNumber.h"
 
+//宏定义开始
 #define ALL_COMMON_SCENE(MACRO)\
 MACRO(Logo)\
-MACRO(FileList)
+MACRO(FileList)\
+MACRO(Background)
+
 #define ALL_COMMON_DIALOG(MACRO)\
 MACRO(Login)\
 MACRO(Message)
@@ -81,6 +84,14 @@ const char* Game::translate(const string &english)const{
 //脚本执行
 bool Game::executeScript(){
 	if(!scenarioScript)return false;
+	if(scenarioScript->backgroundName){//显示背景
+		auto scene=gotoScene_Background(true);
+		scene->setBackground(scenarioScript->backgroundName);
+		scene->color.alpha=0;
+		scene->fadeIn();
+		//over
+		scenarioScript->backgroundName=nullptr;
+	}
 	//说话命令
 	if(scenarioScript->strSay){//说话命令
 		if(layerConversation)layerConversation->setDialogText(scenarioScript->strSay);
@@ -120,6 +131,7 @@ GameScene* Game::gotoScene(GameScene &scene,bool reset){
 
 GAME_GOTOSCENE_DEFINE(Game,Logo)
 GAME_GOTOSCENE_DEFINE(Game,FileList)
+GAME_GOTOSCENE_DEFINE(Game,Background)
 GAME_SHOWDIALOG_DEFINE(Game,Login)
 GAME_SHOWDIALOG_DEFINE(Game,Message)
 

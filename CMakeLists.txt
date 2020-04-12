@@ -80,4 +80,7 @@ else()
 	#库输出
 	add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
 	target_link_libraries(${PROJECT_NAME} GamesEngines ${LIBS_LIST})
+	#执行程序输出
+	add_executable(tools/PngJson ./executable/PngJson.cpp)
+	target_link_libraries(tools/PngJson GamesClient GamesEngines GLU GL gtk-3)
 endif()

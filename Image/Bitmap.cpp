@@ -49,6 +49,21 @@ void Bitmap_32bit::getColorsList(List<uint32> &colorsList,uint maxAmount)const{
 		}
 	}
 }
+Bitmap_32bit Bitmap_32bit::subBitmap(uint x,uint y,uint width,uint height)const{
+	Bitmap_32bit ret;
+	if(ret.newBitmap(width,height)){
+		ret.coordinateType=coordinateType;
+		uint32 color;
+		for(uint yy=0;yy<height;++yy){
+			for(uint xx=0;xx<width;++xx){
+				if(getColor(x+xx,y+yy,color)){
+					ret.setColor(xx,yy,color);
+				}
+			}
+		}
+	}
+	return ret;
+}
 
 //扫描线
 Bitmap32_Scanline::Bitmap32_Scanline():

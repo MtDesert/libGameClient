@@ -27,10 +27,10 @@ void Scene_Logo::consumeTimeSlice(){
 	auto &alpha=logoText.color.alpha;
 	switch(status){
 		case FadeIn:
-			logoText.color.alpha+=3;
+			logoText.color.alpha+=5;
 			if(alpha>=255){
 				status=Delay;
-				countDown=2000;
+				countDown=0;
 			}
 		break;
 		case Delay:
@@ -40,7 +40,7 @@ void Scene_Logo::consumeTimeSlice(){
 			}
 		break;
 		case FadeOut:
-			alpha-=3;
+			alpha-=5;
 			if(alpha<=0){
 				status=StatusOver;
 				if(whenLogoOver)whenLogoOver();

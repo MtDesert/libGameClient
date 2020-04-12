@@ -12,7 +12,8 @@ public:
 	//构造/析构函数
 	Bitmap_32bit();
 	~Bitmap_32bit();
-	//new & delete
+
+	//申请/释放空间
 	bool newBitmap(uint width,uint height);
 	void deleteBitmap();
 	//尺寸
@@ -32,6 +33,9 @@ public:
 	void fillColor(const uint32 &color);
 	//色表,获取所有用到的颜色保存到colorsList,maxAmount为colorsList的上线,0为无限制
 	void getColorsList(List<uint32> &colorsList,uint maxAmount=0)const;
+
+	//局部图像
+	Bitmap_32bit subBitmap(uint x,uint y,uint width,uint height)const;
 private:
 	uint width,height;
 };

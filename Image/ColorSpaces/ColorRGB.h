@@ -89,6 +89,6 @@ struct ColorRGBA:public ColorRGB{//RGBA(Red-Green-Blue-Alpha)
 
 	uint8 alpha;
 	//默认颜色
-	static const ColorRGBA Black,Red,Green,Blue,Gray,White;
+	static const ColorRGBA Black,Red,Green,Blue,Gray,Yellow,Purple,Cyan,White;
 };
 #endif

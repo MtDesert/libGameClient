@@ -9,6 +9,7 @@ GameSprite::GameSprite():color(0xFFFFFFFF),
 	anchorPoint(0.5,0.5){}
 GameSprite::~GameSprite(){}
 
+void GameSprite::setTexture(const Texture *tex){if(tex)setTexture(*tex);}
 void GameSprite::setTexture(const Texture &tex){
 	texture=tex;
 	size.setXY(tex.getWidth(),tex.getHeight());
@@ -43,7 +44,7 @@ void GameSprite::horizontalLayout(SizeType start,SizeType spacing){
 		start += w + spacing;
 	});
 }
-void GameSprite::verticalLayout(SizeType start, SizeType spacing){
+void GameSprite::verticalLayout(SizeType start,SizeType spacing){
 	forEachSubObj<GameSprite>([&](GameSprite &sprite){
 		auto h=sprite.size.y;
 		sprite.position.y = start - h/2;

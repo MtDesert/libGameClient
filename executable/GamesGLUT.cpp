@@ -5,18 +5,24 @@
 
 Game *game=nullptr;
 int window=0;//glut的window
-const Keyboard keyboard;
+const Keyboard keyboard;//键盘对象
+static int fps=0;//帧每秒
 
 enum{
 	TimerCPU,
+	TimerFPS,
 	Timer_Amount
 };
-int timerInterval[Timer_Amount]={16};//microsecond
+int timerInterval[Timer_Amount]={16,1000};//microsecond
 
 void glutTimerFunction(int timerID){
 	switch(timerID){
 		case TimerCPU:
 			game->addTimeSlice(timerInterval[timerID]);
+		break;
+		case TimerFPS:
+			printf("fps:%d\n",fps);
+			fps=0;
 		break;
 	}
 	glutTimerFunc(timerInterval[timerID],glutTimerFunction,timerID);
@@ -138,6 +144,7 @@ void glutDisplayFunction(){
 	glClearColor(0,0,0,1);
 	game->render();
 	glFlush();
+	++fps;
 }
 void glutOverlayDisplayFunction(){}
 void glutEntryFunction(int state){
@@ -211,6 +218,7 @@ int main(int argc,char* argv[]){
 	//计时器回调函数
 	GAMESGLUT_GLUTFUNC(Idle);
 	glutTimerFunc(timerInterval[TimerCPU],glutTimerFunction,TimerCPU);
+	glutTimerFunc(timerInterval[TimerFPS],glutTimerFunction,TimerFPS);
 	//主要输入回调
 	GAMESGLUT_GLUTFUNC(Keyboard);
 	GAMESGLUT_GLUTFUNC(KeyboardUp);

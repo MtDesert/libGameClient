@@ -23,6 +23,7 @@ public:
 	Point3D<float> scale;//缩放
 	Point2D<float> anchorPoint;//锚点(百分比)
 
+	void setTexture(const Texture *tex);
 	void setTexture(const Texture &tex);//设置纹理
 	virtual void setColor(const ColorRGBA &clr);//设置颜色
 	bool isMouseOnSprite()const;//判断当前的鼠标位置有没有在精灵上

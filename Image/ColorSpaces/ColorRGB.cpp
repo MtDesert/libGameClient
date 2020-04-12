@@ -158,4 +158,7 @@ ColorRGBA::Red(0xFF0000FF),
 ColorRGBA::Green(0xFF00FF00),
 ColorRGBA::Blue(0xFFFF0000),
 ColorRGBA::Gray(0xFF808080),
+ColorRGBA::Yellow(0xFF00FFFF),
+ColorRGBA::Purple(0xFFFF00FF),
+ColorRGBA::Cyan(0xFFFFFF00),
 ColorRGBA::White(0xFFFFFFFF);

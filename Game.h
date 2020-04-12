@@ -5,6 +5,7 @@
 #include"GameSettings.h"
 #include"Scene_FileList.h"
 #include"Scene_Logo.h"
+#include"Scene_Background.h"
 #include"GameLayer_Conversation.h"
 #include"Dialog_Login.h"
 #include"Dialog_Message.h"
@@ -95,8 +96,10 @@ public:
 	void clearAllScenes();//清除所有场景
 	GameScene* findFirstScene()const;//寻找首个场景
 	GameScene* gotoScene(GameScene &scene,bool reset=false);//场景跳转,返回scene的指针
+
 	Scene_Logo* gotoScene_Logo(bool reset=false);//场景:游戏标志
 	Scene_FileList* gotoScene_FileList(bool reset=false);//场景:文件选择
+	Scene_Background* gotoScene_Background(bool reset=false);//场景:单独背景
 	//对话框
 	GameDialog* showDialog(GameDialog &dialog);
 	Dialog_Login* showDialog_Login();

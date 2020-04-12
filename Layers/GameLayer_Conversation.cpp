@@ -30,6 +30,7 @@ void GameLayer_Conversation::setDialogText(const char *text){
 }
 void GameLayer_Conversation::setBodyImage(const string &filename){
 	bodySprite.texture.texImage2D_FileName(filename);
+	bodySprite.setTexture(bodySprite.texture);
 }
 
 bool GameLayer_Conversation::keyboardKey(Keyboard::KeyboardKey key,bool pressed){
