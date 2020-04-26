@@ -31,6 +31,12 @@ public:
 	void horizontalLayout(SizeType start,SizeType spacing);
 	void verticalLayout(SizeType start,SizeType spacing);
 
+	//屏幕相关
+	decltype(position) screenPosition()const;//屏幕位置
+	void setScreenPosition(const decltype(position) &pos);//设置精灵在屏幕上的位置
+	//移动到角落
+	void setScreenPosition_Corner(bool right,bool top);
+
 	//以下函数有可能子类差异化
 	virtual void consumeTimeSlice();
 	virtual void render()const;//渲染texture

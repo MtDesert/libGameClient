@@ -63,6 +63,14 @@ void GameString::renderX()const{
 	ShapeRenderer::setColor(color);//设置颜色
 	renderString(0,renderCharAmount,rectF().p0);//开始渲染
 }
+void GameString::insertTexture(const Texture &tex,SizeType pos){
+	CharAttr attr={false,tex};
+	arrayCharAttr.insert(pos,attr);
+	//更新外观
+	byteAmount+=2;
+	++renderCharAmount;
+	size.setXY(stringWidth(),charSize.y);
+}
 
 void GameString::renderString(uint from,uint amount,const Point2D<float> &pos2D)const{
 	point2D=pos2D;

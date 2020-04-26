@@ -32,8 +32,10 @@ struct ColorRGB{//Red-Green-Blue
 	uint8 gray()const;//获取灰度
 	void toGray();//转换成灰度颜色
 
+	//颜色变换
 	ColorRGB darkColor(const ColorRGB &color)const;//暗色,根据color来计算本颜色的暗色
 	ColorRGB lightColor(const ColorRGB &color)const;//亮色,根据color来计算本颜色的亮色
+	ColorRGB alphaBlend(const ColorRGB &rgb,uint8 alpha)const;//alpha混合色,根据color及其alpha值来计算混合后的颜色
 
 	//差异度,计算此颜色和rgb的差异程度
 	int deltaSum(const ColorRGB &rgb)const;
@@ -85,10 +87,10 @@ struct ColorRGBA:public ColorRGB{//RGBA(Red-Green-Blue-Alpha)
 	ColorRGBA darkColor(const ColorRGBA &color)const;//暗色,根据color来计算本颜色的暗色
 	ColorRGBA lightColor(const ColorRGBA &color)const;//亮色,根据color来计算本颜色的亮色
 	//Alpha混合(rgba为一起混合的颜色),返回混合结果
-	ColorRGBA alphaBlend(const ColorRGBA &rgba);
+	ColorRGBA alphaBlend(const ColorRGBA &rgba)const;
 
 	uint8 alpha;
 	//默认颜色
-	static const ColorRGBA Black,Red,Green,Blue,Gray,Yellow,Purple,Cyan,White;
+	static const ColorRGBA Transparent,Black,Red,Green,Blue,Gray,Yellow,Purple,Cyan,White;
 };
 #endif

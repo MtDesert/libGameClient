@@ -49,6 +49,16 @@ ColorRGB ColorRGB::lightColor(const ColorRGB &color)const{
 	return ret;
 }
 
+#define COLOR_ALPHA_BLEND(name) ret.name = Number::divideRound((int)name*(COLOR_MAX-alpha) + (int)rgb.name*alpha,COLOR_MAX);
+ColorRGB ColorRGB::alphaBlend(const ColorRGB &rgb,uint8 alpha)const{
+	ColorRGB ret;
+	COLOR_ALPHA_BLEND(red)
+	COLOR_ALPHA_BLEND(green)
+	COLOR_ALPHA_BLEND(blue)
+	return ret;
+}
+#undef COLOR_ALPHA_BLEND
+
 #define COLOR_DELTA(name) name>rgb.name ? name-rgb.name : rgb.name-name;
 int ColorRGB::deltaSum(const ColorRGB &rgb)const{
 	auto ret=COLOR_DELTA(red);
@@ -74,8 +84,8 @@ ColorRGBA ColorRGBA::lightColor(const ColorRGBA &color)const{
 	return ret;
 }
 
-#define COLOR_ALPHA_BLEND(name) ret.name = ((int)name*alpha + (int)rgba.name*rgba.alpha)/0xFF;
-ColorRGBA ColorRGBA::alphaBlend(const ColorRGBA &rgba){
+#define COLOR_ALPHA_BLEND(name) ret.name = Number::divideRound((int)name*alpha + (int)rgba.name*rgba.alpha,COLOR_MAX);
+ColorRGBA ColorRGBA::alphaBlend(const ColorRGBA &rgba)const{
 	ColorRGBA ret;
 	COLOR_ALPHA_BLEND(red)
 	COLOR_ALPHA_BLEND(green)
@@ -153,6 +163,7 @@ COLOR_CPP_FROMTO32(ABRG,alpha,blue,red,green)
 COLOR_CPP_FROMTO32(ABGR,alpha,blue,green,red)
 
 const ColorRGBA
+ColorRGBA::Transparent(0),
 ColorRGBA::Black(0xFF000000),
 ColorRGBA::Red(0xFF0000FF),
 ColorRGBA::Green(0xFF00FF00),

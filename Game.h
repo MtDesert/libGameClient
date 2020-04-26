@@ -10,6 +10,7 @@
 #include"Dialog_Login.h"
 #include"Dialog_Message.h"
 #include"GameTimer.h"
+#include"CountDown.h"
 #include"GameScript.h"
 #include"Client.h"
 
@@ -53,11 +54,13 @@ public:
 	static Game* newGame();//创建游戏,请在子类实现
 	static Game* currentGame();//当前游戏,子类实现时候注意返回值
 	virtual string gameName()const;//游戏的名字
-	virtual void reset();
+	virtual void reset();//游戏复位,重新读取配置等相关信息
+	virtual void restart();//重新开始,一般在reset之后调用,用于重新开始游戏
 	//输入输出变量
 	static Point3D<int> resolution;//分辨率
 	static Point2D<int> mousePos;//鼠标位置
 	TimeSliceList timeSliceList;//时间片列表,用于控制物体运动
+	CountDownList countDownList;
 
 	//配置
 	GameSettings *gameSettings;

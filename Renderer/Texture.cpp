@@ -132,8 +132,9 @@ void Texture::texImage2D_FileName(const string &filename){
 	}
 }
 
+static Point2D<float> p2D_1_1=Point2D<float>(1,1);
 void Texture::draw(const Point2D<float> &p,TexCoord coord)const{
-	draw(p,sizeF()-Point2D<float>(1,1),coord);
+	draw(p,sizeF()-p2D_1_1,coord);
 }
 void Texture::draw(const Point2D<float> &p,const Point2D<float> &size,TexCoord coord)const{
 	draw(Rectangle2D<float>(p,p+size),coord);

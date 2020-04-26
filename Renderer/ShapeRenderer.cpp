@@ -1,6 +1,5 @@
 #include"ShapeRenderer.h"
 #ifdef __MINGW32__
-ColorRGBA ShapeRenderer::color;
 HDC ShapeRenderer::deviceContext=nullptr;
 static HPEN pen=nullptr;
 static HBRUSH brush=nullptr;
@@ -12,9 +11,14 @@ ShapeRenderer ShapeRenderer::shapeRenderer;
 ShapeRenderer::ShapeRenderer():edgeColor(nullptr),fillColor(nullptr),texture(0){}
 ShapeRenderer::~ShapeRenderer(){}
 
-void ShapeRenderer::setColor(const ColorRGBA &color){
+void ShapeRenderer::setColor(const ColorRGBA &color,bool useAlpha){
+	if(useAlpha)shapeRenderer.color=color;
+	else{
+		auto old=shapeRenderer.color.alpha;
+		shapeRenderer.color=color;
+		shapeRenderer.color.alpha=old;
+	}
 #ifdef __MINGW32__
-	ShapeRenderer::color=color;
 	DeleteObject(pen);
 	DeleteObject(brush);
 	pen=CreatePen(PS_SOLID,1,color.toRGB());
@@ -22,7 +26,8 @@ void ShapeRenderer::setColor(const ColorRGBA &color){
 	SelectObject(deviceContext,pen);
 	SelectObject(deviceContext,brush);
 #else
-	glColor4ub(color.red,color.green,color.blue,color.alpha);
+	glColor4ub(color.red,color.green,color.blue,
+		useAlpha ? color.alpha : shapeRenderer.color.alpha);
 #endif
 }
 void ShapeRenderer::drawRectangle(const Rectangle2D<numType> &rect,const ColorRGBA *border,const ColorRGBA *background){
@@ -46,7 +51,7 @@ void ShapeRenderer::drawPoints(const numType vertex[],int n)const{
 #else
 	if(edgeColor){
 		glBindTexture(GL_TEXTURE_2D,0);
-		setColor(*edgeColor);
+		setColor(*edgeColor,false);
 		glVertexPointer(2,GL_FLOAT,0,vertex);
 		glDrawArrays(GL_POINTS,0,n);
 	}
@@ -77,7 +82,7 @@ void ShapeRenderer::drawLines(const numType vertex[],int n)const{
 #else
 	if(edgeColor){
 		glBindTexture(GL_TEXTURE_2D,0);
-		setColor(*edgeColor);
+		setColor(*edgeColor,false);
 		glVertexPointer(2,GL_FLOAT,0,vertex);
 		glDrawArrays(GL_LINES,0,n*2);
 	}
@@ -90,7 +95,7 @@ void ShapeRenderer::drawBrokenLine(const numType vertex[],int n)const{
 #else
 	if(edgeColor){
 		glBindTexture(GL_TEXTURE_2D,0);
-		setColor(*edgeColor);
+		setColor(*edgeColor,false);
 		glVertexPointer(2,GL_FLOAT,0,vertex);
 		glDrawArrays(GL_LINE_STRIP,0,n*2);
 	}
@@ -171,11 +176,11 @@ void ShapeRenderer::drawPolygen(const numType vertex[],int n)const{
 	glBindTexture(GL_TEXTURE_2D,texture);
 	glVertexPointer(2,GL_FLOAT,0,vertex);
 	if(fillColor){//绘制底色或纹理
-		setColor(*fillColor);
+		setColor(*fillColor,false);
 		glDrawArrays(GL_TRIANGLE_FAN,0,n);
 	}
 	if(edgeColor){//绘制边框线
-		setColor(*edgeColor);
+		setColor(*edgeColor,false);
 		glDrawArrays(GL_LINE_LOOP,0,n);
 	}
 #endif

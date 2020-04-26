@@ -50,6 +50,7 @@ void Game::reset(){
 	cache.bitmapFontGb2312.lv1Chinese.loadFile("fonts/lv1",whenError);
 	cache.bitmapFontGb2312.lv2Chinese.loadFile("fonts/lv2",whenError);
 }
+void Game::restart(){}
 
 bool Game::loadTranslationFile(const string &filename){
 	translationMap.clear();
@@ -87,9 +88,6 @@ bool Game::executeScript(){
 	if(scenarioScript->backgroundName){//显示背景
 		auto scene=gotoScene_Background(true);
 		scene->setBackground(scenarioScript->backgroundName);
-		scene->color.alpha=0;
-		scene->fadeIn();
-		//over
 		scenarioScript->backgroundName=nullptr;
 	}
 	//说话命令
@@ -158,8 +156,9 @@ bool Game::mouseMove(int x,int y){
 	mousePos.setXY(x,y);
 	return GameObject::mouseMove(x,y);
 }
-void Game::addTimeSlice(uint msec){
-	timeSliceList.addTimeSlice(msec);//计时器传递
+void Game::addTimeSlice(uint ms){
+	timeSliceList.addTimeSlice(ms);//计时器传递
+	countDownList.countingDown(ms);
 	executeScript();
 	//处理数据输入
 	GameInputBox::updateInput();

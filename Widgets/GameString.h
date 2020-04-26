@@ -28,6 +28,9 @@ public:
 	virtual SizeType stringWidth()const;//文本宽度,即所有文本所生成的字体加起来的总宽度
 	virtual void renderX()const;//实时渲染文字
 
+	//图文并茂(将纹理tex插入到文字的pos处)
+	void insertTexture(const Texture &tex,SizeType pos);
+
 	//静态变量
 	static Charset charset;//GameString共用的字符集转化方案,暂时还没提供换字符集的方案
 	static FontTextureCache fontTextureCache;//GameString共用的文字缓存,暂时还没提供换字体的方案

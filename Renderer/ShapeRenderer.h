@@ -20,15 +20,15 @@ public:
 	//typedef int numType;
 	typedef float numType;
 	//成员变量
+	ColorRGBA color;//填充色,用于设置图形驱动的当前颜色
 	const ColorRGBA *edgeColor;//这是线的颜色
 	const ColorRGBA *fillColor;//这是闭合图形的填充色
 	int texture;//OpenGL的当前纹理,可混合填充色
 #ifdef __MINGW32__
-	static ColorRGBA color;
 	static HDC deviceContext;
 #endif
 	
-	static void setColor(const ColorRGBA &color);//设置当前绘制的颜色(OpenGL的话则是传给状态机)
+	static void setColor(const ColorRGBA &color,bool useAlpha=true);//设置当前绘制的颜色(OpenGL的话则是传给状态机)
 	static void drawRectangle(const Rectangle2D<numType> &rect,const ColorRGBA *border,const ColorRGBA *background);
 
 	//画点

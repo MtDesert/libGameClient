@@ -43,6 +43,11 @@ void GameObject::addSubObject(GameObject *subObj,bool addFront){
 	addFront ? subObjects.push_front(subObj) : subObjects.push_back(subObj);
 	subObj->parentObject=this;
 }
+void GameObject::reAddSubObject(GameObject *subObj, bool addFront){
+	if(!subObj)return;
+	subObj->removeFromParentObject();
+	addSubObject(subObj,addFront);
+}
 void GameObject::removeSubObject(GameObject *subObj){
 	if(!subObj)return;
 	subObjects.remove(subObj);

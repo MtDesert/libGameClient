@@ -59,10 +59,13 @@ public:
 	GameObject *parentObject;//父物体
 	Array<GameObject*> subObjects;//子物体
 	bool forceIntercept;//是否进行事件拦截
+
 	void addSubObject(GameObject *subObj,bool addFront=false);
+	void reAddSubObject(GameObject *subObj,bool addFront=false);
 	void removeSubObject(GameObject *subObj);
 	void clearSubObjects();
 	void deleteSubObject(GameObject *subObj);
+
 	void removeFromParentObject();
 	void deleteFromParentObject();
 

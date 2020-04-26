@@ -10,6 +10,9 @@ public:
 	GameSettings();
 	~GameSettings();
 
+	//尺寸相关
+	Point2D<int> windowSize;//窗口大小,(在带有窗体操作系统的情况下可以用)
+	Point2D<int> resolution;//分辨率,决定绘制区域的清晰程度
 	//通用配置内容
 	string language;//游戏的语言,用于在加载时候读取对应的翻译文件
 	string headImagePath;//头像路径,特定的游戏会用到

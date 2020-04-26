@@ -1,6 +1,7 @@
 #include"GameSprite.h"
 #include"ShapeRenderer.h"
 #include"Game.h"
+#include"Number.h"
 
 GameSprite::GameSprite():color(0xFFFFFFFF),
 	bgColor(nullptr),borderColor(nullptr),
@@ -16,6 +17,9 @@ void GameSprite::setTexture(const Texture &tex){
 }
 void GameSprite::setColor(const ColorRGBA &clr){
 	color=clr;
+	forEachSubObj<GameSprite>([&](GameSprite &sprite){
+		sprite.setColor(color);
+	});
 #ifdef __MINGW32__
 	texture.setColor(clr);
 #endif
@@ -37,6 +41,7 @@ bool GameSprite::isMouseOnSprite()const{
 	}
 	return rect.containPoint(pos.x,pos.y);
 }
+//布局
 void GameSprite::horizontalLayout(SizeType start,SizeType spacing){
 	forEachSubObj<GameSprite>([&](GameSprite &sprite){
 		auto w=sprite.size.x;
@@ -50,6 +55,37 @@ void GameSprite::verticalLayout(SizeType start,SizeType spacing){
 		sprite.position.y = start - h/2;
 		start -= h + spacing;
 	});
+}
+
+decltype(GameSprite::position) GameSprite::screenPosition()const{
+	decltype(GameSprite::position) ret(position);
+	auto parent=parentObject;
+	while(parent){
+		auto sprite=dynamic_cast<GameSprite*>(parent);
+		if(sprite){
+			ret = ret + sprite->position;
+			parent=sprite->parentObject;
+		}else{
+			parent=nullptr;
+		}
+	}
+	return ret;
+}
+void GameSprite::setScreenPosition(const decltype(GameSprite::position) &pos){position = position + (pos-screenPosition());}
+void GameSprite::setScreenPosition_Corner(bool right,bool top){
+	decltype(position) pos(Game::resolution);
+	pos=pos/2;
+	//顶点修正
+	if(!right)pos.x=-pos.x;
+	if(!top)pos.y=-pos.y;
+	//x锚点修正
+	if(right)pos.x -= size.x*(1-anchorPoint.x);
+	else pos.x += size.x*anchorPoint.x;
+	//y锚点修正
+	if(top)pos.y -= size.y*(1-anchorPoint.y);
+	else pos.y += size.y*anchorPoint.y;
+	setScreenPosition(pos);
+	printf("%d,%d\n",position.x,position.y);
 }
 
 void GameSprite::consumeTimeSlice(){}
@@ -67,10 +103,17 @@ void GameSprite::render()const{
 #endif//__ANDROID__
 	//绘制纹理
 	auto rect=rectF();
-	ShapeRenderer::drawRectangle(rect,nullptr,bgColor);//画背景
+	if(bgColor){//绘制单色背景
+		ShapeRenderer::setColor(color);//主要传递透明度
+		ShapeRenderer::drawRectangle(rect,nullptr,bgColor);//画背景
+	}
+	//绘制纹理
 	ShapeRenderer::setColor(color);
 	texture.draw(rect);
-	ShapeRenderer::drawRectangle(rect,borderColor,nullptr);//画边框
+	if(borderColor){//绘制边框
+		ShapeRenderer::setColor(color);//主要传递透明度
+		ShapeRenderer::drawRectangle(rect,borderColor,nullptr);//画边框
+	}
 	//其它绘制
 	renderX();//特殊绘制
 	GameObject::render();//递归绘制子节点
