@@ -38,7 +38,6 @@ public:
 	void setScreenPosition_Corner(bool right,bool top);
 
 	//以下函数有可能子类差异化
-	virtual void consumeTimeSlice();
 	virtual void render()const;//渲染texture
 	virtual void renderX()const;//子类特殊的渲染方式
 	virtual Rectangle2D<float> rectF()const;//返回精灵在屏幕上的矩形区域,值由成员变量推断

@@ -79,7 +79,8 @@ public:
 	virtual bool mouseMove(int x,int y);//鼠标移动
 	virtual bool mouseWheel(int angle);//单位为角度
 
-	//时间片,一些基于时间的运动(如匀速移动)
+	//消耗时间片,某些object可能会有基于时间片的运动
+	virtual void consumeTimeSlice();
 	//渲染,递归进行渲染
 	virtual void render()const;
 

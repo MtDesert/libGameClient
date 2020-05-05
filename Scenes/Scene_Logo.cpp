@@ -2,20 +2,10 @@
 #include"Game.h"
 #include"CountDown.h"
 
-//流程控制
-enum Status{
-	FadeIn,
-	Delay,
-	FadeOut,
-	StatusOver
-};
-
 Scene_Logo::Scene_Logo():whenLogoOver(nullptr){
 	addSubObject(&logoText);
 }
-Scene_Logo::~Scene_Logo(){
-	Game::currentGame()->timeSliceList.removeTimeSlice(this);
-}
+Scene_Logo::~Scene_Logo(){}
 
 void Scene_Logo::reset(){
 	logoText.color.alpha=0;

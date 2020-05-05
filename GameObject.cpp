@@ -90,6 +90,7 @@ bool GameObject::mouseMove(int x,int y){
 bool GameObject::mouseWheel(int angle){
 	EVENT_TRANSMISSION(mouseWheel(angle))
 }
+void GameObject::consumeTimeSlice(){}
 void GameObject::render()const{
 	FOR_SUB_OBJECTS(obj->render());
 }

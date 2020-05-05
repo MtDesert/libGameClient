@@ -85,10 +85,8 @@ void GameSprite::setScreenPosition_Corner(bool right,bool top){
 	if(top)pos.y -= size.y*(1-anchorPoint.y);
 	else pos.y += size.y*anchorPoint.y;
 	setScreenPosition(pos);
-	printf("%d,%d\n",position.x,position.y);
 }
 
-void GameSprite::consumeTimeSlice(){}
 void GameSprite::render()const{
 	glPushMatrix();//保存矩阵
 	//变换
