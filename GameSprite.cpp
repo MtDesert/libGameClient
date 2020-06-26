@@ -15,6 +15,10 @@ void GameSprite::setTexture(const Texture &tex){
 	texture=tex;
 	size.setXY(tex.getWidth(),tex.getHeight());
 }
+void GameSprite::setTexture_FilePNG(const string &filename,WhenErrorString whenError){
+	texture.texImage2D_FilePNG(filename,whenError);
+	setTexture(texture);
+}
 void GameSprite::setColor(const ColorRGBA &clr){
 	color=clr;
 	forEachSubObj<GameSprite>([&](GameSprite &sprite){
@@ -95,9 +99,9 @@ void GameSprite::render()const{
 	glRotatex(rotateAngle,rotation.x,rotation.y,position.z);
 	glTranslatex(position.x,position.y,position.z);
 #else
-	glScalef(scale.x,scale.y,scale.z);
-	glRotatef(rotateAngle,rotation.x,rotation.y,position.z);
 	glTranslatef(position.x,position.y,position.z);
+	glRotatef(rotateAngle,rotation.x,rotation.y,position.z);
+	glScalef(scale.x,scale.y,scale.z);
 #endif//__ANDROID__
 	//绘制纹理
 	auto rect=rectF();

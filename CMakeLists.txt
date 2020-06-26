@@ -10,6 +10,7 @@ set(GAMECLIENT_DIR
 	Font #字体处理模块,文字可以当作一种特殊的图像
 	Charset #字符集,处理字符转换过程
 	Timer #计时器,主要用于控制物体动作
+	Sound #声音处理模块
 	Network #网络模块
 	Widgets #控件集,类似于各种平台特有的控件
 	Dialogs #对话框
@@ -50,6 +51,9 @@ if(GAME_NAME)
 			#以下为各种可执行文件的编译过程,根据情况选择编译自己需要的可执行文件即可
 			add_executable(GamesGLUT ./executable/GamesGLUT.cpp)
 			target_link_libraries(GamesGLUT ${LIBS_LIST})
+			#更新器
+			add_executable(updater ./executable/updater.cpp)
+			target_link_libraries(updater ${LIBS_LIST})
 		endif()
 	else()
 		message(编译客户端游戏库${GAME_NAME})
@@ -83,4 +87,7 @@ else()
 	#执行程序输出
 	add_executable(tools/PngJson ./executable/PngJson.cpp)
 	target_link_libraries(tools/PngJson GamesClient GamesEngines GLU GL gtk-3)
+
+	add_executable(tools/Mp3Viewer ./executable/Mp3Viewer.cpp)
+	target_link_libraries(tools/Mp3Viewer GamesClient GamesEngines GLU GL gtk-3)
 endif()

@@ -51,7 +51,7 @@ void ShapeRenderer::drawPoints(const numType vertex[],int n)const{
 #else
 	if(edgeColor){
 		glBindTexture(GL_TEXTURE_2D,0);
-		setColor(*edgeColor,false);
+		setColor(*edgeColor,true);
 		glVertexPointer(2,GL_FLOAT,0,vertex);
 		glDrawArrays(GL_POINTS,0,n);
 	}

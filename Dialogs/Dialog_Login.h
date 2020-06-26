@@ -12,7 +12,8 @@ public:
 	GameAttr_InputBoxString inputBoxUsername;
 	GameAttr_InputBoxString inputBoxPassword;
 	GameButtonGroup_ConfirmCancel buttonsConfirmCancel;
-
+	//设置模式(false登陆,true注册)
 	void setIsRegister(bool b);
+	GameButton::ClickCallback whenConfirm;//确认后的回调
 };
 #endif

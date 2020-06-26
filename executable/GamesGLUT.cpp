@@ -18,10 +18,12 @@ int timerInterval[Timer_Amount]={16,1000};//microsecond
 void glutTimerFunction(int timerID){
 	switch(timerID){
 		case TimerCPU:
-			game->addTimeSlice(timerInterval[timerID]);
+			game->addTimeSlice(timerInterval[timerID]);//随时更新
+			glutPostRedisplay();//更新完后开始渲染
 		break;
 		case TimerFPS:
-			printf("fps:%d\n",fps);
+			srand(time(NULL));//随时改变随机序列
+			printf("fps:%d\n",fps);//显示帧数
 			fps=0;
 		break;
 	}
@@ -32,7 +34,7 @@ void glutIdleFunction(){
 	if(error){
 		printf("GL get error %d\n",error);fflush(stdout);
 	}
-	glutPostRedisplay();//空闲时候,立刻通知刷新
+	//glutPostRedisplay();//空闲时候,立刻通知刷新
 }
 
 //input-keyboard

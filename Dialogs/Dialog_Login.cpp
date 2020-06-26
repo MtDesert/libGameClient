@@ -1,7 +1,7 @@
 #include"Dialog_Login.h"
 #include"Game.h"
 
-Dialog_Login::Dialog_Login(){
+Dialog_Login::Dialog_Login():whenConfirm(nullptr){
 	const SizeType itemWidth=400,spacing=16;
 	//内容
 	inputBoxUsername.setLabelName_ValueWidth_MaxWidth("Username",true,280,itemWidth);
@@ -17,5 +17,13 @@ Dialog_Login::Dialog_Login(){
 }
 
 void Dialog_Login::setIsRegister(bool b){
-	buttonsConfirmCancel.buttonConfirm.setString(b?"Register":"Login",true);
+	auto &btn=buttonsConfirmCancel.buttonConfirm;
+	btn.setString(b?"Register":"Login",true);
+	if(b){
+		btn.onClicked=[&](){//发送注册数据
+			auto client=Game::currentClient();
+			client->reqRegister(inputBoxUsername.inputBox.mString,inputBoxPassword.inputBox.mString);//请求注册
+		};
+	}else{
+	}
 }
