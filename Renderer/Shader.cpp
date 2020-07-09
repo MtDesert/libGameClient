@@ -30,7 +30,7 @@ bool Shader::loadShaderString(GLenum shaderType,const DataBlock &sourceCode,When
 	glShaderSource(shader,1,&codeStr,nullptr);
 	SHADER_ASSERT(glGetError()==GL_NO_ERROR,"glShaderSource: ")
 	//编译源码
-	sourceCode.debug();
+	sourceCode.debug(0);
 	glCompileShader(shader);
 	GLint ok;
 	glGetShaderiv(shader,GL_COMPILE_STATUS,&ok);

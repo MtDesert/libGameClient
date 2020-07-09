@@ -32,7 +32,7 @@ if(GAME_NAME)
 		message(编译执行程序)
 		project(GamesExe)
 		#设置共用库,给不同平台的可执行文件用
-		set(LIBS_LIST ${GAME_NAME}Client GamesClient ${GAME_NAME} GamesEngines ${LIBS_LIST} z)#把编译好的引擎添加到库中
+		set(LIBS_LIST ${GAME_NAME}Client GamesClient ${GAME_NAME} GamesEngines ${LIBS_LIST} z pthread)#把编译好的引擎添加到库中
 		if(${TARGET_SYSTEM_NAME} STREQUAL Android)
 			include_directories(${NDK_ROOT}/sources/android/native_app_glue)
 			add_library(main SHARED ./executable/GamesNativeActivity.cpp)
