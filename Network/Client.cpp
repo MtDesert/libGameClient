@@ -5,139 +5,69 @@
 #define GET_CLIENT auto client=reinterpret_cast<Client*>(socket->userData);
 #define CLIENT_EVENT(Name) if(client->when##Name)client->when##Name(client);
 
-//socket事件
-static void whenSocketError(Socket *socket){
-	printf("socket出错%d:\n",socket->errorNumber);
-	GET_CLIENT
-	CLIENT_EVENT(Error)
-}
-static void whenSocketConnected(Socket *socket){
-	printf("socket已经连接\n");
-	GET_CLIENT
-	CLIENT_EVENT(Connected)
-	client->sendData();//连接成功后,发送数据(如果有的话)
-}
-static void whenSocketDisconnected(Socket *socket){
-	printf("socket断开连接\n");
-	GET_CLIENT
-	CLIENT_EVENT(Disconnected)
-}
-
 //Client类
-Client::Client():fileToSend(NULL),fileToRecv(NULL),serverIPaddress(nullptr),serverPort(0),
-	whenError(nullptr),whenConnected(nullptr),whenSent(nullptr),whenReceived(nullptr){
-	ErrorNumber::init();
-	//socket回调函数
-	socket.whenSocketError=whenSocketError;
-	socket.whenSocketConnected=whenSocketConnected;
-	socket.whenSocketSent=whenSocketSent;
-	socket.whenSocketReceived=whenSocketReceived;
-	socket.whenSocketDisconnected=whenSocketDisconnected;
-	socket.userData=this;
-	//缓冲
-	dataToSend.memoryAllocate(BUFSIZ);
+Client::Client():serverIPaddress(nullptr),serverPort(0){
+	whenTransceiverReceived=whenReceived;
 }
-Client::~Client(){
-	dataToSend.memoryFree();
-}
+Client::~Client(){}
 
-//Socket事件
-void Client::whenSocketSent(Socket *socket){
-	//printf("socket发送数据%lu\n",socket->sentData.dataLength);
-	GET_CLIENT
-	CLIENT_EVENT(Sent)
-	//client->sendData();
-}
-void Client::whenSocketReceived(Socket *socket){
-	printf("socket接收数据%lu\n",socket->recvData.dataLength);
-	GET_CLIENT
-	//对数据进行读取分析,并执行相关操作
-	SocketDataBlock data;
-	data.set(socket->recvData);
-	data.readyReadWrite();
-	//读取回复码
-	string respCode;
-	data.read(respCode);
-	if(respCode=="ERR"){//服务端返回错误
-		string errStr;
-		data.read(errStr);
-		printf("服务端报错:%s\n",errStr.data());
-	}else if(respCode=="OK"){//服务器执行成功,读取剩余内容
-		printf("开始执行命令%s\n",client->currentReqStr.data());
-		//执行命令
-#define CASE(command) if(strcmp(client->currentReqStr.data(),#command)==0){client->resp##command(data);}else
-		CASE(UpdateSOfiles)
-		{printf("未知命令%s\n",client->currentReqStr.data());}
-	}else if(respCode=="DATA"){//大批量数据,一般是文件
-#undef CASE
-	}else{//服务器返回了未定义的代码
-		printf("未知回复%s\n",respCode.data());
-	}
-	client->currentReqStr.clear();
-}
-
-void Client::sendData(){
-	if(serverIPaddress){
-		if(socket.send(dataToSend.dataPointer,dataToSend.rwSize)){//已经连接,发送数据应该没问题
-		}else{//尚未连接,先进行连接
-			socket.connect(serverIPaddress,serverPort);
+static const string upgradeFolderName="update";
+bool Client::sendData(){
+	if(socket->isConnected){
+		Transceiver::sendData();
+	}else{//未连接,开始进行连接
+		if(serverIPaddress){
+			socket->connect(serverIPaddress,serverPort);
 		}
 	}
+	return socket->isConnected;
 }
-
-static const char* upgradeFolderName="update";
 void Client::startUpgrade(){
 	if(filenamesList.size()<=0)return;//无文件不升级
 	//创建更新目录
-	auto dir=opendir(upgradeFolderName);
+	auto dir=opendir(upgradeFolderName.data());
 	if(dir)closedir(dir);//目录已经存在
 	else{//目录不存在,创建之
-		if(mkdir(upgradeFolderName,S_IRWXU)==0){}else{
-			printf("无法创建更新目录%s\n",upgradeFolderName);
+		if(mkdir(upgradeFolderName.data(),S_IRWXU)==0){}else{
+			printf("无法创建更新目录%s\n",upgradeFolderName.data());
 			return;
 		}
 	}
-	//开始升级
-	auto filename=filenamesList.front();
-	fileToRecv=fopen((string(upgradeFolderName)+"/"+filename).data(),"wb");
-	if(fileToRecv){
-		reqUpgradeSOfiles(filename);//发送升级请求
-	}else{
-		printf("无法写文件%s\n",filename.data());
-	}
+	//开始发送更新请求
+	reqUpgradeSOfiles(filenamesList.front());
 }
-int Client::epollWait(){return socket.epollWait();}
 
 //请求模块
 #define CLIENT_READY_SEND(request)\
 	currentReqStr=#request;\
-	dataToSend.readyReadWrite();\
-	dataToSend.add(#request)
+	readySend(#request)
 #define CLIENT_SEND sendData();
 
 void Client::reqUpdateSOfiles(const string &gameName,const string &platform){
+	printf("请求:更新%s %s\n",gameName.data(),platform.data());
 	filenamesList.clear();//要清空文件列表
-	CLIENT_READY_SEND(UpdateSOfiles).add(gameName).add(platform);
+	CLIENT_READY_SEND(UpdateSOfiles).write(gameName).write(platform);
 	CLIENT_SEND
 }
 void Client::reqUpgradeSOfiles(const string &filename){
-	CLIENT_READY_SEND(UpgradeSOfiles).add(filename);
+	printf("请求:升级文件%s\n",filename.data());
+	CLIENT_READY_SEND(UpgradeSOfiles).write(filename);
 	CLIENT_SEND
 }
 void Client::reqUpdate(const DataBlock &fileList){
-	CLIENT_READY_SEND(Update).add(fileList);
+	CLIENT_READY_SEND(Update).write(fileList);
 	CLIENT_SEND
 }
 void Client::reqSelectGame(const string &name){
-	CLIENT_READY_SEND(SelectGame).add(name);
+	CLIENT_READY_SEND(SelectGame).write(name);
 	CLIENT_SEND
 }
 void Client::reqRegister(const string &username, const string &password){
-	CLIENT_READY_SEND(Register).add(username).add(password);
+	CLIENT_READY_SEND(Register).write(username).write(password);
 	CLIENT_SEND
 }
 void Client::reqLogin(const string &username,const string &password){
-	CLIENT_READY_SEND(Login).add(username).add(password);
+	CLIENT_READY_SEND(Login).write(username).write(password);
 	CLIENT_SEND
 }
 void Client::reqLogout(){
@@ -146,24 +76,47 @@ void Client::reqLogout(){
 }
 
 //响应模块
+void Client::whenReceived(Transceiver *transceiver){dynamic_cast<Client*>(transceiver)->whenReceived();}
+void Client::whenReceived(){
+	//收到了完整指令
+	string respCode;
+	readBuffer.rwSize=writeBuffer.rwSize=0;
+	readBuffer.read(packetLength).read(respCode);
+	if(respCode=="OK"){//响应成功
+#define CASE(name) if(currentReqStr==#name){resp##name(readBuffer);}else
+		CASE(UpdateSOfiles)
+		CASE(UpgradeSOfiles)
+		{}
+#undef CASE
+	}else if(respCode=="DATA"){//数据,有可能是文件数据
+		receiveFileData();
+	}else if(respCode=="CMD"){//服务端推送
+	}else if(respCode=="ERR"){//有错误
+	}else{
+	}
+}
+
 void Client::respUpdateSOfiles(SocketDataBlock &data){
 	string filename;
 	DirectoryEntry localEntry,remoteEntry;
-	while(data.rwSize<data.dataLength){
+	auto totalLen=defaultHeaderSize+packetLength;
+	while(data.rwSize < totalLen){
 		data.read(filename).read(remoteEntry.structStat.st_mtime);//读取服务器的文件名和时间
-		if(::stat(filename.data(),&localEntry.structStat)==0){//读取本地文件的时间
+		printf("old %s new %s %s\n",localEntry.strModifyTime().data(),remoteEntry.strModifyTime().data(),filename.data());
+		/*if(::stat(filename.data(),&localEntry.structStat)==0){//读取本地文件的时间
 			if(localEntry.structStat.st_mtime < remoteEntry.structStat.st_mtime){//需要更新
-				printf("old %s new %s %s\n",localEntry.strModifyTime().data(),remoteEntry.strModifyTime().data(),filename.data());
 				filenamesList.push_back(filename);
 			}
 		}else{//文件不存在,也要更新
 			filenamesList.push_back(filename);
-		}
+		}*/
+		filenamesList.push_back(filename);
 	}
 	//开始更新文件
 	startUpgrade();
 }
 void Client::respUpgradeSOfiles(SocketDataBlock &data){
-	if(!fileToRecv){//更新文件
-	}
+	data.read(recvFileSize);//获取文件接收大小
+	receiveFile(upgradeFolderName+"/"+filenamesList.front(),recvFileSize);
+	printf("准备更新文件%s大小%lu\n",filenamesList.front().data(),recvFileSize);
 }
