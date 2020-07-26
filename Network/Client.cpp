@@ -2,12 +2,11 @@
 #include"Directory.h"
 #include"ErrorNumber.h"
 
-#define GET_CLIENT auto client=reinterpret_cast<Client*>(socket->userData);
-#define CLIENT_EVENT(Name) if(client->when##Name)client->when##Name(client);
-
 //Client类
 Client::Client():serverIPaddress(nullptr),serverPort(0){
-	whenTransceiverReceived=whenReceived;
+#define WHEN(name) whenTransceiver##name=whenClient##name;
+	TRANSCEIVER_ALL_EVENTS(WHEN)
+#undef WHEN
 }
 Client::~Client(){}
 
@@ -74,10 +73,16 @@ void Client::reqLogout(){
 	CLIENT_READY_SEND(Logout);
 	CLIENT_SEND
 }
+//事件模块
+#define WHEN(name) \
+void Client::whenClient##name(Transceiver *transceiver){\
+	dynamic_cast<Client*>(transceiver)->whenClient##name();\
+}
+TRANSCEIVER_ALL_EVENTS(WHEN)
+#undef WHEN
 
 //响应模块
-void Client::whenReceived(Transceiver *transceiver){dynamic_cast<Client*>(transceiver)->whenReceived();}
-void Client::whenReceived(){
+void Client::whenClientReceived(){
 	//收到了完整指令
 	string respCode;
 	readBuffer.rwSize=writeBuffer.rwSize=0;
@@ -88,14 +93,19 @@ void Client::whenReceived(){
 		CASE(UpgradeSOfiles)
 		{}
 #undef CASE
-	}else if(respCode=="DATA"){//数据,有可能是文件数据
+	}else if(respCode=="FILE"){//数据,有可能是文件数据
 		receiveFileData();
 	}else if(respCode=="CMD"){//服务端推送
 	}else if(respCode=="ERR"){//有错误
 	}else{
 	}
 }
+void Client::whenClientReceivedFile(){
+	filenamesList.pop_front();//接收完毕,从名单中移除
+	startUpgrade();//继续更新
+}
 
+//响应模块
 void Client::respUpdateSOfiles(SocketDataBlock &data){
 	string filename;
 	DirectoryEntry localEntry,remoteEntry;

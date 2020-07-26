@@ -29,9 +29,13 @@ public:
 	void reqRegister(const string &username,const string &password);//注册账户
 	void reqLogin(const string &username,const string &password);//登入
 	void reqLogout();//登出
-	//收到服务端发回的消息
-	static void whenReceived(Transceiver *transceiver);
-	void whenReceived();
+	//客户端事件
+#define WHEN(name) \
+	static void whenClient##name(Transceiver*);\
+	void whenClient##name();
+	TRANSCEIVER_ALL_EVENTS(WHEN)
+#undef WHEN
+
 	//响应服务器发回的反馈
 #define RESP(name) void resp##name(SocketDataBlock &data);
 	RESP(UpdateSOfiles)
