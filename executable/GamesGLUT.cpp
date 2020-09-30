@@ -34,6 +34,7 @@ void glutIdleFunction(){
 	if(error){
 		printf("GL get error %d\n",error);fflush(stdout);
 	}
+	game->currentClient()->epollWait();
 	//glutPostRedisplay();//空闲时候,立刻通知刷新
 }
 

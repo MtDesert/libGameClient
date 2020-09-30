@@ -17,6 +17,9 @@ public:
 	string language;//游戏的语言,用于在加载时候读取对应的翻译文件
 	string headImagePath;//头像路径,特定的游戏会用到
 	string bodyImagePath;//全身像路径,特定的游戏会用到
+	//网络部分
+	string serverIP;
+	uint16 serverPort;
 
 	bool loadFile(const string &filename);
 protected:

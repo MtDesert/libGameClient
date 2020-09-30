@@ -138,7 +138,19 @@ GameDialog* Game::showDialog(GameDialog &dialog){
 	addSubObject(&dialog);
 	return &dialog;
 }
-
+Dialog_Message* Game::dialogOK(const string &text){
+	auto dialog=Game::currentGame()->showDialog_Message();
+	dialog->buttonsConfirmCancel.showButtonCancel(false);
+	dialog->setText(text);
+	return dialog;
+}
+Dialog_Message* Game::dialogConfirm(const string &text,GameButton::ClickCallback confirmCallback){
+	auto dialog=Game::currentGame()->showDialog_Message();
+	dialog->buttonsConfirmCancel.showButtonCancel(true);
+	dialog->setText(text);
+	dialog->setConfirmCallback(confirmCallback);
+	return dialog;
+}
 //错误处理
 static StringList allErrorStrings;//所有错误信息
 static const char* errorString=nullptr;
@@ -164,10 +176,8 @@ void Game::addTimeSlice(uint ms){
 	GameInputBox::updateInput();
 	//错误显示
 	if(errorString){
-		auto dialog=showDialog_Message();
-		dialog->setText(errorString);
-		dialog->setConfirmCallback([&,dialog](){
-			dialog->removeFromParentObject();
+		auto dialog=dialogOK(errorString);
+		dialog->setConfirmCallback([&](){
 			clearErrorMessages();
 		});
 		errorString=nullptr;//防止频繁进入

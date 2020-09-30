@@ -1,3 +1,4 @@
+#define GLFW_INCLUDE_ES2
 #include <GLFW/glfw3.h>
 #include<stdio.h>
 #include<string.h>
@@ -5,7 +6,7 @@
 using namespace std;
 #include"Game.h"
 
-Game game;
+Game *game=nullptr;
 
 static int monitorsCount=0;
 static GLFWmonitor** monitors=NULL;
@@ -136,88 +137,110 @@ void glfwKeyCallback(GLFWwindow *window,int key,int scancode,int action,int mods
 	}
 }
 
-int main(int argc,char* argv[])
-{
+int main(int argc,char* argv[]){
+	game=Game::newGame();
+	game->reset();
+	//打印版本号
 	int major,minor,rev;
 	glfwGetVersion(&major,&minor,&rev);
 	printf("Version: %d.%d.%d\n",major,minor,rev);
 	printf("Version string: %s\n",glfwGetVersionString());
 	if (!glfwInit())return -1;
-	//callback
+	//默认回调函数
 	glfwSetErrorCallback(errorFun);
 	glfwSetMonitorCallback(monitorFun);
-
-	//monitor
+	//获取显示器相关信息
 	monitors=glfwGetMonitors(&monitorsCount);
 	printf("Monitors count: %d\n",monitorsCount);
 	primaryMonitor=glfwGetPrimaryMonitor();
 	for(int i=0;i<monitorsCount;++i){
 		printMonitor(i,*monitors[i]);
 	}
-	
-	glfwDefaultWindowHints();
-	
-	/* Create a windowed mode window and its OpenGL context */
-	auto window = glfwCreateWindow(480, 320, "Hello World", NULL, NULL);
-	if(window){
-		int xpos,ypos,width,height;
-		glfwGetWindowPos(window,&xpos,&ypos);
-		glfwGetWindowSize(window,&width,&height);
-		printf("Window pos=%d,%d size=%d,%d\n",xpos,ypos,width,height);
-		glfwGetFramebufferSize(window,&width,&height);
-		printf("Frame buffer size=%d,%d\n",width,height);
-		//monitor
-		auto monitor=glfwGetWindowMonitor(window);
-		if(monitor){
-			int id=0;
-			for(;id<monitorsCount;++id){
-				if(monitor==monitors[id])break;
-			}
-			printMonitor(id,*monitor);
-		}
-		printWindowAttrib(*window);
-		//window callback
-		glfwSetWindowPosCallback(window,windowPosFun);
-		glfwSetWindowSizeCallback(window,windowSizeFun);
-		glfwSetWindowCloseCallback(window,windowCloseFun);
-		glfwSetWindowRefreshCallback(window,windowRefreshFun);
-		glfwSetWindowFocusCallback(window,windowFocusFun);
-		glfwSetWindowIconifyCallback(window,windowIconifyFun);
-		glfwSetFramebufferSizeCallback(window,frameBufferSizeFun);
-		//input callback
-		glfwSetKeyCallback(window,glfwKeyCallback);
-		
-		printf("%s\n",string_InputMethod_Cursor(glfwGetInputMode(window,GLFW_CURSOR)).data());
-		printf("%.8X\n",glfwGetInputMode(window,GLFW_STICKY_KEYS));
-		printf("%.8X\n",glfwGetInputMode(window,GLFW_STICKY_MOUSE_BUTTONS));
-		
-		//loop
-		glfwMakeContextCurrent(window);
-		while (!glfwWindowShouldClose(window))// Loop until the user closes the window
-		{
-			/* Draw a triangle */
-			glBegin(GL_TRIANGLES);
-			
-			glColor3f(1.0, 0.0, 0.0);    // Red
-			glVertex3f(0.0, 1.0, 0.0);
-			
-			glColor3f(0.0, 1.0, 0.0);    // Green
-			glVertex3f(-1.0, -1.0, 0.0);
-			
-			glColor3f(0.0, 0.0, 1.0);    // Blue
-			glVertex3f(1.0, -1.0, 0.0);
-			
-			glEnd();
-			
-			/* Swap front and back buffers */
-			glfwSwapBuffers(window);
-			
-			/* Poll for and process events */
-			glfwPollEvents();
-		}
-		glfwDestroyWindow(window);
+	glfwDefaultWindowHints();//使用默认窗口设置
+
+	//创建窗口
+	auto window = glfwCreateWindow(game->gameSettings->windowSize.x,game->gameSettings->windowSize.y,"Hello World",NULL,NULL);
+	if(!window){
+		printf("glfwCreateWindow() error!\n");
+		glfwTerminate();
+		return -1;
 	}
-	
+	//获取窗口位置尺寸
+	int xpos,ypos,width,height;
+	glfwGetWindowPos(window,&xpos,&ypos);
+	glfwGetWindowSize(window,&width,&height);
+	printf("Window pos=%d,%d size=%d,%d\n",xpos,ypos,width,height);
+	glfwGetFramebufferSize(window,&width,&height);
+	printf("Frame buffer size=%d,%d\n",width,height);
+	//获取窗口所属的显示器
+	auto monitor=glfwGetWindowMonitor(window);
+	if(monitor){
+		int id=0;
+		for(;id<monitorsCount;++id){
+			if(monitor==monitors[id])break;
+		}
+		printMonitor(id,*monitor);
+	}
+	printWindowAttrib(*window);
+	//窗口回调函数
+	glfwSetWindowPosCallback(window,windowPosFun);
+	glfwSetWindowSizeCallback(window,windowSizeFun);
+	glfwSetWindowCloseCallback(window,windowCloseFun);
+	glfwSetWindowRefreshCallback(window,windowRefreshFun);
+	glfwSetWindowFocusCallback(window,windowFocusFun);
+	glfwSetWindowIconifyCallback(window,windowIconifyFun);
+	glfwSetFramebufferSizeCallback(window,frameBufferSizeFun);
+	//输入回调函数
+	glfwSetKeyCallback(window,glfwKeyCallback);
+
+	printf("InputMode-Cursor: %s\n",string_InputMethod_Cursor(glfwGetInputMode(window,GLFW_CURSOR)).data());
+	printf("InputMode-StickyKeys: %.8X\n",glfwGetInputMode(window,GLFW_STICKY_KEYS));
+	printf("InputMode-StickyMouseButtons: %.8X\n",glfwGetInputMode(window,GLFW_STICKY_MOUSE_BUTTONS));
+	//OpenGL初始化
+	/*glScalef(
+		2.0/game->gameSettings->resolution.x,
+		2.0/game->gameSettings->resolution.y,
+		1);//以原点为缩放源进行缩放,使得整个屏幕的坐标范围变成(-width/2,-height/2 ~ width/2,height/2)*/
+	//图形驱动初始化
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);//设置混合功能对透明度的处理
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	//事件循环
+	glfwMakeContextCurrent(window);
+	ShapeRenderer sr;
+	sr.fillColor=&ColorRGBA::White;
+	sr.edgeColor=&ColorRGBA::White;
+	while(!glfwWindowShouldClose(window)){//用户关闭窗口时跳出循环
+		/* Draw a triangle */
+		/*glBegin(GL_TRIANGLES);
+
+		glColor3f(1.0, 0.0, 0.0);    // Red
+		glVertex3f(0.0, 1.0, 0.0);
+
+		glColor3f(1.0, 1.0, 0.0);    // Green
+		glVertex3f(-1.0, -1.0, 0.0);
+
+		glColor3f(0.0, 0.0, 1.0);    // Blue
+		glVertex3f(1.0, -1.0, 0.0);
+
+		glEnd();*/
+
+		//float arr[]={-0.5,-0.5, 0.5,-0.5, 0.5,0.5, -0.5,0.5};
+		//sr.drawPolygen(arr,4);
+		//交换显示缓冲
+		glClear(GL_DEPTH_BUFFER_BIT|GL_ACCUM_BUFFER_BIT|GL_STENCIL_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
+		glClearColor(0,0,0,1);
+		//game->render();
+		sr.drawPoint(0,0);
+		glFlush();
+		glfwSwapBuffers(window);
+		glfwPollEvents();//处理各种事件
+	}
+	glfwDestroyWindow(window);
 	glfwTerminate();
+	delete game;
 	return 0;
 }

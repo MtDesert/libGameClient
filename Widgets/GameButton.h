@@ -43,6 +43,7 @@ public:
 	typedef GameButton::ClickCallback ClickCallback;
 
 	GameButton_String buttonConfirm,buttonCancel;//确定按钮,取消按钮
+	void showButtonCancel(bool show);//是否显示取消按钮
 	void setConfirmCancelFunction(ClickCallback confirmCallback,ClickCallback cancelCallback);//设置"确定""取消"函数
 };
 #endif

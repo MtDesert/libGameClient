@@ -55,10 +55,7 @@ Scene_FileList::Scene_FileList():lastScene(nullptr){
 				}
 				//询问或者打开/保存文件
 				if(needAskOverWrite){
-					auto dialog=Game::currentGame()->showDialog_Message();
-					dialog->setText(fullPath+" is exist, overwrite?");
-					dialog->setConfirmCallback([&,dialog,fullPath](){
-						dialog->removeFromParentObject();
+					Game::dialogConfirm(fullPath+" is exist, overwrite?",[&,fullPath]{
 						if(whenConfirmFile)whenConfirmFile(fullPath);
 					});
 				}else{

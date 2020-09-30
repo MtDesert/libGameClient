@@ -57,6 +57,16 @@ GameButtonGroup_ConfirmCancel::GameButtonGroup_ConfirmCancel(){
 	addSubObject(&buttonConfirm);
 	addSubObject(&buttonCancel);
 }
+void GameButtonGroup_ConfirmCancel::showButtonCancel(bool show){
+	if(show){//显示取消按钮
+		reAddSubObject(&buttonCancel);
+		const SizeType spacing=16;
+		horizontalLayout(-(buttonConfirm.size.x+spacing+buttonCancel.size.x)/2,spacing);
+	}else{//隐藏取消按钮
+		buttonCancel.removeFromParentObject();
+		horizontalLayout(-buttonConfirm.size.x/2,0);
+	}
+}
 void GameButtonGroup_ConfirmCancel::setConfirmCancelFunction(ClickCallback confirmCallback,ClickCallback cancelCallback){
 	buttonConfirm.onClicked=confirmCallback;
 	buttonCancel.onClicked=cancelCallback;

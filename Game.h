@@ -107,6 +107,8 @@ public:
 	GameDialog* showDialog(GameDialog &dialog);
 	Dialog_Login* showDialog_Login();
 	Dialog_Message* showDialog_Message();
+	static Dialog_Message* dialogOK(const string &text);//显示消息,用于通知玩家
+	static Dialog_Message* dialogConfirm(const string &text,GameButton::ClickCallback confirmCallback);//显示消息让玩家确认或者取消,用于询问
 	//错误处理
 	static void whenError(const string &errStr);
 	static void clearErrorMessages();

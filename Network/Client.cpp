@@ -2,8 +2,13 @@
 #include"Directory.h"
 #include"ErrorNumber.h"
 
-//Client类
-Client::Client():serverIPaddress(nullptr),serverPort(0){
+static Socket clientSocket;//这是用于Client的socket,一般情况下只用一个,除非要连接多个服务
+Client::Client():serverIPaddress(nullptr),serverPort(0),whenClientErrorStr(nullptr)
+#define CALLBACK(name) ,when##name##OK(NULL)
+	PLAYER_REQUEST(CALLBACK)
+#undef CALLBACK
+{
+	setSocket(::clientSocket);
 #define WHEN(name) whenTransceiver##name=whenClient##name;
 	TRANSCEIVER_ALL_EVENTS(WHEN)
 #undef WHEN
@@ -12,25 +17,24 @@ Client::~Client(){}
 
 static const string upgradeFolderName="update";
 bool Client::sendData(){
-	if(socket->isConnected){
+	bool ret=socket->isConnected();
+	if(ret){
+		printf("客户端传输数据\n");
 		Transceiver::sendData();
 	}else{//未连接,开始进行连接
+		printf("客户端重连\n");
 		if(serverIPaddress){
 			socket->connect(serverIPaddress,serverPort);
 		}
 	}
-	return socket->isConnected;
+	return ret;
 }
 void Client::startUpgrade(){
 	if(filenamesList.size()<=0)return;//无文件不升级
 	//创建更新目录
-	auto dir=opendir(upgradeFolderName.data());
-	if(dir)closedir(dir);//目录已经存在
-	else{//目录不存在,创建之
-		if(mkdir(upgradeFolderName.data(),S_IRWXU)==0){}else{
-			printf("无法创建更新目录%s\n",upgradeFolderName.data());
-			return;
-		}
+	if(!Directory::exist(upgradeFolderName) && !Directory::makeDirectory(upgradeFolderName)){//目录不存在,创建之
+		printf("无法创建更新目录%s\n",upgradeFolderName.data());
+		return;
 	}
 	//开始发送更新请求
 	reqUpgradeSOfiles(filenamesList.front());
@@ -53,20 +57,12 @@ void Client::reqUpgradeSOfiles(const string &filename){
 	CLIENT_READY_SEND(UpgradeSOfiles).write(filename);
 	CLIENT_SEND
 }
-void Client::reqUpdate(const DataBlock &fileList){
-	CLIENT_READY_SEND(Update).write(fileList);
+void Client::reqRegister(const string &gameName,const string &username,const string &password){
+	CLIENT_READY_SEND(Register).write(gameName).write(username).write(password);
 	CLIENT_SEND
 }
-void Client::reqSelectGame(const string &name){
-	CLIENT_READY_SEND(SelectGame).write(name);
-	CLIENT_SEND
-}
-void Client::reqRegister(const string &username, const string &password){
-	CLIENT_READY_SEND(Register).write(username).write(password);
-	CLIENT_SEND
-}
-void Client::reqLogin(const string &username,const string &password){
-	CLIENT_READY_SEND(Login).write(username).write(password);
+void Client::reqLogin(const string &gameName, const string &username, const string &password){
+	CLIENT_READY_SEND(Login).write(gameName).write(username).write(password);
 	CLIENT_SEND
 }
 void Client::reqLogout(){
@@ -88,21 +84,30 @@ void Client::whenClientReceived(){
 	readBuffer.rwSize=writeBuffer.rwSize=0;
 	readBuffer.read(packetLength).read(respCode);
 	if(respCode=="OK"){//响应成功
+		//处理系统请求,默认为Client的函数
 #define CASE(name) if(currentReqStr==#name){resp##name(readBuffer);}else
-		CASE(UpdateSOfiles)
-		CASE(UpgradeSOfiles)
-		{}
+		CLIENT_REQUEST(CASE)
 #undef CASE
+		//处理请求用户请求,调用各种游戏自定义的回调函数
+#define CASE(name) if(currentReqStr==#name){if(when##name##OK)when##name##OK(readBuffer);}else
+		PLAYER_REQUEST(CASE)
+#undef CASE
+		{}
 	}else if(respCode=="FILE"){//数据,有可能是文件数据
 		receiveFileData();
 	}else if(respCode=="CMD"){//服务端推送
 	}else if(respCode=="ERR"){//有错误
+		readBuffer.read(respCode);
+		if(whenClientErrorStr)whenClientErrorStr(respCode);
 	}else{
 	}
 }
 void Client::whenClientReceivedFile(){
 	filenamesList.pop_front();//接收完毕,从名单中移除
 	startUpgrade();//继续更新
+}
+void Client::whenClientError(){
+	if(whenClientErrorStr)whenClientErrorStr(ErrorNumber::getErrorString(socket->errorNumber));//直接把socket的错误报上去
 }
 
 //响应模块
@@ -112,14 +117,14 @@ void Client::respUpdateSOfiles(SocketDataBlock &data){
 	auto totalLen=defaultHeaderSize+packetLength;
 	while(data.rwSize < totalLen){
 		data.read(filename).read(remoteEntry.structStat.st_mtime);//读取服务器的文件名和时间
-		printf("old %s new %s %s\n",localEntry.strModifyTime().data(),remoteEntry.strModifyTime().data(),filename.data());
-		/*if(::stat(filename.data(),&localEntry.structStat)==0){//读取本地文件的时间
+		//printf("old %s new %s %s\n",localEntry.strModifyTime().data(),remoteEntry.strModifyTime().data(),filename.data());
+		if(::stat(filename.data(),&localEntry.structStat)==0){//读取本地文件的时间
 			if(localEntry.structStat.st_mtime < remoteEntry.structStat.st_mtime){//需要更新
 				filenamesList.push_back(filename);
 			}
 		}else{//文件不存在,也要更新
 			filenamesList.push_back(filename);
-		}*/
+		}
 		filenamesList.push_back(filename);
 	}
 	//开始更新文件

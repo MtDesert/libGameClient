@@ -29,6 +29,8 @@ bool GameSettings::loadFile(const string &filename){
 	READ_STR(language)
 	READ_STR(headImagePath)
 	READ_STR(bodyImagePath)
+	READ_STR(serverIP)
+	serverPort=luaState.getGlobalInteger("serverPort");
 	readCustom(luaState);
 	//结束
 	luaState.clearStack();
