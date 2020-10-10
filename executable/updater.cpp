@@ -1,6 +1,7 @@
 #include"Directory.h"
 #include"ErrorNumber.h"
-#include"Client.h"
+#include"GameClient.h"
+#include"GameSettings.h"
 
 #include<unistd.h>
 #include<pthread.h>
@@ -11,10 +12,12 @@
 int main(int argc,char* argv[]){
 	Socket socket;
 	//文件列表发送到服务器
-	Client client;
+	GameClient client;
+	GameSettings settings;
+	client.gameSettings=&settings;
+	settings.serverIP="127.0.0.1";
+	settings.serverPort=2048;
 	client.setSocket(socket);
-	client.serverIPaddress="127.0.0.1";
-	client.serverPort=2048;
 	client.reqUpdateSOfiles("AdvanceWars","Linux");
 	//事件循环
 	while(true){

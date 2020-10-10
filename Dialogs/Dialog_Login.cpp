@@ -15,26 +15,31 @@ Dialog_Login::Dialog_Login():whenConfirm(nullptr){
 	size.x = itemWidth + spacing*2;
 	allSubObjects_verticalLayout(spacing);
 	//设置事件
-	auto client=Game::currentClient();
-	client->whenRegisterOK=[&](SocketDataBlock &sdb){//注册成功
-		Game::dialogOK("Register OK!");
-	};
-	client->whenLoginOK=[&](SocketDataBlock &sdb){//登陆成功
-		Game::dialogOK("Login OK!");
-	};
+	auto client=Game::currentGame()->gameClient;
+	if(client){
+		client->whenRegisterOK=[&](SocketDataBlock &sdb){//注册成功
+			Game::dialogOK("Register OK!");
+		};
+		client->whenLoginOK=[&](SocketDataBlock &sdb){//登陆成功
+			Game::dialogOK("Login OK!");
+		};
+	}
 }
 
 void Dialog_Login::setIsRegister(bool b){
 	auto &btn=buttonsConfirmCancel.buttonConfirm;
 	btn.setString(b?"Register":"Login",true);
-	auto client=Game::currentClient();
-	if(b){
-		btn.onClicked=[&,client](){//发送注册数据
-			client->reqRegister(Game::currentGame()->gameName(),inputBoxUsername.inputBox.mString,inputBoxPassword.inputBox.mString);
-		};
-	}else{
-		btn.onClicked=[&,client](){
-			client->reqLogin(Game::currentGame()->gameName(),inputBoxUsername.inputBox.mString,inputBoxPassword.inputBox.mString);
-		};
+	auto game=Game::currentGame();
+	auto client=game->gameClient;
+	if(client){
+		if(b){
+			btn.onClicked=[&,game,client](){//发送注册数据
+				client->reqRegister(game->gameName(),inputBoxUsername.inputBox.mString,inputBoxPassword.inputBox.mString);
+			};
+		}else{
+			btn.onClicked=[&,game,client](){
+				client->reqLogin(game->gameName(),inputBoxUsername.inputBox.mString,inputBoxPassword.inputBox.mString);
+			};
+		}
 	}
 }

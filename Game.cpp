@@ -17,7 +17,7 @@ MACRO(Message)
 ALL_COMMON_SCENE(GAME_SCENE_DECLARE)
 ALL_COMMON_DIALOG(GAME_DIALOG_DECLARE)
 
-Game::Game():gameSettings(nullptr),layerConversation(nullptr),scenarioScript(nullptr){}
+Game::Game():gameSettings(nullptr),gameClient(nullptr),layerConversation(nullptr),scenarioScript(nullptr){}
 Game::~Game(){
 	//删除控件
 	deleteSubObject(sceneLogo);
@@ -43,6 +43,17 @@ Game* Game::currentGame(){return Game::game;}
 string Game::gameName()const{return"";}
 void Game::reset(){
 	ErrorNumber::init();//初始化错误字符串
+	//读取配置
+	if(gameSettings){
+		gameSettings->loadFile("settings.lua");//读取配置
+		resolution.setP(gameSettings->resolution);//设定分辨率
+		loadTranslationFile(gameSettings->language+".csv");//读取翻译文件
+	}
+	//设置网络模块(部分游戏可能没有)
+	if(gameClient){
+		gameClient->gameSettings=this->gameSettings;
+		gameClient->whenClientErrorStr=whenError;
+	}
 	//加载字体
 	FontTextureCache &cache(GameString::fontTextureCache);
 	cache.bitmapFontAscii.charBlock.loadFile("fonts/ascii",whenError);
@@ -102,15 +113,6 @@ bool Game::executeScript(){
 	}
 	//执行完毕
 	return true;
-}
-
-//客户端
-static Client *client=nullptr;
-Client* Game::currentClient(){
-	if(!client){
-		client=new Client();
-	}
-	return client;
 }
 
 //场景管理

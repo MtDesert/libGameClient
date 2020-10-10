@@ -100,7 +100,7 @@ void GameSprite::render()const{
 	glTranslatex(position.x,position.y,position.z);
 #else
 	glTranslatef(position.x,position.y,position.z);
-	glRotatef(rotateAngle,rotation.x,rotation.y,position.z);
+	glRotatef(rotateAngle,rotation.x,rotation.y,rotation.z);
 	glScalef(scale.x,scale.y,scale.z);
 #endif//__ANDROID__
 	//绘制纹理

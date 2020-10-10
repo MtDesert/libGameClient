@@ -10,7 +10,7 @@ Scene_Logo::~Scene_Logo(){}
 void Scene_Logo::reset(){
 	logoText.color.alpha=0;
 	cdFadeTo.fadeTo(&logoText,1000,0xFF,[&](){
-		cdDelay.startCountDown(1000,[&](){
+		cdDelay.startCountDown(1000,0,[&](){
 			cdFadeTo.fadeTo(&logoText,1000,0,[&](){
 				if(whenLogoOver)whenLogoOver();
 			});

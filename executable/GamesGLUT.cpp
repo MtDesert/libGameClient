@@ -30,11 +30,15 @@ void glutTimerFunction(int timerID){
 	glutTimerFunc(timerInterval[timerID],glutTimerFunction,timerID);
 }
 void glutIdleFunction(){
+	//输出OpenGL的错误信息
 	int error=glGetError();
 	if(error){
 		printf("GL get error %d\n",error);fflush(stdout);
 	}
-	game->currentClient()->epollWait();
+	//处理网络消息
+	if(game->gameClient){
+		game->gameClient->epollWait();
+	}
 	//glutPostRedisplay();//空闲时候,立刻通知刷新
 }
 
@@ -215,9 +219,16 @@ int main(int argc,char* argv[]){
 	//glut初始化
 	glutInit(&argc,argv);
 	glutInitDisplayMode(GLUT_SINGLE|GLUT_RGBA|GLUT_DEPTH);
-	glutInitWindowSize(
-		game->gameSettings->windowSize.x,
-		game->gameSettings->windowSize.y);
+	int width=640,height=480,resWidth=width,resHeight=height;
+	if(game->gameSettings){//有配置的时候,使用配置中的分辨率
+		auto sz=game->gameSettings->windowSize;
+		if(sz.x>0)width=sz.x;
+		if(sz.y>0)height=sz.y;
+		sz=game->gameSettings->resolution;
+		if(sz.x>0)resWidth=sz.x;
+		if(sz.y>0)resHeight=sz.y;
+	}
+	glutInitWindowSize(width,height);
 	glutInitWindowPosition(100,100);
 	window=glutCreateWindow(game->gameName().data());
 	//计时器回调函数
@@ -257,11 +268,7 @@ int main(int argc,char* argv[]){
 	//printGlutGet();
 	//printGlutDeviceGet();
 	//OpenGL初始化
-	glScalef(
-		2.0/game->gameSettings->resolution.x,
-		2.0/game->gameSettings->resolution.y,
-		1);//以原点为缩放源进行缩放,使得整个屏幕的坐标范围变成(-width/2,-height/2 ~ width/2,height/2)
-	//图形驱动初始化
+	glScalef(2.0/resWidth,2.0/resHeight,1);//以原点为缩放源进行缩放,使得整个屏幕的坐标范围变成(-width/2,-height/2 ~ width/2,height/2)
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);//设置混合功能对透明度的处理

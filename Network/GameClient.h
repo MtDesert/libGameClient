@@ -1,21 +1,22 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
+#include"GameSettings.h"
+
 #include"Transceiver.h"
 #include"StringList.h"
 #include"Protocol.h"
 
 //客户端,用于向服务端发送请求,成员函数基本都会执行网络发送数据的动作
 //正常情况下,Client对象在客户端中只需要一个,如果需要连接多个端口,应当考虑扩展Client中的socket个数
-class Client:public Transceiver{
-	StringList filenamesList;//文件名列表
-public:
-	Client();
-	~Client();
-	//连接目标,在需要重新连接时候可用
-	const char *serverIPaddress;
-	int serverPort;
+class GameClient:public Transceiver{
+	StringList filenamesList;//文件名列表,用于批量下载
 	string currentReqStr;//当前请求的字符串
+public:
+	GameClient();
+	~GameClient();
+
+	GameSettings *gameSettings;//游戏设置,从设置中读取网络设置
 
 	//连接发送过程
 	virtual bool sendData();//发送数据,自带重连机制

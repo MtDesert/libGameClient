@@ -12,7 +12,7 @@
 #include"GameTimer.h"
 #include"CountDown.h"
 #include"GameScript.h"
-#include"Client.h"
+#include"GameClient.h"
 
 //以下宏定义建议放在Game子类的.cpp文件
 //场景声明,对话框声明
@@ -62,8 +62,9 @@ public:
 	TimeSliceList timeSliceList;//时间片列表,用于控制物体运动
 	CountDownList countDownList;
 
-	//配置
+	//自定义对象(只保留指针)
 	GameSettings *gameSettings;
+	GameClient *gameClient;
 
 	//翻译
 	bool loadTranslationFile(const string &filename);//加载翻译文件
@@ -91,9 +92,6 @@ public:
 		return dynamic_cast<ClassName*>(scenarioScript);\
 	}
 	virtual bool executeScript();//执行脚本命令
-
-	//客户端
-	static Client* currentClient();
 
 	//场景管理
 	void clearAllScenes();//清除所有场景

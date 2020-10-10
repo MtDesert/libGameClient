@@ -1,9 +1,9 @@
-#include"Client.h"
+#include"GameClient.h"
 #include"Directory.h"
 #include"ErrorNumber.h"
 
 static Socket clientSocket;//这是用于Client的socket,一般情况下只用一个,除非要连接多个服务
-Client::Client():serverIPaddress(nullptr),serverPort(0),whenClientErrorStr(nullptr)
+GameClient::GameClient():whenClientErrorStr(nullptr)
 #define CALLBACK(name) ,when##name##OK(NULL)
 	PLAYER_REQUEST(CALLBACK)
 #undef CALLBACK
@@ -13,23 +13,23 @@ Client::Client():serverIPaddress(nullptr),serverPort(0),whenClientErrorStr(nullp
 	TRANSCEIVER_ALL_EVENTS(WHEN)
 #undef WHEN
 }
-Client::~Client(){}
+GameClient::~GameClient(){}
 
 static const string upgradeFolderName="update";
-bool Client::sendData(){
+bool GameClient::sendData(){
 	bool ret=socket->isConnected();
 	if(ret){
 		printf("客户端传输数据\n");
 		Transceiver::sendData();
 	}else{//未连接,开始进行连接
 		printf("客户端重连\n");
-		if(serverIPaddress){
-			socket->connect(serverIPaddress,serverPort);
+		if(gameSettings){
+			socket->connect(gameSettings->serverIP,gameSettings->serverPort);
 		}
 	}
 	return ret;
 }
-void Client::startUpgrade(){
+void GameClient::startUpgrade(){
 	if(filenamesList.size()<=0)return;//无文件不升级
 	//创建更新目录
 	if(!Directory::exist(upgradeFolderName) && !Directory::makeDirectory(upgradeFolderName)){//目录不存在,创建之
@@ -46,39 +46,39 @@ void Client::startUpgrade(){
 	readySend(#request)
 #define CLIENT_SEND sendData();
 
-void Client::reqUpdateSOfiles(const string &gameName,const string &platform){
+void GameClient::reqUpdateSOfiles(const string &gameName,const string &platform){
 	printf("请求:更新%s %s\n",gameName.data(),platform.data());
 	filenamesList.clear();//要清空文件列表
 	CLIENT_READY_SEND(UpdateSOfiles).write(gameName).write(platform);
 	CLIENT_SEND
 }
-void Client::reqUpgradeSOfiles(const string &filename){
+void GameClient::reqUpgradeSOfiles(const string &filename){
 	printf("请求:升级文件%s\n",filename.data());
 	CLIENT_READY_SEND(UpgradeSOfiles).write(filename);
 	CLIENT_SEND
 }
-void Client::reqRegister(const string &gameName,const string &username,const string &password){
+void GameClient::reqRegister(const string &gameName,const string &username,const string &password){
 	CLIENT_READY_SEND(Register).write(gameName).write(username).write(password);
 	CLIENT_SEND
 }
-void Client::reqLogin(const string &gameName, const string &username, const string &password){
+void GameClient::reqLogin(const string &gameName, const string &username, const string &password){
 	CLIENT_READY_SEND(Login).write(gameName).write(username).write(password);
 	CLIENT_SEND
 }
-void Client::reqLogout(){
+void GameClient::reqLogout(){
 	CLIENT_READY_SEND(Logout);
 	CLIENT_SEND
 }
 //事件模块
 #define WHEN(name) \
-void Client::whenClient##name(Transceiver *transceiver){\
-	dynamic_cast<Client*>(transceiver)->whenClient##name();\
+void GameClient::whenClient##name(Transceiver *transceiver){\
+	dynamic_cast<GameClient*>(transceiver)->whenClient##name();\
 }
 TRANSCEIVER_ALL_EVENTS(WHEN)
 #undef WHEN
 
 //响应模块
-void Client::whenClientReceived(){
+void GameClient::whenClientReceived(){
 	//收到了完整指令
 	string respCode;
 	readBuffer.rwSize=writeBuffer.rwSize=0;
@@ -102,16 +102,16 @@ void Client::whenClientReceived(){
 	}else{
 	}
 }
-void Client::whenClientReceivedFile(){
+void GameClient::whenClientReceivedFile(){
 	filenamesList.pop_front();//接收完毕,从名单中移除
 	startUpgrade();//继续更新
 }
-void Client::whenClientError(){
+void GameClient::whenClientError(){
 	if(whenClientErrorStr)whenClientErrorStr(ErrorNumber::getErrorString(socket->errorNumber));//直接把socket的错误报上去
 }
 
 //响应模块
-void Client::respUpdateSOfiles(SocketDataBlock &data){
+void GameClient::respUpdateSOfiles(SocketDataBlock &data){
 	string filename;
 	DirectoryEntry localEntry,remoteEntry;
 	auto totalLen=defaultHeaderSize+packetLength;
@@ -130,7 +130,7 @@ void Client::respUpdateSOfiles(SocketDataBlock &data){
 	//开始更新文件
 	startUpgrade();
 }
-void Client::respUpgradeSOfiles(SocketDataBlock &data){
+void GameClient::respUpgradeSOfiles(SocketDataBlock &data){
 	data.read(recvFileSize);//获取文件接收大小
 	receiveFile(upgradeFolderName+"/"+filenamesList.front(),recvFileSize);
 	printf("准备更新文件%s大小%lu\n",filenamesList.front().data(),recvFileSize);
