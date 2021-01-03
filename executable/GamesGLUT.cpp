@@ -37,7 +37,7 @@ void glutIdleFunction(){
 	}
 	//处理网络消息
 	if(game->gameClient){
-		game->gameClient->epollWait();
+		game->gameClient->addTimeSlice();
 	}
 	//glutPostRedisplay();//空闲时候,立刻通知刷新
 }
@@ -265,8 +265,8 @@ int main(int argc,char* argv[]){
 	GAMESGLUT_GLUTFUNC(Entry);
 
 	//输出调试信息
-	//printGlutGet();
-	//printGlutDeviceGet();
+	printGlutGet();
+	printGlutDeviceGet();
 	//OpenGL初始化
 	glScalef(2.0/resWidth,2.0/resHeight,1);//以原点为缩放源进行缩放,使得整个屏幕的坐标范围变成(-width/2,-height/2 ~ width/2,height/2)
 	glEnable(GL_TEXTURE_2D);

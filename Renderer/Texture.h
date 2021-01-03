@@ -10,7 +10,7 @@ void glTranslatef(float,float,float);
 void glRotatef(float angle,float,float,float);
 void glScalef(float,float,float);
 #else
-#include"gl.h"
+#include"GLES/gl.h"
 #endif
 #include"FileBMP.h"
 #include"FilePNG.h"

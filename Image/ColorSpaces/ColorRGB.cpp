@@ -12,25 +12,18 @@ ColorRGBA::ColorRGBA():ColorRGBA(0,0,0,0){}
 ColorRGBA::ColorRGBA(uint8 r, uint8 g, uint8 b, uint8 a):ColorRGB(r,g,b),alpha(a){}
 ColorRGBA::ColorRGBA(unsigned value){fromRGBA(value);}
 
-uint8 ColorRGB::gray()const{
+uint8 ColorRGB::grayInt()const{return round(gray());}
+DECIMAL ColorRGB::gray()const{
 	//CIE 1931,HDTV,ATSC
 	//return red*0.2126 + green*0.7152 + blue*0.0722;
-
-	//PAL,NTSC(float)
-	//return red*0.299 + green*0.587 + blue*0.114;//SDTV with BT.601
-	//return red*0.30 + green*0.59 + blue*0.11;
-	//return red*0.3 + green*0.6 + blue*0.1;
-
-	//PAL NTSC(int)
-	return Number::divideRound(red*3+green*6+blue,10);
-	//return (red*30+green*59+blue*11)/100;
-	//return (red*299+green*587+blue*114)/1000;//SDTV with BT.601
 
 	//return (red*76+green*151+blue*28)>>8;//bit shift
 	//return (red+green+blue)/3;//average
 	//return green;//only green
+	return red*grayR + green*grayG + blue*grayB;//SDTV with BT.601,PAL & NTSC
 }
-void ColorRGB::toGray(){red=green=blue=gray();}
+void ColorRGB::toGray(){red=green=blue=grayInt();}
+const DECIMAL ColorRGB::grayR(0.299),ColorRGB::grayG(0.587),ColorRGB::grayB(0.114);
 
 #define COLOR_DARK(name) ret.name = Number::divideRound((int)name*color.name,COLOR_MAX);
 ColorRGB ColorRGB::darkColor(const ColorRGB &color)const{
@@ -65,6 +58,10 @@ int ColorRGB::deltaSum(const ColorRGB &rgb)const{
 	ret+=COLOR_DELTA(green);
 	ret+=COLOR_DELTA(blue);
 	return ret;
+}
+#define COLOR_POW2(name) pow((int)name-(int)rgb.name,2)
+double ColorRGB::distance(const ColorRGB &rgb)const{
+	return sqrt(COLOR_POW2(red)+COLOR_POW2(green)+COLOR_POW2(blue));
 }
 
 ColorRGBA ColorRGBA::darkColor(const ColorRGBA &color)const{

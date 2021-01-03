@@ -343,9 +343,9 @@ void FilePNG_PLTE::setColorsList(bool hasColor,bool hasAlpha,const List<uint32> 
 		}else{
 			rgba.fromRGBA(color32);
 			if(hasAlpha){
-				setGrayAlpha(idx,rgba.gray());
+				setGrayAlpha(idx,rgba.grayInt());
 			}else{
-				setGray(idx,rgba.gray());
+				setGray(idx,rgba.grayInt());
 			}
 		}
 		++idx;
@@ -460,7 +460,7 @@ bool FilePNG_Scanline::encodeLine(uint y,const Bitmap_32bit &bitmap){
 					setBufferValue(x,3,color2value(rgba.alpha));
 				}
 			}else{
-				setBufferValue(x,0,color2value(rgba.gray()));
+				setBufferValue(x,0,color2value(rgba.grayInt()));
 				if(hasAlpha){
 					setBufferValue(x,1,color2value(rgba.alpha));
 				}

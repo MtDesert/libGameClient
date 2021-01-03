@@ -4,7 +4,7 @@ HDC ShapeRenderer::deviceContext=nullptr;
 static HPEN pen=nullptr;
 static HBRUSH brush=nullptr;
 #else
-#include"gl.h"
+#include"GLES/gl.h"
 #endif
 
 ShapeRenderer ShapeRenderer::shapeRenderer;

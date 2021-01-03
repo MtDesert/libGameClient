@@ -48,7 +48,8 @@ static const char *gInputStr=nullptr;
 //线程实现输入
 #ifndef __MINGW32__
 #ifdef __ANDROID__
-void GameStringInputBox::startInput(){}
+void GameInputBox_String::startInput(){}
+void GameInputBox_Integer::startInput(){}
 #else
 
 #include<gtk-3.0/gtk/gtk.h>

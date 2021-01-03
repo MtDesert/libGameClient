@@ -21,7 +21,7 @@ int main(int argc,char* argv[]){
 	client.reqUpdateSOfiles("AdvanceWars","Linux");
 	//事件循环
 	while(true){
-		if(client.epollWait()<=0)pthread_yield();
+		if(client.addTimeSlice()<=0)pthread_yield();
 	}
 	return 0;
 }

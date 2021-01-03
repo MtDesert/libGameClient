@@ -3,11 +3,12 @@
 #include"Shader.h"
 #include"DataBlock.h"
 #include"define.h"
-#include"glu.h"
 
 #define SHADER_ASSERT(code,errStr) \
 if(!(code)){\
-	WHEN_ERROR(string(errStr) + (char*)gluErrorString(glGetError()))\
+	char strErr[10];\
+	sprintf(strErr,"%d",glGetError());\
+	WHEN_ERROR(string(errStr) + "error code: "+strErr)\
 	return false;\
 }
 
@@ -30,7 +31,6 @@ bool Shader::loadShaderString(GLenum shaderType,const DataBlock &sourceCode,When
 	glShaderSource(shader,1,&codeStr,nullptr);
 	SHADER_ASSERT(glGetError()==GL_NO_ERROR,"glShaderSource: ")
 	//编译源码
-	sourceCode.debug(0);
 	glCompileShader(shader);
 	GLint ok;
 	glGetShaderiv(shader,GL_COMPILE_STATUS,&ok);

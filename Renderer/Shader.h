@@ -8,7 +8,7 @@
 #include"Array.h"
 //注:在包含gl.h前,此宏必须定义,不然shader相关的内容则无法使用
 #define GL_GLEXT_PROTOTYPES 1
-#include"gl.h"
+#include"GLES2/gl2.h"
 
 class ShaderProgram;
 //着色器,调用硬件提供的功能

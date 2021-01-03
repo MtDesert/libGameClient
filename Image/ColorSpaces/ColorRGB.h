@@ -2,6 +2,8 @@
 #define COLORRGB_H
 
 #include"typedef.h"
+#define RGB_MAX 0xFF
+#define DECIMAL float
 
 #define COLOR_UNSIGNED(Name)\
 	uint32 to##Name()const;\
@@ -15,7 +17,8 @@ struct ColorRGB{//Red-Green-Blue
 	ColorRGB();
 	ColorRGB(uint8 r,uint8 g,uint8 b);
 	ColorRGB(unsigned value);//0x00RRGGBB
-
+	//红绿蓝
+	uint8 red,green,blue;
 	//operator
 	bool operator==(const ColorRGB &color)const;
 
@@ -27,10 +30,11 @@ struct ColorRGB{//Red-Green-Blue
 	COLOR_UNSIGNED24(BRG)
 	COLOR_UNSIGNED24(BGR)
 
-	//灰度,即此颜色对应的灰色(RGB值都相等)
-	//根据不同的标准,灰度的算法也有差异
-	uint8 gray()const;//获取灰度
+	//灰度,即此颜色对应的灰色(RGB值都相等),根据不同的标准,灰度的算法也有差异
+	uint8 grayInt()const;//获取灰度
+	DECIMAL gray()const;//获取灰度(小数)
 	void toGray();//转换成灰度颜色
+	static const DECIMAL grayR,grayG,grayB;
 
 	//颜色变换
 	ColorRGB darkColor(const ColorRGB &color)const;//暗色,根据color来计算本颜色的暗色
@@ -38,10 +42,8 @@ struct ColorRGB{//Red-Green-Blue
 	ColorRGB alphaBlend(const ColorRGB &rgb,uint8 alpha)const;//alpha混合色,根据color及其alpha值来计算混合后的颜色
 
 	//差异度,计算此颜色和rgb的差异程度
-	int deltaSum(const ColorRGB &rgb)const;
-
-	//红绿蓝
-	uint8 red,green,blue;
+	int deltaSum(const ColorRGB &rgb)const;//计算rgb的各个分量的差值之和
+	double distance(const ColorRGB &rgb)const;//计算此颜色和rgb在RGB坐标系中对应点的距离
 };
 
 struct ColorRGBA:public ColorRGB{//RGBA(Red-Green-Blue-Alpha)
