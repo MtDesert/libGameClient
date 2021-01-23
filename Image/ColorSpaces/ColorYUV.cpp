@@ -21,7 +21,7 @@ void ColorYUV::toRGB(ColorRGB &rgb)const{
 	else g=gg;
 }
 
-ColorYCbCr::ColorYCbCr(DECIMAL y, DECIMAL cb, DECIMAL cr):y(y),cb(cb),cr(cr){}
+ColorYCbCr::ColorYCbCr(COLOR_DECIMAL y, COLOR_DECIMAL cb, COLOR_DECIMAL cr):y(y),cb(cb),cr(cr){}
 void ColorYCbCr::fromRGB(const ColorRGB &rgb){
 	auto &r(rgb.red),&b(rgb.blue);
 	y=rgb.gray();//计算亮度

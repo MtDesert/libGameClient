@@ -1,12 +1,12 @@
 #include"ColorHS.h"
 #include<math.h>
 
-const DECIMAL ColorHS::maxHue=360;//角度
-const DECIMAL ColorHS::maxSaturation=255;
-const DECIMAL ColorHSL::maxLightness=255;
+const COLOR_DECIMAL ColorHS::maxHue=360;//角度
+const COLOR_DECIMAL ColorHS::maxSaturation=255;
+const COLOR_DECIMAL ColorHSL::maxLightness=255;
 
-ColorHS::ColorHS(DECIMAL h, DECIMAL s):hue(h),saturation(s){}
-ColorHSL::ColorHSL(DECIMAL h, DECIMAL s, DECIMAL l):ColorHS(h,s),lightness(l){}
+ColorHS::ColorHS(COLOR_DECIMAL h, COLOR_DECIMAL s):hue(h),saturation(s){}
+ColorHSL::ColorHSL(COLOR_DECIMAL h, COLOR_DECIMAL s, COLOR_DECIMAL l):ColorHS(h,s),lightness(l){}
 ColorHSV::ColorHSV(uint16 h, uint8 s, uint8 v):ColorHS(h,s),value(v){}
 
 uint8 ColorHS::minRGB(const ColorRGB &rgb){return min(rgb.red,min(rgb.green,rgb.blue));}
@@ -18,11 +18,11 @@ void ColorHS::caculateHue(const ColorRGB &rgb,uint8 minRGB,uint8 maxRGB){
 		auto &r(rgb.red),&g(rgb.green),&b(rgb.blue);
 		int delta=maxRGB-minRGB;
 		if(maxRGB==r){
-			hue=60*((DECIMAL)g-b)/delta;
+			hue=60*((COLOR_DECIMAL)g-b)/delta;
 		}else if(maxRGB==g){
-			hue=60*((DECIMAL)b-r)/delta+120;
+			hue=60*((COLOR_DECIMAL)b-r)/delta+120;
 		}else if(maxRGB==b){
-			hue=60*((DECIMAL)r-g)/delta+240;
+			hue=60*((COLOR_DECIMAL)r-g)/delta+240;
 		}
 		if(hue<0)hue+=maxHue;
 		if(hue>=maxHue)hue-=maxHue;
@@ -37,7 +37,7 @@ void ColorHS::toRGB(ColorRGB &rgb,uint8 minRGB,uint8 maxRGB)const{
 		uint8 *maxGrp[6]={&r,&g,&g,&b,&b,&r};
 		uint8 *minGrp[6]={&b,&b,&r,&r,&g,&g};
 		uint8 *midGrp[6]={&g,&r,&b,&g,&r,&b};
-		DECIMAL offset[6]={0,120,120,240,240,360};
+		COLOR_DECIMAL offset[6]={0,120,120,240,240,360};
 		for(int i=0;i<6;++i){
 			low=high,high=maxHue*(i+1)/6;
 			if(low<=hue && hue<high){

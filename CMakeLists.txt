@@ -18,47 +18,39 @@ set(GAMECLIENT_DIR
 	Layers #图层,提供公共功能的图层(如游戏中的对话)
 )
 
-if(${TARGET_SYSTEM_NAME} STREQUAL Windows)
-	include_directories(c:/MinGW/include/GL)
-endif()
-
-if(GAME_NAME)
-	include(../lib${GAME_NAME}/CMakeLists.txt)#读取游戏的CMakeLists.txt
-	includeAll(./ ${GAMECLIENT_DIR})
+macro(includeEngine)
 	set(INCLUDE_DIR_ONLY ON)
 	include(../libGamesEngines/CMakeLists.txt)
+endmacro()
+
+if(GAME_NAME)
 	#编译执行程序或库
 	if(COMPILE_GAME_EXE)
 		message(编译执行程序)
 		project(GamesExe)
 		#设置共用库,给不同平台的可执行文件用
 		set(LIBS_LIST ${GAME_NAME}Client GamesClient ${GAME_NAME} GamesEngines ${LIBS_LIST} z pthread)#把编译好的引擎添加到库中
-		if(${TARGET_SYSTEM_NAME} STREQUAL Android)
-			include_directories(${NDK_ROOT}/sources/android/native_app_glue)
-			add_library(main SHARED ./executable/GamesNativeActivity.cpp)
-			target_link_libraries(main android log EGL GLESv1_CM)
-		else()
-			#GLUT库
-			set(GLUT_NAME glut)
-			if(${TARGET_SYSTEM_NAME} STREQUAL Windows)
-				set(GLUT_NAME freeglut)
-			endif()
-			set(LIBS_LIST ${LIBS_LIST} ${GLUT_NAME})
-			#linux相关依赖
-			if(${TARGET_SYSTEM_NAME} STREQUAL Linux)
-				set(LIBS_LIST ${LIBS_LIST} GLU GL gtk-3 gobject-2.0)
-			endif()
-			#以下为各种可执行文件的编译过程,根据情况选择编译自己需要的可执行文件即可
-			add_executable(GamesGLUT ./executable/GamesGLUT.cpp)
-			target_link_libraries(GamesGLUT ${LIBS_LIST})
-			#更新器
-			add_executable(updater ./executable/updater.cpp)
-			target_link_libraries(updater ${LIBS_LIST})
-		endif()
+		#GLUT库
+		set(GLUT_NAME glut)
+		set(LIBS_LIST ${LIBS_LIST} ${GLUT_NAME})
+		#linux相关依赖
+		set(LIBS_LIST ${LIBS_LIST} GLU GL gtk-3 gobject-2.0)
+		#以下为各种可执行文件的编译过程,根据情况选择编译自己需要的可执行文件即可
+		add_executable(GamesGLUT ./executable/GamesGLUT.cpp)
+		target_link_libraries(GamesGLUT ${LIBS_LIST})
+		#更新器
+		add_executable(updater ./executable/updater.cpp)
+		target_link_libraries(updater ${LIBS_LIST})
 	else()
 		message(编译客户端游戏库${GAME_NAME})
 		project(${GAME_NAME}Client)
+		include(../lib${GAME_NAME}/CMakeLists.txt)#读取游戏的CMakeLists.txt
 		srcIncludeAll(../lib${GAME_NAME}/Client/ ${CLIENT_DIR})
+		includeAll(./ ${GAMECLIENT_DIR})
+		includeEngine()
+		foreach(name ${CMAKE_INCLUDE_PATH})
+			message(....${name})
+		endforeach()
 		#库输出
 		add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
 		target_link_libraries(${PROJECT_NAME} GamesClient ${GAME_NAME} GamesEngines ${LIBS_LIST})
@@ -69,26 +61,23 @@ else()
 	#添加所有paths下的源码和头文件
 	srcIncludeAll(./ ${GAMECLIENT_DIR})
 	#包含依赖库的目录
-	set(INCLUDE_DIR_ONLY ON)
-	include(../libGamesEngines/CMakeLists.txt)
-	if(${TARGET_SYSTEM_NAME} STREQUAL Linux)
-		include_directories(
-			/usr/include/gtk-3.0
-			/usr/include/atk-1.0
-			/usr/include/glib-2.0
-			/usr/include/pango-1.0
-			/usr/include/harfbuzz
-			/usr/include/cairo
-			/usr/include/gdk-pixbuf-2.0/
-			/usr/lib/x86_64-linux-gnu/glib-2.0/include)
-	endif()
+	includeEngine()
+	include_directories(
+		/usr/include/gtk-3.0
+		/usr/include/atk-1.0
+		/usr/include/glib-2.0
+		/usr/include/pango-1.0
+		/usr/include/harfbuzz
+		/usr/include/cairo
+		/usr/include/gdk-pixbuf-2.0/
+		/usr/lib/x86_64-linux-gnu/glib-2.0/include)
 	#库输出
 	add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
 	target_link_libraries(${PROJECT_NAME} GamesEngines ${LIBS_LIST})
 	#执行程序输出
-	add_executable(tools/PngJson ./executable/PngJson.cpp)
-	target_link_libraries(tools/PngJson GamesClient GamesEngines GLU GL gtk-3)
+	#add_executable(tools/PngJson ./executable/PngJson.cpp)
+	#target_link_libraries(tools/PngJson GamesClient GamesEngines GLU GL gtk-3)
 
-	add_executable(tools/Mp3Viewer ./executable/Mp3Viewer.cpp)
-	target_link_libraries(tools/Mp3Viewer GamesClient GamesEngines GLU GL gtk-3)
+	#add_executable(tools/Mp3Viewer ./executable/Mp3Viewer.cpp)
+	#target_link_libraries(tools/Mp3Viewer GamesClient GamesEngines GLU GL gtk-3)
 endif()

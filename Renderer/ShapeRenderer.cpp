@@ -1,6 +1,7 @@
 #include"ShapeRenderer.h"
 #ifdef __MINGW32__
 HDC ShapeRenderer::deviceContext=nullptr;
+ColorRGBA ShapeRenderer::color;
 static HPEN pen=nullptr;
 static HBRUSH brush=nullptr;
 #else

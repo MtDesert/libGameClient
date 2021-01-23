@@ -13,10 +13,10 @@ struct ColorCMY{//自定义的颜色结构,和RGB为互补关系
 	void toRGB(ColorRGB &color)const;
 };
 struct ColorCMYK{//标准的CMYK结构
-	ColorCMYK(DECIMAL c=0,DECIMAL m=0,DECIMAL y=0,DECIMAL k=0);
+	ColorCMYK(COLOR_DECIMAL c=0,COLOR_DECIMAL m=0,COLOR_DECIMAL y=0,COLOR_DECIMAL k=0);
 	ColorCMYK(const ColorRGB &rgb);
 
-	DECIMAL cyan,magenta,yellow,black;
+	COLOR_DECIMAL cyan,magenta,yellow,black;
 
 	void fromRGB(const ColorRGB &rgb);
 	void toRGB(ColorRGB &rgb)const;

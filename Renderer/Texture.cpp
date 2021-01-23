@@ -7,7 +7,7 @@ static Bitmap_32bit bitmap;//图像数据,用于传递给显卡或第三方库
 #ifdef __MINGW32__
 #include"ShapeRenderer.h"
 HDC Texture::deviceContext=nullptr;//绘图设备
-static BLENDFUNCTION blendFunction={AC_SRC_OVER,0,255,AC_SRC_ALPHA};
+//static BLENDFUNCTION blendFunction={AC_SRC_OVER,0,255,AC_SRC_ALPHA};
 //模拟OpenGL的驱动
 static const XFORM orgXForm = {1,0,0,1,0,0};
 static XFORM currentXForm = orgXForm;
@@ -34,6 +34,13 @@ void glRotatef(float angle,float x,float y,float z){
 	currentXForm.eM11=cos(arc);
 	currentXForm.eM22=sin(arc);*/
 }
+#else//Linux类系统
+static float vertex[]={0,0,0,0,0,0,0,0};
+static float texCoord_Default[]  ={0.0,0.0, 1.0,0.0, 1.0,1.0, 0.0,1.0};
+static float texCoord_LeftHalf[] ={0.0,0.0, 0.5,0.0, 0.5,1.0, 0.0,1.0};
+static float texCoord_RightHalf[]={0.5,0.0, 1.0,0.0, 1.0,1.0, 0.5,1.0};
+static float texCoord_UpHalf[]   ={0.0,0.5, 1.0,0.5, 1.0,1.0, 0.0,1.0};
+static float texCoord_DownHalf[] ={0.0,0.0, 1.0,0.0, 1.0,0.5, 0.0,0.5};
 #endif
 
 Texture::Texture():
@@ -45,13 +52,6 @@ texture(0),
 width(0),height(0){}
 Texture::~Texture(){}
 FontTexture::FontTexture():charCode(0){}
-
-static float vertex[]={0,0,0,0,0,0,0,0};
-static float texCoord_Default[]  ={0.0,0.0, 1.0,0.0, 1.0,1.0, 0.0,1.0};
-static float texCoord_LeftHalf[] ={0.0,0.0, 0.5,0.0, 0.5,1.0, 0.0,1.0};
-static float texCoord_RightHalf[]={0.5,0.0, 1.0,0.0, 1.0,1.0, 0.5,1.0};
-static float texCoord_UpHalf[]   ={0.0,0.5, 1.0,0.5, 1.0,1.0, 0.0,1.0};
-static float texCoord_DownHalf[] ={0.0,0.0, 1.0,0.0, 1.0,0.5, 0.0,0.5};
 
 //创建纹理
 void Texture::texImage2D(int width,int height,const void *pixels){
@@ -200,7 +200,7 @@ void Texture::setColor(const ColorRGBA &color){
 	if(!(shadowColor==ColorRGBA::White) && bitmapColor==shadowColor)return;//和影色一样,则不需要再生成影子
 	//生成影子
 	if(!bitmap.newBitmap(width,height))return;//申请空间
-	if(!GetBitmapBits(hBitmap,bitmap.dataLength,bitmap.dataPointer)==bitmap.dataLength)return;//获取图像数据
+	if((SizeType)GetBitmapBits(hBitmap,bitmap.dataLength,bitmap.dataPointer)!=bitmap.dataLength)return;//获取图像数据
 	//开始调色
 	uint32 u32=0;
 	ColorRGBA tmpColor;

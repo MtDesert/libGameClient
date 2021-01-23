@@ -15,11 +15,11 @@ void ColorCMY::toRGB(ColorRGB &color) const{
 	color.blue=RGB_MAX-yellow;
 }
 //CMYK
-ColorCMYK::ColorCMYK(DECIMAL c,DECIMAL m,DECIMAL y,DECIMAL k):cyan(c),magenta(m),yellow(y),black(k){}
+ColorCMYK::ColorCMYK(COLOR_DECIMAL c,COLOR_DECIMAL m,COLOR_DECIMAL y,COLOR_DECIMAL k):cyan(c),magenta(m),yellow(y),black(k){}
 ColorCMYK::ColorCMYK(const ColorRGB &rgb){fromRGB(rgb);}
 
 void ColorCMYK::fromRGB(const ColorRGB &rgb){
-#define DECL(var,name) DECIMAL var=(DECIMAL)rgb.name/RGB_MAX;
+#define DECL(var,name) COLOR_DECIMAL var=(COLOR_DECIMAL)rgb.name/RGB_MAX;
 	DECL(r,red)DECL(g,green)DECL(b,blue)//转换成比例形式
 #undef DECL
 	black=1-max(r,max(g,b));//黑色比例

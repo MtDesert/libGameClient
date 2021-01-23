@@ -1,20 +1,20 @@
 #include <EGL/egl.h>
 #include <GLES/gl.h>
 
-#include <android/asset_manager.h>
-#include <android/bitmap.h>
-#include <android/configuration.h>
-#include <android/input.h>
-#include <android/keycodes.h>
-#include <android/log.h>
-#include <android/looper.h>
-#include <android/native_window.h>
-#include <android/obb.h>
-#include <android/rect.h>
-#include <android/sensor.h>
-#include <android/storage_manager.h>
-//#include <android/tts.h>
-#include <android/window.h>
+//#include "android/asset_manager.h"
+//#include "android/bitmap.h"
+//#include "android/configuration.h"
+//#include "android/input.h"
+//#include "android/keycodes.h"
+#include "android/log.h"
+//#include "android/looper.h"
+#include "android/native_window.h"
+//#include "android/obb.h"
+//#include "android/rect.h"
+#include "android/sensor.h"
+//#include "android/storage_manager.h"
+//#include "android/tts.h"
+//#include "android/window.h"
 #include "android_native_app_glue.h"
 
 #include<string.h>
@@ -130,8 +130,8 @@ static int32_t engine_handle_input(struct android_app* app,AInputEvent* event){
 				case AMOTION_EVENT_ACTION_HOVER_ENTER:LOGI("盘旋进入");break;
 				case AMOTION_EVENT_ACTION_HOVER_EXIT:LOGI("盘旋退出");break;
 			}
-			SizeType pointerCount=AMotionEvent_getPointerCount(event);
-			SizeType i=0;
+			size_t pointerCount=AMotionEvent_getPointerCount(event);
+			size_t i=0;
 			for(;i<pointerCount;++i){
 				float x=AMotionEvent_getX(event,i);
 				float y=AMotionEvent_getY(event,i);
@@ -198,7 +198,7 @@ static void engine_handle_cmd(struct android_app *app, int32_t cmd) {
 	}
 }
 
-void android_main(struct android_app* app) {
+void android_main(struct android_app* app){
 	LOGI("主函数开始启动");
 	EngineEGL engine;
 	memset(&engine, 0, sizeof(engine));

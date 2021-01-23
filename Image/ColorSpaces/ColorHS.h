@@ -5,13 +5,13 @@
 //HSL,HSV色彩模式,主要用于色彩分析,选择,调整等
 
 struct ColorHS{//Hue and Saturation
-	ColorHS(DECIMAL h=0,DECIMAL s=0);
+	ColorHS(COLOR_DECIMAL h=0,COLOR_DECIMAL s=0);
 
-	DECIMAL hue;//色调
-	DECIMAL saturation;//饱和度
+	COLOR_DECIMAL hue;//色调
+	COLOR_DECIMAL saturation;//饱和度
 
-	static const DECIMAL maxHue;
-	static const DECIMAL maxSaturation;
+	static const COLOR_DECIMAL maxHue;
+	static const COLOR_DECIMAL maxSaturation;
 
 	static uint8 minRGB(const ColorRGB &rgb);//rgb分量中的最小值
 	static uint8 maxRGB(const ColorRGB &rgb);//rgb分量中的最小值
@@ -22,10 +22,10 @@ struct ColorHS{//Hue and Saturation
 	virtual void toRGB(ColorRGB &color)const=0;
 };
 struct ColorHSL:public ColorHS{//Hue-Saturation-Lightness, equal HSI(Hue-Saturation-Intensity)
-	ColorHSL(DECIMAL h=0,DECIMAL s=0,DECIMAL l=0);
+	ColorHSL(COLOR_DECIMAL h=0,COLOR_DECIMAL s=0,COLOR_DECIMAL l=0);
 
-	DECIMAL lightness;//亮度
-	static const DECIMAL maxLightness;
+	COLOR_DECIMAL lightness;//亮度
+	static const COLOR_DECIMAL maxLightness;
 	//RGB互转
 	void fromRGB(const ColorRGB &rgb);
 	void toRGB(ColorRGB &rgb)const;

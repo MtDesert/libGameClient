@@ -3,7 +3,7 @@
 
 #include"typedef.h"
 #define RGB_MAX 0xFF
-#define DECIMAL float
+#define COLOR_DECIMAL float
 
 #define COLOR_UNSIGNED(Name)\
 	uint32 to##Name()const;\
@@ -32,9 +32,9 @@ struct ColorRGB{//Red-Green-Blue
 
 	//灰度,即此颜色对应的灰色(RGB值都相等),根据不同的标准,灰度的算法也有差异
 	uint8 grayInt()const;//获取灰度
-	DECIMAL gray()const;//获取灰度(小数)
+	COLOR_DECIMAL gray()const;//获取灰度(小数)
 	void toGray();//转换成灰度颜色
-	static const DECIMAL grayR,grayG,grayB;
+	static const COLOR_DECIMAL grayR,grayG,grayB;
 
 	//颜色变换
 	ColorRGB darkColor(const ColorRGB &color)const;//暗色,根据color来计算本颜色的暗色

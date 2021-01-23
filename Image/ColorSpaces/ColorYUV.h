@@ -11,10 +11,10 @@ struct ColorYUV{
 	void toRGB(ColorRGB &rgb)const;
 };
 struct ColorYCbCr{//Y-ComponentBlue-ComponentRed,ITU-R BT.601 recommendation,用于数字视频,计算机显示器
-	ColorYCbCr(DECIMAL y=0,DECIMAL cb=0,DECIMAL cr=0);
+	ColorYCbCr(COLOR_DECIMAL y=0,COLOR_DECIMAL cb=0,COLOR_DECIMAL cr=0);
 	
 	void fromRGB(const ColorRGB &rgb);
 	void toRGB(ColorRGB &rgb)const;
-	DECIMAL y,cb,cr;
+	COLOR_DECIMAL y,cb,cr;
 };
 #endif

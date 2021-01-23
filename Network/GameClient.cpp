@@ -4,9 +4,9 @@
 
 static Socket clientSocket;//这是用于Client的socket,一般情况下只用一个,除非要连接多个服务
 GameClient::GameClient():whenClientErrorStr(nullptr)
-#define CALLBACK(name) ,when##name##OK(NULL)
-	PLAYER_REQUEST(CALLBACK)
-#undef CALLBACK
+#define CALL_BACK(name) ,when##name##OK(NULL)
+	PLAYER_REQUEST(CALL_BACK)
+#undef CALL_BACK
 {
 	setSocket(::clientSocket);
 #define WHEN(name) whenTransceiver##name=whenClient##name;
@@ -117,7 +117,6 @@ void GameClient::respUpdateSOfiles(SocketDataBlock &data){
 	auto totalLen=defaultHeaderSize+packetLength;
 	while(data.rwSize < totalLen){
 		data.read(filename).read(remoteEntry.structStat.st_mtime);//读取服务器的文件名和时间
-		//printf("old %s new %s %s\n",localEntry.strModifyTime().data(),remoteEntry.strModifyTime().data(),filename.data());
 		if(::stat(filename.data(),&localEntry.structStat)==0){//读取本地文件的时间
 			if(localEntry.structStat.st_mtime < remoteEntry.structStat.st_mtime){//需要更新
 				filenamesList.push_back(filename);
@@ -133,5 +132,4 @@ void GameClient::respUpdateSOfiles(SocketDataBlock &data){
 void GameClient::respUpgradeSOfiles(SocketDataBlock &data){
 	data.read(recvFileSize);//获取文件接收大小
 	receiveFile(upgradeFolderName+"/"+filenamesList.front(),recvFileSize);
-	printf("准备更新文件%s大小%lu\n",filenamesList.front().data(),recvFileSize);
 }
