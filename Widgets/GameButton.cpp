@@ -60,7 +60,7 @@ GameButtonGroup_ConfirmCancel::GameButtonGroup_ConfirmCancel(){
 void GameButtonGroup_ConfirmCancel::showButtonCancel(bool show){
 	if(show){//显示取消按钮
 		reAddSubObject(&buttonCancel);
-		const SizeType spacing=16;
+		const int spacing=16;
 		horizontalLayout(-(buttonConfirm.size.x+spacing+buttonCancel.size.x)/2,spacing);
 	}else{//隐藏取消按钮
 		buttonCancel.removeFromParentObject();

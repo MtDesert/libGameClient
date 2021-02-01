@@ -53,11 +53,7 @@ SizeType Charset::charAmount(const char *str,EnumCharset charset){
 static SizeType prefixLen,bytesPerChar;
 //转换过程变量
 static iconv_t convert;
-#ifdef __MINGW32__
-static const char *fromStr;
-#else
 static char *fromStr;
-#endif
 static char *toStr;
 static SizeType fromLen,toLen;
 

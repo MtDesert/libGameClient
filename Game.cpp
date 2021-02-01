@@ -2,6 +2,7 @@
 #include"GameInputBox.h"
 #include"Dialog_Message.h"
 #include"ErrorNumber.h"
+#include"PrintF.h"
 #include<errno.h>
 
 //宏定义开始
@@ -146,7 +147,7 @@ void Game::whenError(const string &errStr){
 	allErrorStrings.push_back(errStr);
 	//设置首个错误信息
 	errorString=allErrorStrings.front().data();
-	printf("error: %s\n",errStr.data());
+	PRINT_ERROR("error: %s",errStr.data());
 }
 void Game::clearErrorMessages(){allErrorStrings.clear();}
 
@@ -159,8 +160,6 @@ void Game::addTimeSlice(uint ms){
 	timeSliceList.addTimeSlice(ms);//计时器传递
 	countDownList.countingDown(ms);
 	executeScript();
-	//处理数据输入
-	GameInputBox::updateInput();
 	//错误显示
 	if(errorString){
 		auto dialog=dialogOK(errorString);

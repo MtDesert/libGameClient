@@ -24,9 +24,6 @@ void GameSprite::setColor(const ColorRGBA &clr){
 	forEachSubObj<GameSprite>([&](GameSprite &sprite){
 		sprite.setColor(color);
 	});
-#ifdef __MINGW32__
-	texture.setColor(clr);
-#endif
 }
 bool GameSprite::isMouseOnSprite()const{
 	auto rect=rectF();
@@ -46,14 +43,14 @@ bool GameSprite::isMouseOnSprite()const{
 	return rect.containPoint(pos.x,pos.y);
 }
 //布局
-void GameSprite::horizontalLayout(SizeType start,SizeType spacing){
+void GameSprite::horizontalLayout(int start,int spacing){
 	forEachSubObj<GameSprite>([&](GameSprite &sprite){
 		auto w=sprite.size.x;
 		sprite.position.x = start + w/2;
 		start += w + spacing;
 	});
 }
-void GameSprite::verticalLayout(SizeType start,SizeType spacing){
+void GameSprite::verticalLayout(int start,int spacing){
 	forEachSubObj<GameSprite>([&](GameSprite &sprite){
 		auto h=sprite.size.y;
 		sprite.position.y = start - h/2;
@@ -125,14 +122,9 @@ void GameSprite::renderX()const{}
 
 Rectangle2D<float> GameSprite::rectF()const{
 	Rectangle2D<float> rect;
-#ifdef __MINGW32__
 	rect.p0.x = -anchorPoint.x * size.x;
-	rect.p0.y = anchorPoint.y * size.y - size.y;
-	rect.p1 = rect.p0 + size;
-#else
-	rect.p0.x=-anchorPoint.x * size.x;
-	rect.p0.y= -anchorPoint.y * size.y;
-	rect.p1 = rect.p0 + size;
-#endif
+	rect.p0.y = -anchorPoint.y * size.y;
+	rect.p1.x = rect.p0.x + size.x;
+	rect.p1.y = rect.p0.y + size.y;
 	return rect;
 }

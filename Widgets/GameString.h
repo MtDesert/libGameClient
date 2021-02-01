@@ -22,7 +22,6 @@ public:
 	Point2D<SizeType> charSize;//文字宽高,请注意这里的宽是ASCII字符的宽度,汉字的话则是两倍此宽度
 	SizeType renderCharAmount;//渲染的文字数量
 	//成员函数
-	virtual void setColor(const ColorRGBA &color);//override
 	virtual void setString(const string &str,bool translate=false);//设置文本内容
 	virtual void setRawString(const string &str);//设置原始文本内容(不经过charset转化,不翻译)
 	virtual SizeType stringWidth()const;//文本宽度,即所有文本所生成的字体加起来的总宽度

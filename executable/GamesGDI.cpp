@@ -22,7 +22,7 @@ void windowsMessage_Key(WPARAM key,bool isPressed){
 		CASE(DOWN,Down)
 		CASE(LEFT,Left)
 		CASE(RIGHT,Right)
-		default:printf("key %d????\n",key);
+		default:printf("key %llu????\n",key);
 	}
 	game->keyboardKey(k,isPressed);
 }
@@ -101,8 +101,8 @@ LRESULT __stdcall windowProcedure(HWND window,unsigned int msg,WPARAM wp,LPARAM 
 void printMSG(const MSG &msg){
 	printf("time=%lu ",msg.time);
 	printf("message=%u ",msg.message);
-	if(msg.wParam)printf("w=%u ",msg.wParam);
-	if(msg.lParam)printf("l=%ld ",msg.lParam);
+	if(msg.wParam)printf("w=%llu ",msg.wParam);
+	if(msg.lParam)printf("l=%lld ",msg.lParam);
 	printf("\n");
 	fflush(stdout);
 }

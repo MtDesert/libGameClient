@@ -17,11 +17,7 @@ SizeType GameText::stringWidth()const{return charSize.x*min(charAmountPerLine,by
 void GameText::renderX()const{
 	ShapeRenderer::setColor(color);
 	auto rect=rectF();
-#ifdef __MINGW32__
-	point2D.setXY(rect.p0.x,rect.p0.y-charSize.y);
-#else
 	point2D.setXY(rect.p0.x,rect.p1.y);
-#endif
 	//开始计算
 	SizeType line=0,from=0,to=0;
 	for(auto itr=lineStartList.begin();itr!=lineStartList.end();++itr){
@@ -36,11 +32,7 @@ void GameText::renderX()const{
 		from=*itr;
 		to=(itrNext!=lineStartList.end()?*itrNext:arrayCharAttr.size());
 		//开始渲染
-#ifdef __MINGW32__
-		point2D.y += charSize.y;
-#else
 		point2D.y -= charSize.y;
-#endif
 		if(renderCharAmount<to){
 			renderString(from,renderCharAmount-from,point2D);
 			break;

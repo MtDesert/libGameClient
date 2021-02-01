@@ -1,7 +1,8 @@
 #include"Game.h"
+#include"PrintF.h"
 #include<GL/glut.h>
-//#include<GL/glext.h>
 #include<stdio.h>
+#include<time.h>
 
 Game *game=nullptr;
 int window=0;//glut的window
@@ -23,7 +24,7 @@ void glutTimerFunction(int timerID){
 		break;
 		case TimerFPS:
 			srand(time(NULL));//随时改变随机序列
-			printf("fps:%d\n",fps);//显示帧数
+			PRINT_INFO("fps:%d",fps);//显示帧数
 			fps=0;
 		break;
 	}
@@ -33,12 +34,14 @@ void glutIdleFunction(){
 	//输出OpenGL的错误信息
 	int error=glGetError();
 	if(error){
-		printf("GL get error %d\n",error);fflush(stdout);
+		PRINT_ERROR("GL get error %d",error);fflush(stdout);
 	}
 	//处理网络消息
 	if(game->gameClient){
 		game->gameClient->addTimeSlice();
 	}
+	//处理界面控件
+	GameInputBox::inputing();
 	//glutPostRedisplay();//空闲时候,立刻通知刷新
 }
 
@@ -48,7 +51,7 @@ void keyboardFunction(unsigned char key,bool pressed){
 	if(k<Keyboard::Amount_KeyboardKey){
 		game->keyboardKey(k,pressed);
 	}else{
-		printf("keyboardFunction: unknown %d\n",key);
+		PRINT_INFO("keyboardFunction: unknown %d",key);
 	}
 }
 void glutKeyboardFunction(unsigned char key,int x,int y){keyboardFunction(key,true);}
@@ -86,7 +89,7 @@ void specialFunction(int key,bool pressed){
 		case 0x73:k=Keyboard::Key_CtrlR;break;
 		case 0x74:k=Keyboard::Key_AltL;break;
 		case 0x75:k=Keyboard::Key_AltR;break;
-		default:printf("specialFunction: unknown key %.8X\n",key);//do nothing
+		default:PRINT_INFO("specialFunction: unknown key %.8X",key);//do nothing
 	}
 	game->keyboardKey(k,pressed);
 }
@@ -107,7 +110,7 @@ void glutMouseFunction(int button,int state,int x,int y){
 				game->mouseWheel(button==3 ? 1 : -1);
 			}
 		break;
-		default:printf("unknown mouse button: %d\n",button);
+		default:PRINT_INFO("unknown mouse button: %d",button);
 	}
 }
 void glutMotionFunction(int x,int y){
@@ -175,7 +178,7 @@ void printGlutGet(){
 	printf("Parent: %d\n",glutGet(GLUT_WINDOW_PARENT));
 	printf("NumChildren: %d\n",glutGet(GLUT_WINDOW_NUM_CHILDREN));
 	printf("ColorMap Size: %d\n",glutGet(GLUT_WINDOW_COLORMAP_SIZE));
-	printf("Num Sample: %d\n",glutGet(GLUT_WINDOW_NUM_SAMPLES));
+	//printf("Num Sample: %d\n",glutGet(GLUT_WINDOW_NUM_SAMPLES));//会报枚举错误
 	printf("Stereo: %d\n",glutGet(GLUT_WINDOW_STEREO));
 	printf("Cursor: %d\n",glutGet(GLUT_WINDOW_CURSOR));
 	printf("FormatID: %d\n",glutGet(GLUT_WINDOW_FORMAT_ID));
@@ -266,7 +269,7 @@ int main(int argc,char* argv[]){
 
 	//输出调试信息
 	printGlutGet();
-	printGlutDeviceGet();
+	//printGlutDeviceGet();
 	//OpenGL初始化
 	glScalef(2.0/resWidth,2.0/resHeight,1);//以原点为缩放源进行缩放,使得整个屏幕的坐标范围变成(-width/2,-height/2 ~ width/2,height/2)
 	glEnable(GL_TEXTURE_2D);

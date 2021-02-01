@@ -1,8 +1,5 @@
 #include"GameScript.h"
 #include"Game.h"
-#ifdef __MINGW32__
-#include<windows.h>
-#endif
 
 GameScript* GameScript::gameScript=nullptr;
 

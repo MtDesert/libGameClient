@@ -1,17 +1,7 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
-#ifdef __MINGW32__
-#include"windows.h"
-//模拟OpenGL的矩阵变换
-void glPushMatrix();
-void glPopMatrix();
-void glTranslatef(float,float,float);
-void glRotatef(float angle,float,float,float);
-void glScalef(float,float,float);
-#else
-#include"GLES/gl.h"
-#endif
+#include"GL/gl.h"
 #include"FileBMP.h"
 #include"FilePNG.h"
 #include"Pixmap.h"
@@ -22,14 +12,7 @@ Linux->OpenGL
 Windows->GDI32
 */
 class Texture{
-#ifdef __MINGW32__
-	HBITMAP hBitmap;//纹理句柄
-	ColorRGBA bitmapColor;//当前纹理的颜色
-	HBITMAP hBitmapShadow;//根据hBitmap推出来的影子
-	ColorRGBA shadowColor;//影子的颜色,影响渲染
-#else
 	GLuint texture;//纹理ID
-#endif//__MINGW32__
 	int width,height;//纹理尺寸
 public:
 	//构造/析构
@@ -72,10 +55,6 @@ public:
 	static void rect2vertex(const Rectangle2D<float> &rect,float vertex[]);
 
 	static Texture makeSolidTexture(int width,int height,const uint32 &u32);//生成特定颜色的纹理
-#ifdef __MINGW32__
-	void setColor(const ColorRGBA &color);//设置纹理颜色,以便生成变色后的纹理
-	static HDC deviceContext;//绘图设备
-#endif
 };
 
 //文字纹理,主要用于文字渲染

@@ -13,14 +13,6 @@ GameString::GameString(const string &str):GameString(){
 }
 GameString::~GameString(){}
 
-void GameString::setColor(const ColorRGBA &color){
-	GameSprite::setColor(color);
-#ifdef __MINGW32__
-	for(auto &attr:arrayCharAttr){
-		attr.tex.setColor(color);
-	}
-#endif
-}
 void GameString::setString(const string &str,bool translate){
 	//获取字符及其特征
 	auto block=charset.newString(translate ? Game::currentGame()->translate(str) : str.data());

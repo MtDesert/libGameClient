@@ -1,6 +1,7 @@
 #include"GameClient.h"
 #include"Directory.h"
 #include"ErrorNumber.h"
+#include"PrintF.h"
 
 static Socket clientSocket;//这是用于Client的socket,一般情况下只用一个,除非要连接多个服务
 GameClient::GameClient():whenClientErrorStr(nullptr)
@@ -19,10 +20,9 @@ static const string upgradeFolderName="update";
 bool GameClient::sendData(){
 	bool ret=socket->isConnected();
 	if(ret){
-		printf("客户端传输数据\n");
 		Transceiver::sendData();
 	}else{//未连接,开始进行连接
-		printf("客户端重连\n");
+		PRINT_WARN("客户端重连\n");
 		if(gameSettings){
 			socket->connect(gameSettings->serverIP,gameSettings->serverPort);
 		}
@@ -33,7 +33,7 @@ void GameClient::startUpgrade(){
 	if(filenamesList.size()<=0)return;//无文件不升级
 	//创建更新目录
 	if(!Directory::exist(upgradeFolderName) && !Directory::makeDirectory(upgradeFolderName)){//目录不存在,创建之
-		printf("无法创建更新目录%s\n",upgradeFolderName.data());
+		PRINT_ERROR("无法创建更新目录%s\n",upgradeFolderName.data());
 		return;
 	}
 	//开始发送更新请求
@@ -47,13 +47,13 @@ void GameClient::startUpgrade(){
 #define CLIENT_SEND sendData();
 
 void GameClient::reqUpdateSOfiles(const string &gameName,const string &platform){
-	printf("请求:更新%s %s\n",gameName.data(),platform.data());
+	PRINT_INFO("请求:更新%s %s\n",gameName.data(),platform.data());
 	filenamesList.clear();//要清空文件列表
 	CLIENT_READY_SEND(UpdateSOfiles).write(gameName).write(platform);
 	CLIENT_SEND
 }
 void GameClient::reqUpgradeSOfiles(const string &filename){
-	printf("请求:升级文件%s\n",filename.data());
+	PRINT_INFO("请求:升级文件%s\n",filename.data());
 	CLIENT_READY_SEND(UpgradeSOfiles).write(filename);
 	CLIENT_SEND
 }

@@ -14,7 +14,7 @@ public:
 	//显示内容
 	Texture texture;//精灵的纹理,基本上每个精灵都有纹理,如果2D游戏要变换显示的内容,简单改变此值就好
 	ColorRGBA color;//精灵可以有颜色,可以通过变色来区分
-	Point2D<SizeType> size;//精灵的大小,没有纹理的情况下可以考虑使用此值
+	Point2D<int> size;//精灵的大小,没有纹理的情况下可以考虑使用此值
 	const ColorRGBA *bgColor,*borderColor;//背景色与边框色,在有值的情况下进行绘制
 	//几何变量
 	Point3D<int> position;//位置(用来表现在屏幕上的位置)
@@ -31,8 +31,8 @@ public:
 	virtual void setColor(const ColorRGBA &clr);//设置颜色
 	bool isMouseOnSprite()const;//判断当前的鼠标位置有没有在精灵上
 	//布局相关,针对所有子物体
-	void horizontalLayout(SizeType start,SizeType spacing);
-	void verticalLayout(SizeType start,SizeType spacing);
+	void horizontalLayout(int start,int spacing);
+	void verticalLayout(int start,int spacing);
 
 	//屏幕相关
 	decltype(position) screenPosition()const;//屏幕位置

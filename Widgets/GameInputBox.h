@@ -7,10 +7,11 @@
 class GameInputBox:public GameButton_String{
 public:
 	GameInputBox();
-	virtual void startInput()=0;//开始输入,一般通过具体的系统调用来解决
 	function<void()> whenInputConfirm;//当输入确认后,调用此函数(如果有的话)
 
-	static void updateInput();//更新当前输入框的内容,由Game调度
+	static void startInput(GameInputBox *inputBox);//开始输入,一般通过具体的系统调用来解决
+	static void inputing();//输入回调,由Game频繁调度
+	static void finishInput();
 };
 //布尔输入框,只能输入两种值
 class GameInputBox_Bool:public GameInputBox{
@@ -20,8 +21,6 @@ public:
 	bool boolValue;
 	const char *falseStr,*trueStr;//真假时需要显示的内容
 	void setValue(bool b);
-	//override
-	virtual void startInput();
 };
 //字符串输入框,非常常见的一种框
 class GameInputBox_String:public GameInputBox{
@@ -31,8 +30,6 @@ public:
 	string mString;//字符串内容,可直接读取此变量的值,写时请用setString()
 	char passwordChar;//密码字符,'\0'为正常显示,一般密码可以设置为'*',当然也可以设置成你想要的其它字符
 	void setValue(const string &str);
-	//override
-	virtual void startInput();
 };
 //整数输入框
 class GameInputBox_Integer:public GameInputBox{
@@ -42,8 +39,6 @@ public:
 	int mInteger;//整数内容,获取整数值,写时请用setInteger
 	int minInteger,maxInteger;//值域
 	void setValue(int num);
-	//override
-	virtual void startInput();
 };
 
 //属性输入框控件,自带具有提示用的标签
@@ -84,5 +79,4 @@ public:
 	int getValue()const;//获取整数(可能有负数)
 	unsigned getUnsignedValue()const;//获取无符号数
 };
-
 #endif
