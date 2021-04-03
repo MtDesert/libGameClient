@@ -1,36 +1,42 @@
 #include"Texture.h"
+#include"ShapeRenderer.h"
+
 #include<math.h>
 //缓冲区
 static DataBlock fileDataBlock;//图片文件数据缓冲
 static Bitmap_32bit bitmap;//图像数据,用于传递给显卡或第三方库
+Texture Texture::emptyTex;
 
-static float vertex[]={0,0,0,0,0,0,0,0};
-static float texCoord_Default[]  ={0.0,0.0, 1.0,0.0, 1.0,1.0, 0.0,1.0};
-static float texCoord_LeftHalf[] ={0.0,0.0, 0.5,0.0, 0.5,1.0, 0.0,1.0};
-static float texCoord_RightHalf[]={0.5,0.0, 1.0,0.0, 1.0,1.0, 0.5,1.0};
-static float texCoord_UpHalf[]   ={0.0,0.5, 1.0,0.5, 1.0,1.0, 0.0,1.0};
-static float texCoord_DownHalf[] ={0.0,0.0, 1.0,0.0, 1.0,0.5, 0.0,0.5};
+typedef Texture::numType numType;
 
-Texture::Texture():texture(0),width(0),height(0){}
+/*static numType vertex[]={0,0,0,0,0,0,0,0};
+static numType texCoord_Default[]  ={0.0,0.0, 1.0,0.0, 1.0,1.0, 0.0,1.0};
+static numType texCoord_LeftHalf[] ={0.0,0.0, 0.5,0.0, 0.5,1.0, 0.0,1.0};
+static numType texCoord_RightHalf[]={0.5,0.0, 1.0,0.0, 1.0,1.0, 0.5,1.0};
+static numType texCoord_UpHalf[]   ={0.0,0.5, 1.0,0.5, 1.0,1.0, 0.0,1.0};
+static numType texCoord_DownHalf[] ={0.0,0.0, 1.0,0.0, 1.0,0.5, 0.0,0.5};
+*/
+Texture::Texture():width(0),height(0){}
 Texture::~Texture(){}
 FontTexture::FontTexture():charCode(0){}
 
 //创建纹理
 void Texture::texImage2D(int width,int height,const void *pixels){
-	if(!glIsTexture(texture)){//防止多次申请从而导致原texture值丢失
-		glGenTextures(1,&texture);//申请纹理序号
+	if(!glIsTexture(tex2D)){//防止多次申请从而导致原tex2D值丢失
+		glGenTextures(1,&tex2D);//申请纹理序号
 	}
-	glBindTexture(GL_TEXTURE_2D,texture);
+	glBindTexture(GL_TEXTURE_2D,tex2D);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,pixels);
 	this->width=width;
 	this->height=height;
 }
+bool Texture::hasTexture()const{return glIsTexture(tex2D);}
 void Texture::deleteTexture(){
-	//glIsTexture(texture);在驱动有问题的情况下返回值会有问题,这里的处理方法是直接删除
-	glDeleteTextures(1,&texture);
-	texture=0;
+	//glIsTexture(tex2D);在驱动有问题的情况下返回值会有问题,这里的处理方法是直接删除
+	glDeleteTextures(1,&tex2D);
+	tex2D=0;
 }
 //创建纹理(根据不同的类)
 void Texture::texImage2D(const FileBMP &fileBmp){
@@ -83,45 +89,14 @@ void Texture::texImage2D_FileName(const string &filename){
 	}
 }
 
-static Point2D<float> p2D_1_1=Point2D<float>(1,1);
-void Texture::draw(const Point2D<float> &p,TexCoord coord)const{
-	draw(p,sizeF()-p2D_1_1,coord);
-}
-void Texture::draw(const Point2D<float> &p,const Point2D<float> &size,TexCoord coord)const{
-	draw(Rectangle2D<float>(p,p+size),coord);
-}
-void Texture::draw(const Rectangle2D<float> &rect,TexCoord coord)const{
-	if(!glIsTexture(texture))return;
-	glBindTexture(GL_TEXTURE_2D,texture);
-	//顶点数组
-	rect2vertex(rect,vertex);
-	glVertexPointer(2,GL_FLOAT,0,vertex);
-	//纹理坐标数组
-#define TEXTURE_TEXCOORD(name) case TexCoord_##name:glTexCoordPointer(2,GL_FLOAT,0,texCoord_##name);break;
-	switch(coord){
-		TEXTURE_TEXCOORD(Default)
-		TEXTURE_TEXCOORD(LeftHalf)
-		TEXTURE_TEXCOORD(RightHalf)
-		TEXTURE_TEXCOORD(UpHalf)
-		TEXTURE_TEXCOORD(DownHalf)
-#undef TEXTURE_TEXCOORD
-		default:;
-	}
-	//绘制
-	glDrawArrays(GL_TRIANGLE_FAN,0,4);
-}
+static Point2D<numType> p2D_1_1=Point2D<numType>(1,1);
+
+void Texture::drawRectangle_TexCoord(const Point2D<numType> &downLeft,const Point2D<numType> &upRight,TexCoord coord)const{}
 
 int Texture::getWidth()const{return width;}
 int Texture::getHeight()const{return height;}
 Point2D<int> Texture::size()const{return Point2D<int>(width,height);}
-Point2D<float> Texture::sizeF()const{return Point2D<float>(width,height);}
-
-void Texture::rect2vertex(const Rectangle2D<float> &rect,float vertex[]){
-	vertex[0]=vertex[6]=rect.p0.x;
-	vertex[1]=vertex[3]=rect.p0.y;
-	vertex[2]=vertex[4]=rect.p1.x;
-	vertex[5]=vertex[7]=rect.p1.y;
-}
+Point2D<numType> Texture::sizeF()const{return Point2D<numType>(width,height);}
 
 Texture Texture::makeSolidTexture(int width, int height, const uint32 &u32){
 	Texture tex;

@@ -1,158 +1,138 @@
 #include"ShapeRenderer.h"
+#include"Number.h"
+
 #include"GL/gl.h"
 
-ShapeRenderer ShapeRenderer::shapeRenderer;
-ShapeRenderer::ShapeRenderer():edgeColor(nullptr),fillColor(nullptr),texture(0){}
+bool ShapeRenderer::fillMode=false;
+static ShapeRenderer::numType texCoord_Default[]  ={0.0,0.0, 1.0,0.0, 1.0,1.0, 0.0,1.0};
+
+ShapeRenderer::ShapeRenderer():tex2D(0){}
 ShapeRenderer::~ShapeRenderer(){}
-
-void ShapeRenderer::setColor(const ColorRGBA &color,bool useAlpha){
-	if(useAlpha)shapeRenderer.color=color;
-	else{
-		auto old=shapeRenderer.color.alpha;
-		shapeRenderer.color=color;
-		shapeRenderer.color.alpha=old;
+#include"PrintF.h"
+void ShapeRenderer::draw(uint mode,const numType vertex[],int d,int n)const{
+	glBindTexture(GL_TEXTURE_1D,0);
+	glBindTexture(GL_TEXTURE_2D,tex2D);
+	if(tex2D)glTexCoordPointer(2,GL_FLOAT,0,texCoord_Default);
+#ifdef __i386
+	switch(mode){
+		case GL_LINE_LOOP:{
+			glBegin(mode);
+			for(int i=0;i<n;++i){
+				switch(d){
+					case 2:glVertex2f(vertex[i*2],vertex[i*2+1]);break;
+					case 3:glVertex3f(vertex[i*3],vertex[i*3+1],vertex[i*3+2]);break;
+					case 4:glVertex4f(vertex[i*4],vertex[i*4+1],vertex[i*4+2],vertex[i*4+3]);break;
+				}
+			}
+			glEnd();
+			return;
+		}break;
 	}
-	glColor4ub(color.red,color.green,color.blue,
-		useAlpha ? color.alpha : shapeRenderer.color.alpha);
+#endif
+	glVertexPointer(d,GL_FLOAT,0,vertex);
+	glDrawArrays(mode,0,n);
 }
-void ShapeRenderer::drawRectangle(const Rectangle2D<numType> &rect,const ColorRGBA *border,const ColorRGBA *background){
-	shapeRenderer.edgeColor=border;
-	shapeRenderer.fillColor=background;
-	shapeRenderer.drawRectangle(rect);
+void ShapeRenderer::drawPoints(const numType vertex[],int d,int n)const{draw(GL_POINTS,vertex,d,n);}
+void ShapeRenderer::drawLines(const numType vertex[],int d,int n)const{draw(GL_LINES,vertex,d,n);}
+void ShapeRenderer::drawPolygen(const numType vertex[],int d,int n)const{
+	if(tex2D||fillMode){
+		draw(GL_TRIANGLE_FAN,vertex,d,n);
+	}else{
+		draw(GL_LINE_LOOP,vertex,d,n);
+	}
 }
 
+void ShapeRenderer::setColor(const ColorRGBA &color,uint8 alpha){glColor4ub(color.red,color.green,color.blue,alpha);}
+void ShapeRenderer::setColor(const ColorRGBA &color){glColor4ub(color.red,color.green,color.blue,color.alpha);}
 //画点
 void ShapeRenderer::drawPoint(numType x,numType y)const{
-	numType vertex[2];
-	vertex[0]=x;
-	vertex[1]=y;
-	drawPoints(vertex,1);
+	numType vtx[]={x,y};
+	drawPoints(vtx,1,2);
 }
-void ShapeRenderer::drawPoint(const Point2D<numType> &p)const{
-	drawPoints(&p.x,1);
+void ShapeRenderer::drawPoint(numType x,numType y,numType z)const{
+	numType vtx[]={x,y,z};
+	drawPoints(vtx,1,3);
 }
-void ShapeRenderer::drawPoints(const numType vertex[],int n)const{
-	if(edgeColor){
-		glBindTexture(GL_TEXTURE_2D,0);
-		setColor(*edgeColor,true);
-		glVertexPointer(2,GL_FLOAT,0,vertex);
-		glDrawArrays(GL_POINTS,0,n);
-	}
+void ShapeRenderer::drawPoint(const Pt2 &p)const{
+	numType vtx[]={p.x,p.y};
+	drawPoints(vtx,1,2);
+}
+void ShapeRenderer::drawPoint(const Pt3 &p)const{
+	numType vtx[]={p.x,p.y,p.z};
+	drawPoints(vtx,1,3);
 }
 
 //画线
 #define SHAPERENDERER_DRAWLINE(x0,y0,x1,y1) \
-numType vertex[4];\
-vertex[0]=x0;\
-vertex[1]=y0;\
-vertex[2]=x1;\
-vertex[3]=y1;\
-drawLines(vertex,1);
+numType vertex[]={x0,y0,x1,y1};\
+drawLines(vertex,2,2);
 
-void ShapeRenderer::drawLine(numType x0,numType y0,numType x1,numType y1)const{
+void ShapeRenderer::drawLine2D(numType x0,numType y0,numType x1,numType y1)const{
 	SHAPERENDERER_DRAWLINE(x0,y0,x1,y1)
 }
-void ShapeRenderer::drawLine(const Point2D<numType> p0,const Point2D<numType> p1)const{
+void ShapeRenderer::drawLine2D(const Pt2 &p0,const Pt2 &p1)const{
 	SHAPERENDERER_DRAWLINE(p0.x,p0.y,p1.x,p1.y)
 }
-void ShapeRenderer::drawLine(const Line2D<numType> &line)const{
+void ShapeRenderer::drawLine2D(const Line2D<numType> &line)const{
 	SHAPERENDERER_DRAWLINE(line.p0.x,line.p0.y,line.p1.x,line.p1.y)
 }
+//3D直线
+#define SHAPERENDERER_DRAWLINE_3D(x0,y0,z0,x1,y1,z1) \
+numType vertex[]={x0,y0,z0,x1,y1,z1};\
+drawLines(vertex,3,2);
 
-void ShapeRenderer::drawLines(const numType vertex[],int n)const{
-	if(edgeColor){
-		glBindTexture(GL_TEXTURE_2D,0);
-		setColor(*edgeColor,false);
-		glVertexPointer(2,GL_FLOAT,0,vertex);
-		glDrawArrays(GL_LINES,0,n*2);
-	}
+void ShapeRenderer::drawLine3D(numType x0,numType y0,numType z0,numType x1,numType y1,numType z1)const{
+	SHAPERENDERER_DRAWLINE_3D(x0,y0,z0,x1,y1,z1)
+}
+void ShapeRenderer::drawLine3D(const Pt3 &p0,const Pt3 &p1)const{
+	SHAPERENDERER_DRAWLINE_3D(p0.x,p0.y,p0.z,p1.x,p1.y,p1.z)
+}
+void ShapeRenderer::drawLine3D(const Line3D<numType> &line)const{
+	SHAPERENDERER_DRAWLINE_3D(line.p0.x,line.p0.y,line.p0.z,line.p1.x,line.p1.y,line.p1.z)
 }
 
 //折线
-void ShapeRenderer::drawBrokenLine(const numType vertex[],int n)const{
-	if(edgeColor){
-		glBindTexture(GL_TEXTURE_2D,0);
-		setColor(*edgeColor,false);
-		glVertexPointer(2,GL_FLOAT,0,vertex);
-		glDrawArrays(GL_LINE_STRIP,0,n*2);
-	}
+void ShapeRenderer::drawBrokenLine2D(const numType vertex[],int n)const{draw(GL_LINE_STRIP,vertex,2,n);}
+void ShapeRenderer::drawBrokenLine3D(const numType vertex[],int n)const{draw(GL_LINE_STRIP,vertex,3,n);}
+
+//多边形
+void ShapeRenderer::drawPolygen2D(const numType vertex[],int n)const{drawPolygen(vertex,2,n);}
+void ShapeRenderer::drawPolygen2D(const Point2D<numType> vertex[],int n)const{drawPolygen2D((numType*)vertex,n);}
+void ShapeRenderer::drawPolygen3D(const numType vertex[],int n)const{drawPolygen(vertex,3,n);}
+void ShapeRenderer::drawPolygen3D(const Point3D<numType> vertex[],int n)const{drawPolygen3D((numType*)vertex,n);}
+
+void ShapeRenderer::drawCircle(const Circle<numType> &circle)const{
+	drawPolygen2D(circle.vertex,circle.segment);
 }
 
 //三角形
-#define SHAPERENDERER_DRAW_TRIANGLE(x0,y0,x1,y1,x2,y2) \
-numType vertex[6];\
-vertex[0]=x0;\
-vertex[1]=y0;\
-vertex[2]=x1;\
-vertex[3]=y1;\
-vertex[4]=x2;\
-vertex[5]=y2;\
-drawTriangle(vertex);
-
-void ShapeRenderer::drawTriangle(numType x0,numType y0,numType x1,numType y1,numType x2,numType y2)const{
-	SHAPERENDERER_DRAW_TRIANGLE(x0,y0,x1,y1,x2,y2)
-}
-void ShapeRenderer::drawTriangle(const Point2D<numType> p0,const Point2D<numType> p1,const Point2D<numType> p2)const{
-	SHAPERENDERER_DRAW_TRIANGLE(p0.x,p0.y,p1.x,p1.y,p2.x,p2.y)
-}
-void ShapeRenderer::drawTriangle(const Triangle2D<numType> &triangle)const{
-	SHAPERENDERER_DRAW_TRIANGLE(
-		triangle.p0.x,triangle.p0.y,
-		triangle.p1.x,triangle.p1.y,
-		triangle.p2.x,triangle.p2.y)
-}
-void ShapeRenderer::drawTriangle(const numType vertex[])const{
-	drawPolygen(vertex,3);
-}
+void ShapeRenderer::drawTriangle2D(const Triangle2D<numType> &triangle)const{drawPolygen2D((numType*)triangle.vertex,3);}
+void ShapeRenderer::drawTriangle3D(const Triangle3D<numType> &triangle)const{drawPolygen3D((numType*)triangle.vertex,3);}
 
 //画矩形
 #define SHAPERENDERER_DRAW_RECTANGLE(x0,y0,x1,y1)\
-numType vertex[8];\
-vertex[0]=vertex[6]=x0;\
-vertex[1]=vertex[3]=y0;\
-vertex[2]=vertex[4]=x1;\
-vertex[5]=vertex[7]=y1;\
-drawRectangle(vertex);
+numType vertex[]={x0,y0,x1,y0,x1,y1,x0,y1};\
+drawPolygen(vertex,2,4);
 
 void ShapeRenderer::drawRectangle(numType x0,numType y0,numType x1,numType y1)const{
 	SHAPERENDERER_DRAW_RECTANGLE(x0,y0,x1,y1)
 }
-void ShapeRenderer::drawRectangle(const Point2D<numType> &p0,const Point2D<numType> &p1)const{
+void ShapeRenderer::drawRectangle(const Pt2 &p0,const Pt2 &p1)const{
 	SHAPERENDERER_DRAW_RECTANGLE(p0.x,p0.y,p1.x,p1.y)
 }
 void ShapeRenderer::drawRectangle(const Rectangle2D<numType> &rect)const{
 	SHAPERENDERER_DRAW_RECTANGLE(rect.p0.x,rect.p0.y,rect.p1.x,rect.p1.y)
 }
-void ShapeRenderer::drawRectangle(const numType vertex[])const{
-	drawPolygen(vertex,4);
-}
-
-//多边形
-void ShapeRenderer::drawPolygen(const numType vertex[],int n)const{
-	glBindTexture(GL_TEXTURE_2D,texture);
-	glVertexPointer(2,GL_FLOAT,0,vertex);
-	if(fillColor){//绘制底色或纹理
-		setColor(*fillColor,false);
-#ifdef __i386
-		glBegin(GL_TRIANGLE_FAN);
-		for(int i=0;i<n;++i){
-			glVertex2f(vertex[i*2],vertex[i*2+1]);
-		}
-		glEnd();
-#else
-		glDrawArrays(GL_TRIANGLE_FAN,0,n);
-#endif
+//立方体
+void ShapeRenderer::drawCubeLines(const CubeF &cube)const{
+	CubeF::setCubeF(cube);
+	for(int i=0;i<cube.AmountOfLine;++i){
+		drawPolygen3D(cube.getLineVertexs(i),2);
 	}
-	if(edgeColor){//绘制边框线
-		setColor(*edgeColor,false);
-#ifdef __i386
-		glBegin(GL_LINE_LOOP);
-		for(int i=0;i<n;++i){
-			glVertex2f(vertex[i*2],vertex[i*2+1]);
-		}
-		glEnd();
-#else
-		glDrawArrays(GL_LINE_LOOP,0,n);
-#endif
+}
+void ShapeRenderer::drawCubePlanes(const CubeF &cube)const{
+	CubeF::setCubeF(cube);
+	for(int i=0;i<cube.AmountOfPlane;++i){
+		drawPolygen3D(cube.getPlaneVertexs(i),4);
 	}
 }

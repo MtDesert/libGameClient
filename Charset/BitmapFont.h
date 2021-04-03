@@ -45,5 +45,4 @@ public:
 	DataBlock lv1Chinese;//一级汉字
 	DataBlock lv2Chinese;//二级汉字
 };
-
 #endif

@@ -33,5 +33,4 @@ public:
 	//转换(静态方法)
 	static bool newString(const char *str,EnumCharset fromCharset,EnumCharset toCharset);
 };
-
 #endif

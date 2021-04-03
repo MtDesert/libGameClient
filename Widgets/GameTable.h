@@ -35,7 +35,7 @@ public:
 			for(x=0;x<colAmount;++x){
 				rct.p1.x = rct.p0.x + columnWidth(x);//调整渲染参数
 				//渲染边框
-				ShapeRenderer::drawRectangle(rct,&ColorRGBA::White,nullptr);
+				//ShapeRenderer::drawRectangle(rct,&ColorRGBA::White,nullptr);
 				rct.p0.x = rct.p1.x;//调整渲染参数
 			}
 		}

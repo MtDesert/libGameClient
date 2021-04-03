@@ -1,5 +1,4 @@
 #include"GameSprite.h"
-#include"ShapeRenderer.h"
 #include"Game.h"
 #include"Number.h"
 
@@ -101,17 +100,22 @@ void GameSprite::render()const{
 	glScalef(scale.x,scale.y,scale.z);
 #endif//__ANDROID__
 	//绘制纹理
+	glDisable(GL_DEPTH_TEST);//绘制2D图像要关闭深度绘制
 	auto rect=rectF();
 	if(bgColor){//绘制单色背景
-		ShapeRenderer::setColor(color);//主要传递透明度
-		ShapeRenderer::drawRectangle(rect,nullptr,bgColor);//画背景
+		Texture::setColor(*bgColor,color.alpha);
+		Texture::fillMode=true;
+		Texture::emptyTex.drawRectangle(rect);//画背景
 	}
-	//绘制纹理
-	ShapeRenderer::setColor(color);
-	texture.draw(rect);
+	if(texture.hasTexture()){//有纹理才绘制
+		Texture::setColor(color);
+		Texture::fillMode=false;
+		texture.drawRectangle(rect);
+	}
 	if(borderColor){//绘制边框
-		ShapeRenderer::setColor(color);//主要传递透明度
-		ShapeRenderer::drawRectangle(rect,borderColor,nullptr);//画边框
+		Texture::setColor(*borderColor,color.alpha);
+		Texture::fillMode=false;
+		Texture::emptyTex.drawRectangle(rect);//画边框
 	}
 	//其它绘制
 	renderX();//特殊绘制

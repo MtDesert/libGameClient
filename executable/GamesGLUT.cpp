@@ -1,20 +1,41 @@
 #include"Game.h"
 #include"PrintF.h"
+
+//Windows特性
+#ifdef __i386
+#include"WinAPI.h"
+#define WINAPI_CODE(code) code
+#else
+#define WINAPI_CODE(code)
+#endif
+
 #include<GL/glut.h>
 #include<stdio.h>
 #include<time.h>
 
-Game *game=nullptr;
+Game *game=nullptr;//游戏本体
 int window=0;//glut的window
 const Keyboard keyboard;//键盘对象
 static int fps=0;//帧每秒
-
+//时间片类型
 enum{
 	TimerCPU,
 	TimerFPS,
 	Timer_Amount
 };
 int timerInterval[Timer_Amount]={16,1000};//microsecond
+//检查OpenGL执行是否出错
+void checkGLerror(const char *name){
+	int error=glGetError();
+	if(error){
+		PRINT_ERROR("%s: 出错%d",name,error)
+	}else{
+		if(name)PRINT_OK(name)
+	}
+}
+#define CHECK_GL_ERROR(name,code)\
+code;\
+checkGLerror(#name);
 
 void glutTimerFunction(int timerID){
 	switch(timerID){
@@ -41,8 +62,8 @@ void glutIdleFunction(){
 		game->gameClient->addTimeSlice();
 	}
 	//处理界面控件
-	GameInputBox::inputing();
-	//glutPostRedisplay();//空闲时候,立刻通知刷新
+	//GameInputBox::inputing();
+	WINAPI_CODE(WinAPI::addTimeSlice();)
 }
 
 //input-keyboard
@@ -66,18 +87,14 @@ void specialFunction(int key,bool pressed){
 		case GLUT_KEY_DOWN:k=Keyboard::Key_Down;break;
 		case GLUT_KEY_LEFT:k=Keyboard::Key_Left;break;
 		case GLUT_KEY_RIGHT:k=Keyboard::Key_Right;break;
-		CASE(1)
-		CASE(2)
-		CASE(3)
-		CASE(4)
-		CASE(5)
-		CASE(6)
-		CASE(7)
-		CASE(8)
-		CASE(9)
-		CASE(10)
-		CASE(11)
-		CASE(12)
+		case GLUT_KEY_F1:{
+			k=Keyboard::Key_F1;
+			//启动编辑界面
+			if(!pressed){
+				WINAPI_CODE(WinAPI::showWindow_Game(game);)
+			}
+		}break;
+		CASE(2)CASE(3)CASE(4)CASE(5)CASE(6)CASE(7)CASE(8)CASE(9)CASE(10)CASE(11)CASE(12)
 		case GLUT_KEY_PAGE_UP:k=Keyboard::Key_PageUp;break;
 		case GLUT_KEY_PAGE_DOWN:k=Keyboard::Key_PageDown;break;
 		case GLUT_KEY_HOME:k=Keyboard::Key_Home;break;
@@ -154,6 +171,7 @@ void glutDisplayFunction(){
 	glClearColor(0,0,0,1);
 	game->render();
 	glFlush();
+	glutSwapBuffers();
 	++fps;
 }
 void glutOverlayDisplayFunction(){}
@@ -213,7 +231,10 @@ void printGlutDeviceGet(){
 
 #define GAMESGLUT_GLUTFUNC(name) glut##name##Func(glut##name##Function)
 
-static void whenExit(){delete game;}
+static void whenExit(){
+	WINAPI_CODE(WinAPI::deleteThis();)
+	delete game;
+}
 
 int main(int argc,char* argv[]){
 	//游戏参数初始化
@@ -221,7 +242,7 @@ int main(int argc,char* argv[]){
 	game->reset();
 	//glut初始化
 	glutInit(&argc,argv);
-	glutInitDisplayMode(GLUT_SINGLE|GLUT_RGBA|GLUT_DEPTH);
+	glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGBA|GLUT_DEPTH);
 	int width=640,height=480,resWidth=width,resHeight=height;
 	if(game->gameSettings){//有配置的时候,使用配置中的分辨率
 		auto sz=game->gameSettings->windowSize;
@@ -231,6 +252,7 @@ int main(int argc,char* argv[]){
 		if(sz.x>0)resWidth=sz.x;
 		if(sz.y>0)resHeight=sz.y;
 	}
+	int resZ=max(resWidth,resHeight);
 	glutInitWindowSize(width,height);
 	glutInitWindowPosition(100,100);
 	window=glutCreateWindow(game->gameName().data());
@@ -269,17 +291,21 @@ int main(int argc,char* argv[]){
 
 	//输出调试信息
 	printGlutGet();
-	//printGlutDeviceGet();
+	printGlutDeviceGet();
 	//OpenGL初始化
-	glScalef(2.0/resWidth,2.0/resHeight,1);//以原点为缩放源进行缩放,使得整个屏幕的坐标范围变成(-width/2,-height/2 ~ width/2,height/2)
-	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);//设置混合功能对透明度的处理
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	CHECK_GL_ERROR(缩放原点,glScalef(2.0/resWidth,2.0/resHeight,2.0/resZ))//以原点为缩放源进行缩放,使得整个屏幕的坐标范围变成(-width/2,-height/2 ~ width/2,height/2)
+	CHECK_GL_ERROR(启用1D纹理,glEnable(GL_TEXTURE_1D))
+	CHECK_GL_ERROR(启用2D纹理,glEnable(GL_TEXTURE_2D))
+	CHECK_GL_ERROR(启用混合,glEnable(GL_BLEND))
+	//CHECK_GL_ERROR(启用深度测试,glEnable(GL_DEPTH_TEST))
+	CHECK_GL_ERROR(设置混合函数,glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA))//设置混合功能对透明度的处理
+	CHECK_GL_ERROR(启用客户端状态-顶点数组,glEnableClientState(GL_VERTEX_ARRAY))
+	CHECK_GL_ERROR(启用客户端状态-纹理坐标数组,glEnableClientState(GL_TEXTURE_COORD_ARRAY))
+	//CHECK_GL_ERROR(启用客户端状态-法线数组,glEnableClientState(GL_NORMAL_ARRAY))
 	//开始事件循环
 	game->restart();
 	atexit(whenExit);
+	WINAPI_CODE(WinAPI::newThis();)
 	glutMainLoop();
 	//永远不会执行到这里,可以考虑用glutLeaveMainLoop(),但某些老版本可能没有此函数
 	//网上说有种方案是在调用glutMainLoop()前执行下面一行代码

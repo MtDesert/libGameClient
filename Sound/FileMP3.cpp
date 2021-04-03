@@ -92,7 +92,7 @@ SizeType FileMP3_AudioFrame::parseData(){
 			int bitRate=FileMP3_AudioFrame::bitRate(brIndex);
 			int sampleRate=FileMP3_AudioFrame::sampleRate(srIndex);
 			dataLength = Number::divideRound(144*bitRate*1000,sampleRate) + (padding?1:0);
-			printf("bit sample %u %u === %lu\n",bitRate,sampleRate,dataLength);
+			//printf("bit sample %u %u === %lu\n",bitRate,sampleRate,dataLength);
 		}
 	}else{
 		dataLength=0;
@@ -128,7 +128,7 @@ SizeType FileMP3::parseData(){
 	//头部
 	if(dataLength<MP3_TAG_LEN)return dataLength;
 	subDataBlock(0,MP3_TAG_LEN,fileMP3_ID3V2);
-	printf("tag len %u(%.8X)\n",fileMP3_ID3V2.tagSize(),fileMP3_ID3V2.tagSize());
+	//printf("tag len %u(%.8X)\n",fileMP3_ID3V2.tagSize(),fileMP3_ID3V2.tagSize());
 	//ID3V2的各个子帧数据
 	SizeType pos=MP3_TAG_LEN,len=MP3_TAG_LEN+fileMP3_ID3V2.tagSize();
 	FileMP3_ID3V2_Frame frame;
@@ -139,7 +139,7 @@ SizeType FileMP3::parseData(){
 		//debug
 		frame.getFrameType(frameType);
 		if(frameType==0)break;
-		printf("%.8X name=%s addr=%.8X len=%lu\n",frameType,frame.frameName().data(),(uint)(pos-frame.dataLength),frame.dataLength);
+		//printf("%.8X name=%s addr=%.8X len=%lu\n",frameType,frame.frameName().data(),(uint)(pos-frame.dataLength),frame.dataLength);
 	};
 	//音频数据
 	pos=len;
@@ -150,10 +150,10 @@ SizeType FileMP3::parseData(){
 		audioFrame.parseData();
 		//搜寻下一帧
 		if(audioFrame.dataLength){
-			printf("audio %.8X\n",(uint)pos);
+			//printf("audio %.8X\n",(uint)pos);
 			pos += audioFrame.dataLength;
 		}else{
-			printf("skip %.8X\n",(uint)pos);
+			//printf("skip %.8X\n",(uint)pos);
 			++pos;
 		}
 	}

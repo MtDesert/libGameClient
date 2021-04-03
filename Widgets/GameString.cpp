@@ -5,7 +5,6 @@
 //静态变量
 Charset GameString::charset;
 FontTextureCache GameString::fontTextureCache;
-static Point2D<float> point2D,size2D;
 
 GameString::GameString():charSize(16,32),renderCharAmount(0),byteAmount(0){}
 GameString::GameString(const string &str):GameString(){
@@ -65,8 +64,7 @@ void GameString::insertTexture(const Texture &tex,SizeType pos){
 }
 
 void GameString::renderString(uint from,uint amount,const Point2D<float> &pos2D)const{
-	point2D=pos2D;
-	size2D.setXY(0,charSize.y);
+	Point2D<float> downLeft=pos2D,size2D(0,charSize.y),topRight;
 	for(decltype(amount) i=0;i<amount;++i){
 		//获取文字纹理
 		auto attr=arrayCharAttr.data(from+i);
@@ -74,11 +72,13 @@ void GameString::renderString(uint from,uint amount,const Point2D<float> &pos2D)
 		//根据是否ASCII来进行渲染
 		if(attr->isAscii){
 			size2D.x=charSize.x;//确定宽度
-			attr->tex.draw(point2D,size2D,Texture::TexCoord_LeftHalf);//渲染
+			topRight=downLeft+size2D;
+			attr->tex.drawRectangle_TexCoord(downLeft,topRight,Texture::TexCoord_LeftHalf);//渲染
 		}else{
 			size2D.x=charSize.x*2;//确定宽度
-			attr->tex.draw(point2D,size2D);
+			topRight=downLeft+size2D;
+			attr->tex.ShapeRenderer::drawRectangle(downLeft,topRight);
 		}
-		point2D.x += size2D.x;//确定下一个字的绘制位置
+		downLeft.x += size2D.x;//确定下一个字的绘制位置
 	}
 }

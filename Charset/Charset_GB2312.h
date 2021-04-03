@@ -28,5 +28,4 @@ public:
 	static bool charIndex_lv1Chinese(uint16 character,uint16 &index);
 	static bool charIndex_lv2Chinese(uint16 character,uint16 &index);
 };
-
 #endif
