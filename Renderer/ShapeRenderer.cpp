@@ -4,15 +4,26 @@
 #include"GL/gl.h"
 
 bool ShapeRenderer::fillMode=false;
-static ShapeRenderer::numType texCoord_Default[]  ={0.0,0.0, 1.0,0.0, 1.0,1.0, 0.0,1.0};
+typedef ShapeRenderer::numType numType;
+//常用纹理坐标,请参考ShapeRenderer::TexCoord
+static numType allTexCoords[5][8]={
+	{0.0,0.0, 1.0,0.0, 1.0,1.0, 0.0,1.0},
+	{0.0,0.0, 0.5,0.0, 0.5,1.0, 0.0,1.0},
+	{0.5,0.0, 1.0,0.0, 1.0,1.0, 0.5,1.0},
+	{0.0,0.0, 1.0,0.0, 1.0,0.5, 0.0,0.5},
+	{0.0,0.5, 1.0,0.5, 1.0,1.0, 0.0,1.0},
+};
 
 ShapeRenderer::ShapeRenderer():tex2D(0){}
 ShapeRenderer::~ShapeRenderer(){}
-#include"PrintF.h"
-void ShapeRenderer::draw(uint mode,const numType vertex[],int d,int n)const{
+
+void ShapeRenderer::draw(uint mode, const numType vertex[],int d,int n,TexCoord texCoord)const{
 	glBindTexture(GL_TEXTURE_1D,0);
 	glBindTexture(GL_TEXTURE_2D,tex2D);
-	if(tex2D)glTexCoordPointer(2,GL_FLOAT,0,texCoord_Default);
+	//确定纹理坐标
+	if(tex2D){
+		glTexCoordPointer(2,GL_FLOAT,0,allTexCoords[texCoord]);
+	}
 #ifdef __i386
 	switch(mode){
 		case GL_LINE_LOOP:{
@@ -34,12 +45,8 @@ void ShapeRenderer::draw(uint mode,const numType vertex[],int d,int n)const{
 }
 void ShapeRenderer::drawPoints(const numType vertex[],int d,int n)const{draw(GL_POINTS,vertex,d,n);}
 void ShapeRenderer::drawLines(const numType vertex[],int d,int n)const{draw(GL_LINES,vertex,d,n);}
-void ShapeRenderer::drawPolygen(const numType vertex[],int d,int n)const{
-	if(tex2D||fillMode){
-		draw(GL_TRIANGLE_FAN,vertex,d,n);
-	}else{
-		draw(GL_LINE_LOOP,vertex,d,n);
-	}
+void ShapeRenderer::drawPolygen(const numType vertex[], int d, int n,TexCoord texCoord)const{
+	draw((tex2D||fillMode) ? GL_TRIANGLE_FAN : GL_LINE_LOOP,vertex,d,n,texCoord);
 }
 
 void ShapeRenderer::setColor(const ColorRGBA &color,uint8 alpha){glColor4ub(color.red,color.green,color.blue,alpha);}
@@ -112,15 +119,15 @@ void ShapeRenderer::drawTriangle3D(const Triangle3D<numType> &triangle)const{dra
 //画矩形
 #define SHAPERENDERER_DRAW_RECTANGLE(x0,y0,x1,y1)\
 numType vertex[]={x0,y0,x1,y0,x1,y1,x0,y1};\
-drawPolygen(vertex,2,4);
+drawPolygen(vertex,2,4,texCoord);
 
-void ShapeRenderer::drawRectangle(numType x0,numType y0,numType x1,numType y1)const{
+void ShapeRenderer::drawRectangle(numType x0,numType y0,numType x1,numType y1,TexCoord texCoord)const{
 	SHAPERENDERER_DRAW_RECTANGLE(x0,y0,x1,y1)
 }
-void ShapeRenderer::drawRectangle(const Pt2 &p0,const Pt2 &p1)const{
+void ShapeRenderer::drawRectangle(const Pt2 &p0,const Pt2 &p1,TexCoord texCoord)const{
 	SHAPERENDERER_DRAW_RECTANGLE(p0.x,p0.y,p1.x,p1.y)
 }
-void ShapeRenderer::drawRectangle(const Rectangle2D<numType> &rect)const{
+void ShapeRenderer::drawRectangle(const Rectangle2D<numType> &rect,TexCoord texCoord)const{
 	SHAPERENDERER_DRAW_RECTANGLE(rect.p0.x,rect.p0.y,rect.p1.x,rect.p1.y)
 }
 //立方体

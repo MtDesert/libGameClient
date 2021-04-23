@@ -73,11 +73,11 @@ void GameString::renderString(uint from,uint amount,const Point2D<float> &pos2D)
 		if(attr->isAscii){
 			size2D.x=charSize.x;//确定宽度
 			topRight=downLeft+size2D;
-			attr->tex.drawRectangle_TexCoord(downLeft,topRight,Texture::TexCoord_LeftHalf);//渲染
+			attr->tex.drawRectangle(downLeft,topRight,Texture::TexCoord_LeftHalf);//渲染
 		}else{
 			size2D.x=charSize.x*2;//确定宽度
 			topRight=downLeft+size2D;
-			attr->tex.ShapeRenderer::drawRectangle(downLeft,topRight);
+			attr->tex.drawRectangle(downLeft,topRight);
 		}
 		downLeft.x += size2D.x;//确定下一个字的绘制位置
 	}

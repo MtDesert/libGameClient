@@ -1,5 +1,4 @@
 #include"GameObject.h"
-#include<stdio.h>
 
 GameObject::GameObject():parentObject(nullptr),forceIntercept(false){}
 GameObject::~GameObject(){clearSubObjects();}

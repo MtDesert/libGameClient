@@ -18,13 +18,21 @@ public:
 	typedef float numType;
 	typedef Point2D<numType> Pt2;
 	typedef Point3D<numType> Pt3;
+	//枚举
+	enum TexCoord{
+		TexCoord_Default,
+		TexCoord_LeftHalf,
+		TexCoord_RightHalf,
+		TexCoord_DownHalf,
+		TexCoord_UpHalf,
+	};
 private:
 	//各种绘图函数,mode为图形类别,表示画的是什么
 	//vertex顶点数据,d维度,n数量
-	void draw(uint mode,const numType vertex[],int d,int n)const;
+	void draw(uint mode,const numType vertex[],int d,int n,TexCoord texCoord=TexCoord_Default)const;
 	void drawPoints(const numType vertex[],int d,int n)const;//点
 	void drawLines(const numType vertex[],int d,int n)const;//线
-	void drawPolygen(const numType vertex[],int n,int d)const;//多边形
+	void drawPolygen(const numType vertex[],int n,int d,TexCoord texCoord=TexCoord_Default)const;//多边形
 protected:
 	uint tex2D;//2维纹理,渲染用
 public:
@@ -59,9 +67,9 @@ public:
 	void drawPolygen2D(const numType vertex[],int n)const;/*多边形*/
 	void drawPolygen2D(const Point2D<numType> vertex[],int n)const;/*多边形*/
 	void drawTriangle2D(const Triangle2D<numType> &triangle)const;/*三角形*/
-	void drawRectangle(numType x0,numType y0,numType x1,numType y1)const;/*矩形*/
-	void drawRectangle(const Pt2 &p0,const Pt2 &p1)const;/*矩形*/
-	void drawRectangle(const Rectangle2D<numType> &rect)const;/*矩形*/
+	void drawRectangle(numType x0,numType y0,numType x1,numType y1,TexCoord texCoord=TexCoord_Default)const;/*矩形*/
+	void drawRectangle(const Pt2 &p0,const Pt2 &p1,TexCoord texCoord=TexCoord_Default)const;/*矩形*/
+	void drawRectangle(const Rectangle2D<numType> &rect,TexCoord texCoord=TexCoord_Default)const;/*矩形*/
 	void drawCircle(const Circle<numType> &circle)const;/*圆*/
 
 	//3D多边形

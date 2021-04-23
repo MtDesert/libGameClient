@@ -33,17 +33,6 @@ public:
 	void texImage2D_FilePNG(const string &filename,WhenErrorString whenError=nullptr);
 	void texImage2D_FileName(const string &filename);
 
-	//局部绘制枚举
-	enum TexCoord{
-		TexCoord_Default,//默认绘制整个纹理
-		TexCoord_LeftHalf,//左半部分(可用于绘制ASCII字母)
-		TexCoord_RightHalf,//右半部分
-		TexCoord_UpHalf,//上半部分
-		TexCoord_DownHalf//下半部分
-	};
-	//平面绘制(从p开始绘制,绘制大小为size,若没指定size则以本身的宽和高来作为默认size)
-	void drawRectangle_TexCoord(const Point2D<numType> &downLeft,const Point2D<numType> &upRight,TexCoord coord)const;
-
 	//纹理的几何尺寸
 	int getWidth()const;//宽
 	int getHeight()const;//高

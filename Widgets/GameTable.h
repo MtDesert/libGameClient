@@ -3,7 +3,6 @@
 
 #include"GameMenu.h"
 #include"GameString.h"
-#include"ShapeRenderer.h"
 
 /*游戏中常用的表,表的作用是用来给玩家查询一些数据
 本类只负责简单画上表格线,以及一些文字数据,不负责存储数据
@@ -35,7 +34,7 @@ public:
 			for(x=0;x<colAmount;++x){
 				rct.p1.x = rct.p0.x + columnWidth(x);//调整渲染参数
 				//渲染边框
-				//ShapeRenderer::drawRectangle(rct,&ColorRGBA::White,nullptr);
+				Texture::emptyTex.drawRectangle(rct);
 				rct.p0.x = rct.p1.x;//调整渲染参数
 			}
 		}

@@ -9,13 +9,6 @@ Texture Texture::emptyTex;
 
 typedef Texture::numType numType;
 
-/*static numType vertex[]={0,0,0,0,0,0,0,0};
-static numType texCoord_Default[]  ={0.0,0.0, 1.0,0.0, 1.0,1.0, 0.0,1.0};
-static numType texCoord_LeftHalf[] ={0.0,0.0, 0.5,0.0, 0.5,1.0, 0.0,1.0};
-static numType texCoord_RightHalf[]={0.5,0.0, 1.0,0.0, 1.0,1.0, 0.5,1.0};
-static numType texCoord_UpHalf[]   ={0.0,0.5, 1.0,0.5, 1.0,1.0, 0.0,1.0};
-static numType texCoord_DownHalf[] ={0.0,0.0, 1.0,0.0, 1.0,0.5, 0.0,0.5};
-*/
 Texture::Texture():width(0),height(0){}
 Texture::~Texture(){}
 FontTexture::FontTexture():charCode(0){}
@@ -90,8 +83,6 @@ void Texture::texImage2D_FileName(const string &filename){
 }
 
 static Point2D<numType> p2D_1_1=Point2D<numType>(1,1);
-
-void Texture::drawRectangle_TexCoord(const Point2D<numType> &downLeft,const Point2D<numType> &upRight,TexCoord coord)const{}
 
 int Texture::getWidth()const{return width;}
 int Texture::getHeight()const{return height;}
